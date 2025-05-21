@@ -34,31 +34,70 @@ namespace Sistema_Tea.Controllers
 
             if (rol == "Administrador")
             {
-                // Total de Psicólogos
-                ViewBag.TotalPsicologos = _context.Usuario
+                var now = DateTime.Now;
+                var inicioMesActual = new DateTime(now.Year, now.Month, 1);
+                var inicioMesAnterior = inicioMesActual.AddMonths(-1);
+                var finMesAnterior = inicioMesActual.AddDays(-1);
+
+                // ==== Psicólogos ====
+                var psicologosMesActual = _context.Usuario
                     .Include(u => u.Rol)
-                    .Count(u => u.Rol.NombreRol == "Psicólogo");
+                    .Where(u => u.Rol.NombreRol == "Psicologo" && u.FechaCreacion >= inicioMesActual)
+                    .Count();
 
-                // Total de Pacientes
-                ViewBag.TotalPacientes = _context.Paciente.Count();
+                var psicologosMesAnterior = _context.Usuario
+                    .Include(u => u.Rol)
+                    .Where(u => u.Rol.NombreRol == "Psicologo" &&
+                                u.FechaCreacion >= inicioMesAnterior && u.FechaCreacion <= finMesAnterior)
+                    .Count();
 
-                // Total de Citas (sesiones de cualquier prueba)
-                int totalSesiones =
-                    _context.ADOS2_Sesion.Count() +
-                    _context.ADIR_Sesion.Count() +
-                    _context.CARS2_Sesion.Count();
-                ViewBag.TotalSesiones = totalSesiones;
+                ViewBag.TotalPsicologos = psicologosMesActual;
+                ViewBag.CambioPsicologos = CalcularCambioPorcentual(psicologosMesAnterior, psicologosMesActual);
 
-                // Total de Citas Pendientes
-                int sesionesPendientes =
-                    _context.ADOS2_Sesion.Count(s => s.Estado == "Pendiente") +
-                    _context.ADIR_Sesion.Count(s => s.Estado == "Pendiente") +
-                    _context.CARS2_Sesion.Count(s => s.Estado == "Pendiente");
+                // ==== Pacientes ====
+                var pacientesMesActual = _context.Paciente
+                    .Where(p => p.FechaRegistro >= inicioMesActual)
+                    .Count();
+
+                var pacientesMesAnterior = _context.Paciente
+                    .Where(p => p.FechaRegistro >= inicioMesAnterior && p.FechaRegistro <= finMesAnterior)
+                    .Count();
+
+                ViewBag.TotalPacientes = pacientesMesActual;
+                ViewBag.CambioPacientes = CalcularCambioPorcentual(pacientesMesAnterior, pacientesMesActual);
+
+                // ==== Sesiones ====
+                int sesionesActual = _context.ADOS2_Sesion.Count(s => s.FechaInicio >= inicioMesActual)
+                                   + _context.ADIR_Sesion.Count(s => s.FechaInicio >= inicioMesActual)
+                                   + _context.CARS2_Sesion.Count(s => s.FechaInicio >= inicioMesActual);
+
+                int sesionesAnterior = _context.ADOS2_Sesion.Count(s => s.FechaInicio >= inicioMesAnterior && s.FechaInicio <= finMesAnterior)
+                                     + _context.ADIR_Sesion.Count(s => s.FechaInicio >= inicioMesAnterior && s.FechaInicio <= finMesAnterior)
+                                     + _context.CARS2_Sesion.Count(s => s.FechaInicio >= inicioMesAnterior && s.FechaInicio <= finMesAnterior);
+
+                ViewBag.TotalSesiones = sesionesActual;
+                ViewBag.CambioSesiones = CalcularCambioPorcentual(sesionesAnterior, sesionesActual);
+
+                // ==== Sesiones Pendientes ====
+                int sesionesPendientes = _context.ADOS2_Sesion.Count(s => s.Estado == "Pendiente")
+                                       + _context.ADIR_Sesion.Count(s => s.Estado == "Pendiente")
+                                       + _context.CARS2_Sesion.Count(s => s.Estado == "Pendiente");
+
                 ViewBag.SesionesPendientes = sesionesPendientes;
             }
 
             return View();
         }
+
+        private string CalcularCambioPorcentual(int anterior, int actual)
+        {
+            if (anterior == 0)
+                return actual > 0 ? "+100%" : "0%";
+
+            var cambio = ((double)(actual - anterior) / anterior) * 100;
+            return (cambio >= 0 ? "+" : "") + Math.Round(cambio, 1) + "%";
+        }
+
 
 
 
