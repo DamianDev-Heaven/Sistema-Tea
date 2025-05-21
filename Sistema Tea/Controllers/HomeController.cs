@@ -21,6 +21,17 @@ namespace Sistema_Tea.Controllers
         {
             return View();
         }
+
+        // === Función para obtener el rango de fechas del mes actual y el mes anterior :D, asi es un poco de canchereo ====
+        private (DateTime InicioMesActual, DateTime InicioMesAnterior, DateTime FinMesAnterior) GetDateRanges()
+        {
+            var now = DateTime.Now;
+            var inicioMesActual = new DateTime(now.Year, now.Month, 1);
+            var inicioMesAnterior = inicioMesActual.AddMonths(-1);
+            var finMesAnterior = inicioMesActual.AddDays(-1);
+            return (inicioMesActual, inicioMesAnterior, finMesAnterior);
+        }
+
         public IActionResult Dashboard()
         {
             var nombre = HttpContext.Session.GetString("Nombre");
@@ -34,10 +45,7 @@ namespace Sistema_Tea.Controllers
 
             if (rol == "Administrador")
             {
-                var now = DateTime.Now;
-                var inicioMesActual = new DateTime(now.Year, now.Month, 1);
-                var inicioMesAnterior = inicioMesActual.AddMonths(-1);
-                var finMesAnterior = inicioMesActual.AddDays(-1);
+                var (inicioMesActual, inicioMesAnterior, finMesAnterior) = GetDateRanges();
 
                 // ==== Psicólogos ====
                 var psicologosMesActual = _context.Usuario
@@ -104,7 +112,6 @@ namespace Sistema_Tea.Controllers
             return View("Admin/Dashboard");
         }
 
-
         public IActionResult ListarPsicologos()
         {
             var psicologos = _context.Usuario
@@ -115,7 +122,6 @@ namespace Sistema_Tea.Controllers
             return View("Admin/ListarPsicologos", psicologos);
         }
 
-
         private string CalcularCambioPorcentual(int anterior, int actual)
         {
             if (anterior == 0)
@@ -124,9 +130,6 @@ namespace Sistema_Tea.Controllers
             var cambio = ((double)(actual - anterior) / anterior) * 100;
             return (cambio >= 0 ? "+" : "") + Math.Round(cambio, 1) + "%";
         }
-
-
-
 
         public IActionResult Privacy()
         {
