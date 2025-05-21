@@ -31,6 +31,8 @@ namespace Sistema_Tea.Models.Data
         public DbSet<CARS2_QPC_Respuesta> CARS2_QPC_Respuesta { get; set; }
 
         public DbSet<Auditoria> Auditoria { get; set; }
+        public DbSet<AsignacionPaciente> AsignacionPaciente { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -86,7 +86,8 @@ namespace Sistema_Tea.Controllers
                 ViewBag.SesionesPendientes = sesionesPendientes;
             }
 
-            return View();
+            return View("Admin/Dashboard");
+
         }
 
         private string CalcularCambioPorcentual(int anterior, int actual)
