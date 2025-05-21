@@ -1,46 +1,98 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var nombre = Context.Session.GetString("Nombre") ?? "Admin";
+    var rol = Context.Session.GetString("Rol");
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Sistema_Tea</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - eMind</title>
+
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Sistema_Tea.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-light">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Sistema_Tea</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <a class="navbar-brand d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-hospital me-2"></i> eMind
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between align-items-center">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                     </ul>
+
+                    <div class="navbar-profile">
+                        <!-- "fotos de perfil" (se toma la primera inicial noma) -->
+                        <div class="profile-icon" title="Perfil">@nombre.Substring(0, 1).ToUpper()</div>
+                        <span>Welcome, <strong>@nombre</strong></span>
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - Sistema_Tea - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            
+            <div class="list-group list-group-flush">
+                <a asp-controller="Home" asp-action="Dashboard" class="list-group-item list-group-item-action">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+
+                @if (rol == "Administrador")
+                {
+                    <a asp-controller="Psicologo" asp-action="Index" class="list-group-item list-group-item-action">
+                        <i class="bi bi-people-fill"></i> Psicólogos
+                    </a>
+                    <a asp-controller="Reporte" asp-action="Index" class="list-group-item list-group-item-action">
+                        <i class="bi bi-file-earmark-bar-graph-fill"></i> Reportes
+                    </a>
+                    <a asp-controller="Configuracion" asp-action="Index" class="list-group-item list-group-item-action">
+                        <i class="bi bi-gear-fill"></i> Configuraciones
+                    </a>
+                }
+                else if (rol == "Psicologo")
+                {
+                    <a asp-controller="Paciente" asp-action="Index" class="list-group-item list-group-item-action">
+                        <i class="bi bi-person-lines-fill"></i> Mis Pacientes
+                    </a>
+                    <a asp-controller="Sesion" asp-action="Index" class="list-group-item list-group-item-action">
+                        <i class="bi bi-calendar-check-fill"></i> Sesiones
+                    </a>
+                    <a asp-controller="Consentimiento" asp-action="Index" class="list-group-item list-group-item-action">
+                        <i class="bi bi-file-text-fill"></i> Consentimientos
+                    </a>
+                }
+
+                <a asp-controller="Cuenta" asp-action="Logout" class="list-group-item list-group-item-action text-danger">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                </a>
+            </div>
         </div>
-    </footer>
+        <div class="container-fluid p-4">
+            @RenderBody()
+        </div>
+    </div>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
