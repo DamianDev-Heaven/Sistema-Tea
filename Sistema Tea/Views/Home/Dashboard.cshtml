@@ -2,45 +2,48 @@
     ViewData["Title"] = "Dashboard";
 }
 
+<!--para contenido usar este, para cosas como en la navbar o sidebar usar poppins -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
 <h2>Bienvenido, @ViewBag.NombreUsuario (@ViewBag.RolUsuario)</h2>
 
 @if (ViewBag.RolUsuario == "Administrador")
 {
-    <div class="row mt-4">
-        <div class="col-md-3">
-            <div class="card bg-light border-primary">
-                <div class="card-body">
-                    <h5 class="card-title">Total Psychologists</h5>
-                    <p class="card-text display-6">@ViewBag.TotalPsicologos</p>
-                    <small class="text-success">+10% from last month</small>
-                </div>
+    <div class="dashboard-row">
+        <div class="dashboard-card">
+            <div class="card-title">
+                <i class="bi bi-person-badge-fill"></i> Total de psicologos
+            </div>
+            <div class="card-text">@ViewBag.TotalPsicologos</div>
+            <div class="card-small-text">
+                <i class="bi bi-arrow-up-circle-fill"></i> @ViewBag.CambioPsicologos durante el ultimo mes
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-light border-success">
-                <div class="card-body">
-                    <h5 class="card-title">Total Patients</h5>
-                    <p class="card-text display-6">@ViewBag.TotalPacientes</p>
-                    <small class="text-success">+15% from last month</small>
-                </div>
+        <div class="dashboard-card">
+            <div class="card-title">
+                <i class="bi bi-people-fill"></i> Total de pacientes
+            </div>
+            <div class="card-text">@ViewBag.TotalPacientes</div>
+            <div class="card-small-text">
+                <i class="bi bi-arrow-up-circle-fill"></i> @ViewBag.CambioPacientes durante el ultimo mes
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-light border-info">
-                <div class="card-body">
-                    <h5 class="card-title">Total Appointments</h5>
-                    <p class="card-text display-6">@ViewBag.TotalSesiones</p>
-                    <small class="text-success">+8% from last month</small>
-                </div>
+        <div class="dashboard-card">
+            <div class="card-title">
+                <i class="bi bi-calendar-check-fill"></i> Total de sesiones
+            </div>
+            <div class="card-text">@ViewBag.TotalSesiones</div>
+            <div class="card-small-text">
+                <i class="bi bi-arrow-up-circle-fill"></i> @ViewBag.CambioSesiones durante el ultimo mes
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-light border-warning">
-                <div class="card-body">
-                    <h5 class="card-title">Scheduled Appointments</h5>
-                    <p class="card-text display-6">@ViewBag.SesionesPendientes</p>
-                </div>
+        <div class="dashboard-card">
+            <div class="card-title">
+                <i class="bi bi-clock-history"></i> Sesiones pendientes
             </div>
+            <div class="card-text">@ViewBag.SesionesPendientes</div>
         </div>
     </div>
 }
