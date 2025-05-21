@@ -1,0 +1,34 @@
+﻿@model List<Sistema_Tea.Models.Usuario>
+@{
+    ViewData["Title"] = "Lista de Psicólogos";
+}
+
+<h2>Psicólogos Registrados</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Fecha de Registro</th>
+            <th>Activo</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var psicologo in Model)
+        {
+            <tr>
+                <td>@psicologo.NombreCompleto</td>
+                <td>@psicologo.Email</td>
+                <td>@psicologo.FechaCreacion.ToString("dd/MM/yyyy")</td>
+                <td>@(psicologo.Activo ? "Sí" : "No")</td>
+                <td>
+                    <a asp-action="EditarPsicologo" asp-route-id="@psicologo.UsuarioID" class="btn btn-sm btn-primary">
+                        <i class="bi bi-pencil-square"></i> Editar
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

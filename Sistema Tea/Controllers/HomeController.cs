@@ -66,6 +66,21 @@ namespace Sistema_Tea.Controllers
                 ViewBag.TotalPacientes = pacientesMesActual;
                 ViewBag.CambioPacientes = CalcularCambioPorcentual(pacientesMesAnterior, pacientesMesActual);
 
+                // ==== Coordinadores Clínicos ====
+                var coordinadoresMesActual = _context.Usuario
+                    .Include(u => u.Rol)
+                    .Where(u => u.Rol.NombreRol == "Coordinador" && u.FechaCreacion >= inicioMesActual)
+                    .Count();
+
+                var coordinadoresMesAnterior = _context.Usuario
+                    .Include(u => u.Rol)
+                    .Where(u => u.Rol.NombreRol == "Coordinador" &&
+                                u.FechaCreacion >= inicioMesAnterior && u.FechaCreacion <= finMesAnterior)
+                    .Count();
+
+                ViewBag.TotalCoordinadores = coordinadoresMesActual;
+                ViewBag.CambioCoordinadores = CalcularCambioPorcentual(coordinadoresMesAnterior, coordinadoresMesActual);
+
                 // ==== Sesiones ====
                 int sesionesActual = _context.ADOS2_Sesion.Count(s => s.FechaInicio >= inicioMesActual)
                                    + _context.ADIR_Sesion.Count(s => s.FechaInicio >= inicioMesActual)
@@ -87,8 +102,19 @@ namespace Sistema_Tea.Controllers
             }
 
             return View("Admin/Dashboard");
-
         }
+
+
+        public IActionResult ListarPsicologos()
+        {
+            var psicologos = _context.Usuario
+                .Include(u => u.Rol)
+                .Where(u => u.Rol.NombreRol == "Psicologo")
+                .ToList();
+
+            return View("Admin/ListarPsicologos", psicologos);
+        }
+
 
         private string CalcularCambioPorcentual(int anterior, int actual)
         {
