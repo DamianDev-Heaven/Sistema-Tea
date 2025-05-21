@@ -2,10 +2,49 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<h2>Bienvenido, @ViewBag.NombreUsuario</h2>
+<h2>Bienvenido, @ViewBag.NombreUsuario (@ViewBag.RolUsuario)</h2>
 
-<p>Este es tu panel principal.</p>
-
-<form asp-controller="Cuenta" asp-action="Logout" method="post" style="margin-top: 20px;">
-    <button type="submit" class="btn btn-danger">Cerrar sesión</button>
-</form>
+@if (ViewBag.RolUsuario == "Administrador")
+{
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card bg-light border-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Total Psychologists</h5>
+                    <p class="card-text display-6">@ViewBag.TotalPsicologos</p>
+                    <small class="text-success">+10% from last month</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-light border-success">
+                <div class="card-body">
+                    <h5 class="card-title">Total Patients</h5>
+                    <p class="card-text display-6">@ViewBag.TotalPacientes</p>
+                    <small class="text-success">+15% from last month</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-light border-info">
+                <div class="card-body">
+                    <h5 class="card-title">Total Appointments</h5>
+                    <p class="card-text display-6">@ViewBag.TotalSesiones</p>
+                    <small class="text-success">+8% from last month</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-light border-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Scheduled Appointments</h5>
+                    <p class="card-text display-6">@ViewBag.SesionesPendientes</p>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <p>Este es tu panel principal.</p>
+}
