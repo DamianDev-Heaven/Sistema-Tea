@@ -18,9 +18,11 @@ public class Paciente
 
     public string DiagnosticoPrevio { get; set; }
 
-    public int? PsicologoAsignadoID { get; set; }
+    public int? TutorID { get; set; }
 
     public DateTime FechaRegistro { get; set; } = DateTime.Now;
 
-    public Usuario PsicologoAsignado { get; set; }
+    public Tutor Tutor { get; set; }
+    public ICollection<AsignacionPaciente> Asignaciones { get; set; }
+
 }
