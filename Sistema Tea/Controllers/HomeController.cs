@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Sistema_Tea.Filters;
 using Sistema_Tea.Models;
@@ -130,6 +131,90 @@ namespace Sistema_Tea.Controllers
             var cambio = ((double)(actual - anterior) / anterior) * 100;
             return (cambio >= 0 ? "+" : "") + Math.Round(cambio, 1) + "%";
         }
+
+        public IActionResult CrearPsicologo()
+        {
+            var roles = _context.Rol.ToList();
+            var rolPsicologo = roles.FirstOrDefault(r => r.NombreRol == "Psicologo");
+
+            if (rolPsicologo == null)
+            {
+                TempData["ErrorMessage"] = "No se encontró el rol Psicólogo en la base de datos.";
+                return RedirectToAction("Dashboard");
+            }
+
+            ViewBag.Roles = new SelectList(roles, "RolID", "NombreRol", rolPsicologo.RolID);
+
+            var nuevoPsicologo = new Usuario
+            {
+                RolID = rolPsicologo.RolID
+            };
+
+            return View("Admin/CrearPsicologo", nuevoPsicologo);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CrearPsicologo(Usuario model)
+        {
+            var rolPsicologo = await _context.Rol.FirstOrDefaultAsync(r => r.NombreRol == "Psicologo");
+            if (rolPsicologo == null)
+            {
+                ModelState.AddModelError("", "No se encontró el rol Psicólogo.");
+                return View("Admin/CrearPsicologo", model);
+            }
+
+            model.RolID = rolPsicologo.RolID;
+            ModelState.Remove("RolID");
+
+            
+            if (await _context.Usuario.AnyAsync(u => u.Email == model.Email))
+            {
+                ModelState.AddModelError("Email", "El correo electrónico ya está registrado.");
+                var roles = await _context.Rol.ToListAsync();
+                ViewBag.Roles = new SelectList(roles, "RolID", "NombreRol", model.RolID);
+                return View("Admin/CrearPsicologo", model);
+            }
+
+            model.FechaCreacion = DateTime.Now;
+            model.Activo = true;
+            model.ContrasenaHash = HashPassword(model.ContrasenaHash);
+
+            _context.Usuario.Add(model);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Psicólogo creado correctamente.";
+            return RedirectToAction("ListarPsicologos");
+        }
+
+        private string HashPassword(string password)
+        {
+            using (var sha = System.Security.Cryptography.SHA256.Create())
+            {
+                var bytes = System.Text.Encoding.UTF8.GetBytes(password);
+                var hash = sha.ComputeHash(bytes);
+                return Convert.ToBase64String(hash);
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EliminarPsicologo(int usuarioId)
+        {
+            var psicologo = await _context.Usuario.FindAsync(usuarioId);
+            if (psicologo == null)
+            {
+                TempData["ErrorMessage"] = "Psicólogo no encontrado.";
+                return RedirectToAction("ListarPsicologos");
+            }
+
+            _context.Usuario.Remove(psicologo);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Psicólogo eliminado correctamente.";
+            return RedirectToAction("ListarPsicologos");
+        }
+
 
         public IActionResult Privacy()
         {

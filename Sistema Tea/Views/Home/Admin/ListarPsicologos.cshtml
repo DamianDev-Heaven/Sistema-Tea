@@ -1,12 +1,23 @@
 ﻿@model List<Sistema_Tea.Models.Usuario>
+
 @{
     ViewData["Title"] = "Lista de Psicólogos";
 }
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+<link rel="stylesheet" href="~/css/ListarPsi.css" asp-append-version="true" />
 
 <div class="psych-list-container">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
     <div class="psych-list-header sticky-top">
         <h2>
             <i class="bi bi-person-badge-fill me-2"></i>
@@ -17,8 +28,13 @@
         </a>
     </div>
 
+    <!-- Buscador -->
+    <div class="mb-3">
+        <input id="buscador" type="text" class="form-control" placeholder="Buscar por nombre o correo..." />
+    </div>
+
     <div class="table-responsive">
-        <table class="table psych-table align-middle mb-0">
+        <table class="table psych-table align-middle mb-0" id="tablaPsicologos">
             <thead>
                 <tr>
                     <th>Nombre</th>
@@ -37,10 +53,10 @@
                                 <span class="avatar-circle">
                                     @psicologo.NombreCompleto.Substring(0, 1).ToUpper()
                                 </span>
-                                <span class="fw-semibold">@psicologo.NombreCompleto</span>
+                                <span class="fw-semibold nombre">@psicologo.NombreCompleto</span>
                             </div>
                         </td>
-                        <td class="text-truncate" style="max-width: 220px;">@psicologo.Email</td>
+                        <td class="text-truncate correo" style="max-width: 220px;">@psicologo.Email</td>
                         <td>@psicologo.FechaCreacion.ToString("dd/MM/yyyy")</td>
                         <td>
                             <span class="badge @(psicologo.Activo ? "bg-success" : "bg-secondary")">
@@ -52,6 +68,10 @@
                                class="btn btn-sm btn-outline-primary rounded-circle" title="Editar">
                                 <i class="bi bi-pencil-square"></i>
                             </a>
+                            <a href="#" class="btn btn-sm btn-outline-danger rounded-circle eliminar-btn"
+                               data-id="@psicologo.UsuarioID" data-nombre="@psicologo.NombreCompleto" title="Eliminar">
+                                <i class="bi bi-trash3-fill"></i>
+                            </a>
                         </td>
                     </tr>
                 }
@@ -59,213 +79,62 @@
         </table>
     </div>
 
-    <!-- Botón flotante para móvil -->
     <a asp-action="CrearPsicologo" class="btn btn-primary add-btn-float d-md-none" title="Nuevo Psicólogo">
         <i class="bi bi-plus"></i>
     </a>
 </div>
 
-<style>
-    body {
-        font-family: 'Inter', sans-serif;
-        background-color: #f9fafb;
-        color: #212529;
-    }
+<div class="modal fade" id="confirmarEliminarModal" tabindex="-1" aria-labelledby="confirmarEliminarLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form asp-action="EliminarPsicologo" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmarEliminarLabel">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar al psicólogo <strong id="nombrePsicologo"></strong>?</p>
+                    <input type="hidden" name="usuarioId" id="usuarioIdEliminar" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
-    .psych-list-container {
-        max-width: 1050px;
-        margin: 2.5rem auto;
-        padding: 2.5rem 1.2rem;
-        background: #fff;
-        border-radius: 22px;
-        box-shadow: 0 10px 32px 0 rgba(59,73,223,0.07), 0 1.5px 3px 0 rgba(59,73,223,0.02);
-        position: relative;
-    }
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const eliminarBtns = document.querySelectorAll(".eliminar-btn");
+            const modal = new bootstrap.Modal(document.getElementById("confirmarEliminarModal"));
+            const inputId = document.getElementById("usuarioIdEliminar");
+            const nombreSpan = document.getElementById("nombrePsicologo");
 
-    .psych-list-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2.2rem;
-        background: #fff;
-        z-index: 10;
-        border-radius: 22px 22px 0 0;
-        padding-bottom: 1rem;
-    }
+            eliminarBtns.forEach(btn => {
+                btn.addEventListener("click", function () {
+                    const id = this.getAttribute("data-id");
+                    const nombre = this.getAttribute("data-nombre");
+                    inputId.value = id;
+                    nombreSpan.textContent = nombre;
+                    modal.show();
+                });
+            });
 
-        .psych-list-header h2 {
-            font-weight: 700;
-            font-size: 2rem;
-            color: #3b49df;
-            margin: 0;
-            letter-spacing: 0.04em;
-        }
+            const buscador = document.getElementById("buscador");
+            const filas = document.querySelectorAll("#tablaPsicologos tbody tr");
 
-    .add-btn, .add-btn-float {
-        font-weight: 600;
-        font-size: 1.1rem;
-        padding: 0.6rem 1.3rem;
-        border-radius: 14px;
-        box-shadow: 0 4px 16px rgba(59, 73, 223, 0.13);
-        transition: background 0.3s, box-shadow 0.3s;
-    }
-
-        .add-btn:hover, .add-btn:focus, .add-btn-float:active {
-            background: #2c3dbd;
-            box-shadow: 0 8px 24px rgba(44, 61, 189, 0.17);
-            outline: none;
-        }
-
-    .add-btn-float {
-        position: fixed;
-        right: 1.7rem;
-        bottom: 2.2rem;
-        width: 54px;
-        height: 54px;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 2rem;
-        z-index: 1050;
-        box-shadow: 0 6px 18px rgba(59,73,223,0.23);
-    }
-
-    .psych-table {
-        background: transparent;
-        border-radius: 16px;
-        overflow: hidden;
-    }
-
-        .psych-table thead tr th {
-            background: #f0f4ff;
-            border: none;
-            font-weight: 700;
-            color: #3b49df;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-            font-size: 1rem;
-            padding: 1rem .8rem;
-        }
-
-        .psych-table tbody tr {
-            background: #fff;
-            border-radius: 14px;
-            box-shadow: 0 2px 8px rgba(59,73,223,0.04);
-            transition: box-shadow 0.2s, transform 0.2s;
-        }
-
-            .psych-table tbody tr:hover {
-                box-shadow: 0 8px 24px rgba(59,73,223,0.13);
-                transform: translateY(-2px) scale(1.01);
-            }
-
-        .psych-table td {
-            vertical-align: middle;
-            font-size: 1.05rem;
-            padding: 1.1rem .8rem;
-            background: transparent;
-            border: none;
-        }
-
-    .avatar-circle {
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #3b49df 60%, #4a90e2 100%);
-        color: #fff;
-        font-weight: 700;
-        font-size: 1.15rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: .2rem;
-        box-shadow: 0 2px 8px rgba(59,73,223,0.13);
-        letter-spacing: 0.03em;
-    }
-
-    .badge {
-        font-weight: 700;
-        border-radius: 14px;
-        font-size: 1rem;
-        padding: 0.4em 1.1em;
-        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.13);
-    }
-
-    .btn-outline-primary {
-        border-radius: 50%;
-        padding: 0.35rem 0.6rem;
-        font-size: 1.2rem;
-        transition: background 0.3s, color 0.3s;
-    }
-
-        .btn-outline-primary:hover {
-            background: #3b49df;
-            color: #fff;
-        }
-
-    .text-truncate {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        max-width: 180px;
-    }
-
-    @@media (max-width: 992px) {
-        .psych-list-container
-
-    {
-        padding: 1.5rem 0.5rem;
-    }
-
-    .psych-list-header h2 {
-        font-size: 1.3rem;
-    }
-
-    .add-btn {
-        font-size: 1rem;
-        padding: 0.5rem 1rem;
-    }
-
-    .psych-table td, .psych-table th {
-        font-size: 0.95rem;
-        padding: 0.8rem .5rem;
-    }
-
-    .avatar-circle {
-        width: 32px;
-        height: 32px;
-        font-size: 1rem;
-    }
-
-    }
-
-    @@media (max-width: 576px) {
-        .psych-list-container
-
-    {
-        padding: 1rem 0.1rem;
-        border-radius: 12px;
-    }
-
-    .psych-list-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-
-    .psych-table td, .psych-table th {
-        padding: 0.6rem 0.3rem;
-        font-size: 0.9rem;
-    }
-
-    .add-btn-float {
-        right: 1rem;
-        bottom: 1.2rem;
-        width: 48px;
-        height: 48px;
-        font-size: 1.5rem;
-    }
-
-    }
-</style>
+            buscador.addEventListener("input", function () {
+                const texto = this.value.toLowerCase();
+                filas.forEach(fila => {
+                    const nombre = fila.querySelector(".nombre").textContent.toLowerCase();
+                    const correo = fila.querySelector(".correo").textContent.toLowerCase();
+                    fila.style.display = (nombre.includes(texto) || correo.includes(texto)) ? "" : "none";
+                });
+            });
+        });
+    </script>
+}

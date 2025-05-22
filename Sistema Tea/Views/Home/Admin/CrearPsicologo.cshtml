@@ -1,0 +1,48 @@
+﻿@model Sistema_Tea.Models.Usuario
+@{
+    ViewData["Title"] = "Crear Psicólogo";
+}
+
+<div class="form-container shadow-sm p-4 rounded-4 mx-auto" style="max-width: 480px; background: #fff;">
+    <h2 class="mb-4 text-primary fw-bold">Crear Nuevo Psicólogo</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    <form asp-action="CrearPsicologo" method="post" novalidate>
+        <div class="mb-3">
+            <label asp-for="NombreCompleto" class="form-label fw-semibold"></label>
+            <input asp-for="NombreCompleto" class="form-control" placeholder="Nombre completo" />
+            <span asp-validation-for="NombreCompleto" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label fw-semibold"></label>
+            <input asp-for="Email" class="form-control" placeholder="correo@ejemplo.com" />
+            <span asp-validation-for="Email" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ContrasenaHash" class="form-label fw-semibold">Contraseña</label>
+            <input asp-for="ContrasenaHash" type="password" class="form-control" placeholder="Contraseña segura" />
+            <span asp-validation-for="ContrasenaHash" class="text-danger small"></span>
+        </div>
+
+        <!-- Rol (oculto pero enviado) -->
+        <input type="hidden" asp-for="RolID" />
+
+        <!-- Opcional: mostrar el nombre del rol fijo, solo como info -->
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Rol asignado</label>
+            <input type="text" class="form-control" value="Psicólogo" disabled />
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 fw-semibold">Crear Psicólogo</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
