@@ -1,0 +1,102 @@
+﻿body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f9fafb;
+    color: #212529;
+}
+
+.form-container {
+    max-width: 480px;
+    margin: 3rem auto;
+    background-color: #fff;
+    padding: 2.5rem 3rem;
+    border-radius: 16px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+    transition: box-shadow 0.3s ease;
+}
+
+    .form-container:hover {
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .form-container h2 {
+        font-weight: 700;
+        font-size: 2rem;
+        color: #3b49df;
+        margin-bottom: 2rem;
+        user-select: none;
+    }
+
+.form-label {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #444;
+}
+
+.form-control {
+    border-radius: 12px;
+    padding: 0.85rem 1.2rem;
+    font-size: 1.1rem;
+    border: 2px solid #d1d9e6;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: none;
+}
+
+    .form-control:focus {
+        border-color: #3b49df;
+        box-shadow: 0 0 12px rgba(59, 73, 223, 0.6);
+        outline: none;
+    }
+
+input[disabled] {
+    background-color: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background-color: #3b49df;
+    border: none;
+    padding: 0.85rem 1.6rem;
+    font-weight: 700;
+    border-radius: 12px;
+    width: 100%;
+    font-size: 1.1rem;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 6px 16px rgba(59, 73, 223, 0.4);
+    cursor: pointer;
+}
+
+    .btn-primary:hover,
+    .btn-primary:focus {
+        background-color: #2c3dbd;
+        box-shadow: 0 8px 24px rgba(44, 61, 189, 0.7);
+        outline: none;
+    }
+
+.text-danger {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+@media (max-width: 576px) {
+    .form-container {
+        padding: 2rem 1.5rem;
+        margin: 2rem 1rem;
+        border-radius: 14px;
+    }
+
+        .form-container h2 {
+            font-size: 1.6rem;
+            margin-bottom: 1.5rem;
+        }
+
+    .form-control {
+        font-size: 1rem;
+        padding: 0.75rem 1rem;
+    }
+
+    .btn-primary {
+        font-size: 1rem;
+        padding: 0.75rem 1.2rem;
+    }
+}
