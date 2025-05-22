@@ -1,7 +1,7 @@
 ﻿@model List<Sistema_Tea.Models.Usuario>
 
 @{
-    ViewData["Title"] = "Lista de Psicólogos";
+    ViewData["Title"] = "Lista de Coordinadores";
 }
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
@@ -20,21 +20,21 @@
 
     <div class="psych-list-header sticky-top">
         <h2>
-            <i class="bi bi-person-badge-fill me-2"></i>
-            Psicólogos Registrados
+            <i class="bi bi-person-check-fill me-2"></i>
+            Coordinadores Registrados
         </h2>
-        <a asp-action="CrearPsicologo" class="btn btn-primary add-btn d-none d-md-flex align-items-center gap-2">
-            <i class="bi bi-plus-circle"></i> Nuevo Psicólogo
+        <a asp-action="CrearCoordinador" class="btn btn-primary add-btn d-none d-md-flex align-items-center gap-2">
+            <i class="bi bi-plus-circle"></i> Nuevo Coordinador
         </a>
     </div>
 
     <!-- Buscador -->
     <div class="mb-3">
-        <input id="buscador" type="text" class="form-control" placeholder="Buscar por nombre o correo..." />
+        <input id="buscadorCoordinador" type="text" class="form-control" placeholder="Buscar por nombre o correo..." />
     </div>
 
     <div class="table-responsive">
-        <table class="table psych-table align-middle mb-0" id="tablaPsicologos">
+        <table class="table psych-table align-middle mb-0" id="tablaCoordinadores">
             <thead>
                 <tr>
                     <th>Nombre</th>
@@ -45,31 +45,31 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var psicologo in Model)
+                @foreach (var coordinador in Model)
                 {
                     <tr>
                         <td>
                             <div class="d-flex align-items-center gap-2">
                                 <span class="avatar-circle">
-                                    @psicologo.NombreCompleto.Substring(0, 1).ToUpper()
+                                    @coordinador.NombreCompleto.Substring(0, 1).ToUpper()
                                 </span>
-                                <span class="fw-semibold nombre">@psicologo.NombreCompleto</span>
+                                <span class="fw-semibold nombre">@coordinador.NombreCompleto</span>
                             </div>
                         </td>
-                        <td class="text-truncate correo" style="max-width: 220px;">@psicologo.Email</td>
-                        <td>@psicologo.FechaCreacion.ToString("dd/MM/yyyy")</td>
+                        <td class="text-truncate correo" style="max-width: 220px;">@coordinador.Email</td>
+                        <td>@coordinador.FechaCreacion.ToString("dd/MM/yyyy")</td>
                         <td>
-                            <span class="badge @(psicologo.Activo ? "bg-success" : "bg-secondary")">
-                                @(psicologo.Activo ? "Sí" : "No")
+                            <span class="badge @(coordinador.Activo ? "bg-success" : "bg-secondary")">
+                                @(coordinador.Activo ? "Sí" : "No")
                             </span>
                         </td>
                         <td class="text-center">
-                            <a asp-action="EditarPsicologo" asp-route-id="@psicologo.UsuarioID"
+                            <a asp-action="EditarCoordinador" asp-route-id="@coordinador.UsuarioID"
                                class="btn btn-sm btn-outline-primary rounded-circle" title="Editar">
                                 <i class="bi bi-pencil-square"></i>
                             </a>
                             <a href="#" class="btn btn-sm btn-outline-danger rounded-circle eliminar-btn"
-                               data-id="@psicologo.UsuarioID" data-nombre="@psicologo.NombreCompleto" title="Eliminar">
+                               data-id="@coordinador.UsuarioID" data-nombre="@coordinador.NombreCompleto" title="Eliminar">
                                 <i class="bi bi-trash3-fill"></i>
                             </a>
                         </td>
@@ -79,22 +79,21 @@
         </table>
     </div>
 
-    <a asp-action="CrearPsicologo" class="btn btn-primary add-btn-float d-md-none" title="Nuevo Psicólogo">
+    <a asp-action="CrearCoordinador" class="btn btn-primary add-btn-float d-md-none" title="Nuevo Coordinador">
         <i class="bi bi-plus"></i>
     </a>
 </div>
 
-
 <div class="modal fade" id="confirmarEliminarModal" tabindex="-1" aria-labelledby="confirmarEliminarLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <form asp-action="EliminarPsicologo" method="post">
+            <form asp-action="EliminarCoordinador" method="post">
                 <div class="modal-header">
                     <h5 class="modal-title" id="confirmarEliminarLabel">Confirmar Eliminación</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    <p>¿Estás seguro de que deseas eliminar al psicólogo <strong id="nombrePsicologo"></strong>?</p>
+                    <p>¿Estás seguro de que deseas eliminar al coordinador <strong id="nombreCoordinador"></strong>?</p>
                     <input type="hidden" name="usuarioId" id="usuarioIdEliminar" />
                 </div>
                 <div class="modal-footer">
@@ -113,7 +112,7 @@
             const eliminarBtns = document.querySelectorAll(".eliminar-btn");
             const modal = new bootstrap.Modal(document.getElementById("confirmarEliminarModal"));
             const inputId = document.getElementById("usuarioIdEliminar");
-            const nombreSpan = document.getElementById("nombrePsicologo");
+            const nombreSpan = document.getElementById("nombreCoordinador");
 
             eliminarBtns.forEach(btn => {
                 btn.addEventListener("click", function () {
@@ -125,8 +124,8 @@
                 });
             });
 
-            const buscador = document.getElementById("buscador");
-            const filas = document.querySelectorAll("#tablaPsicologos tbody tr");
+            const buscador = document.getElementById("buscadorCoordinador");
+            const filas = document.querySelectorAll("#tablaCoordinadores tbody tr");
 
             buscador.addEventListener("input", function () {
                 const texto = this.value.toLowerCase();

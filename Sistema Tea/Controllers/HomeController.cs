@@ -215,6 +215,69 @@ namespace Sistema_Tea.Controllers
             return RedirectToAction("ListarPsicologos");
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ListarCoordinadores()
+        {
+            var coordinadores = await _context.Usuario
+                .Where(u => u.Rol.NombreRol == "Coordinador")
+                .ToListAsync();
+            return View("Admin/ListarCoordinadores", coordinadores);
+        }
+
+        [HttpGet]
+        public IActionResult CrearCoordinador()
+        {
+            return View("Admin/CrearCoordinador", new Usuario());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CrearCoordinador(Usuario model)
+        {
+            var rolCoord = await _context.Rol.FirstOrDefaultAsync(r => r.NombreRol == "Coordinador");
+            if (rolCoord == null)
+            {
+                ModelState.AddModelError("", "No se encontró el rol Coordinador.");
+                return View("Admin/CrearCoordinador", model);
+            }
+
+            model.RolID = rolCoord.RolID;
+            ModelState.Remove("RolID");
+
+            if (await _context.Usuario.AnyAsync(u => u.Email == model.Email))
+            {
+                ModelState.AddModelError("Email", "El correo electrónico ya está registrado.");
+                return View("Admin/CrearCoordinador", model);
+            }
+
+            model.FechaCreacion = DateTime.Now;
+            model.Activo = true;
+            model.ContrasenaHash = HashPassword(model.ContrasenaHash);
+
+            _context.Usuario.Add(model);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Coordinador creado correctamente.";
+            return RedirectToAction("ListarCoordinadores");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EliminarCoordinador(int usuarioId)
+        {
+            var usuario = await _context.Usuario.FindAsync(usuarioId);
+            if (usuario == null)
+            {
+                TempData["ErrorMessage"] = "Coordinador no encontrado.";
+            }
+            else
+            {
+                _context.Usuario.Remove(usuario);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Coordinador eliminado correctamente.";
+            }
+            return RedirectToAction("ListarCoordinadores");
+        }
 
         public IActionResult Privacy()
         {
