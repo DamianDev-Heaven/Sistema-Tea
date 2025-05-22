@@ -1,0 +1,35 @@
+﻿@model Sistema_Tea.Models.Rol
+
+@{
+    ViewData["Title"] = "Crear Rol";
+}
+
+<link rel="stylesheet" href="~/css/create.css" asp-append-version="true" />
+
+<div class="form-container shadow-sm p-4 rounded-4 mx-auto" style="max-width: 480px; background: #fff;">
+    <h2 class="mb-4 text-primary fw-bold">Crear Nuevo Rol</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <form asp-action="Create" method="post" novalidate>
+        <div class="mb-3">
+            <label asp-for="NombreRol" class="form-label fw-semibold"></label>
+            <input asp-for="NombreRol" class="form-control" placeholder="Ej. Administrador, Psicólogo, Técnico" />
+            <span asp-validation-for="NombreRol" class="text-danger small"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 fw-semibold">Crear Rol</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
