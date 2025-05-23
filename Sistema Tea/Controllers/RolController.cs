@@ -43,12 +43,21 @@ namespace Sistema_Tea.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Rol rol)
         {
-             // Esto es solo para probar si guarda sin validación
-             _context.Rol.Add(rol);
-             _context.SaveChanges();
-             return RedirectToAction(nameof(Index));
+            // Esto es solo para probar si guarda sin validación
+            if (ModelState.IsValid)
+            {
+                _context.Rol.Add(rol);
+                _context.SaveChanges();
+                return RedirectToAction(nameof(Index));
+
+            }
+            else
+            {
+                // Si hay errores de validación, se devuelven al formulario
+                return View(rol);
 
 
+            }
         }
 
 
@@ -86,15 +95,6 @@ namespace Sistema_Tea.Controllers
             return View(rol);
         }
 
-        // GET: RolController/Delete/5
-        public async Task<IActionResult> Delete(int id)
-        {
-            var rol = await _context.Rol.FirstOrDefaultAsync(r => r.RolID == id);
-            if (rol == null)
-                return NotFound();
-
-            return View(rol);
-        }
 
         // POST: RolController/Delete/5
         [HttpPost, ActionName("Delete")]
@@ -102,14 +102,26 @@ namespace Sistema_Tea.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var rol = await _context.Rol.FindAsync(id);
-            if (rol != null)
-            {
-                _context.Rol.Remove(rol);
-                await _context.SaveChangesAsync();
-            }
 
+            if (rol == null)
+            {
+                TempData["ErrorMessage"] = "Rol no encontrado.";
+                return RedirectToAction(nameof(Index));
+            }
+            bool tieneUsuarios = await _context.Usuario.AnyAsync(u => u.RolID == id);
+
+            if (tieneUsuarios)
+            {
+                TempData["ErrorMessage"] = "No se puede eliminar el rol porque tiene usuarios asociados.";
+                return RedirectToAction(nameof(Index));
+            }
+            _context.Rol.Remove(rol);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Rol eliminado correctamente.";
             return RedirectToAction(nameof(Index));
         }
+
     }
 }
 

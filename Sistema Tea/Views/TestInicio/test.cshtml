@@ -1,0 +1,81 @@
+﻿@model List<Sistema_Tea.Models.TestInicial>
+@{
+    Layout = null;
+    ViewData["Title"] = "Test de Detección de Autismo";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="~/css/ListarPsi.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/tetstIni.css" asp-append-version="true" />
+
+ </head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm">
+            <div class="container-fluid">
+                <a class="navbar-brand d-flex align-items-center">
+                    <i class="bi bi-hospital me-2"></i> eMind
+                </a>
+            </div>
+        </nav>
+    </header>
+    <div class="container py-5">
+        <h2 class="mb-4 fw-bold text-center">Responde con sinceridad</h2>
+        <form asp-action="Resultado" method="post">
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                <div class="question-card">
+                    <div class="question-title">@($"{i + 1}. {Model[i].Texto}")</div>
+                    @for (int j = 0; j < Model[i].Opciones.Count; j++)
+                    {
+                        var valor = j == 3 ? 4 : (j == 2 ? 3 : (j == 1 ? 2 : 1)); // A=1, B=2, C=3, D=4
+                        var letra = (char)('A' + j);
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="respuestas[@i]" id="resp_@i@j" value="@valor" required />
+                            <label class="form-check-label" for="resp_@i@j">
+                                <strong>@letra)</strong> @Model[i].Opciones[j]
+                            </label>
+                        </div>
+                    }
+                </div>
+            }
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-light text-primary submit-btn">
+                    <i class="bi bi-check2-circle me-2"></i> Ver Resultado
+                </button>
+            </div>
+        </form>
+    </div>
+    <!-- Footer -->
+    <footer class="bg-light p-4 rounded shadow-sm">
+        <div class="row">
+            <div class="col-md-6">
+                <h5>Clínica de Evaluación TEA eMind</h5>
+                <p><i class="bi bi-geo-alt-fill me-2"></i> Santa Ana</p>
+                <p>
+                    <i class="bi bi-telephone-fill me-2"></i>  (+503) 2401-3421
+                </p>
+                <p><i class="bi bi-envelope-fill me-2"></i> eMind@gmail.com</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <p class="mb-0">© @DateTime.Now.Year Clínica eMind - Todos los derechos reservados</p>
+            </div>
+        </div>
+    </footer>
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+﻿@{
+    Layout = null;
+    ViewData["Title"] = "Test de Autismo - Página de Inicio";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/ListarPsi.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        footer h5 {
+            font-weight: 600;
+        }
+
+        footer p {
+            margin-bottom: 0.3rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm">
+            <div class="container-fluid">
+                <a class="navbar-brand d-flex align-items-center">
+                    <i class="bi bi-hospital me-2"></i> eMind
+                </a>
+            </div>
+        </nav>
+    </header>
+    <div class="container py-5">
+        <!-- Sección Hero -->
+        <div class="row align-items-center mb-5">
+            <div class="col-md-6">
+                <h1 class="fw-bold mb-3">Test de Detección de Autismo (TEA)</h1>
+                <p class="lead">
+                    Evalúa señales tempranas del Trastorno del Espectro Autista en niños, adolescentes o adultos.
+                    Este test es gratuito, anónimo y rápido. No reemplaza una evaluación profesional, pero puede
+                    orientarte si necesitas consultar con un especialista.
+                </p>
+                <a asp-controller="TestInicio" asp-action="test" class="btn btn-primary mt-3">
+                    <i class="bi bi-clipboard-check me-2"></i> Comenzar Test
+                </a>
+            </div>
+            <div class="col-md-6 text-center">
+                <img src="~/img/eMindc.png" alt="Ilustración TEA" class="img-fluid rounded shadow-sm" style="max-height: 300px;" />
+            </div>
+        </div>
+
+        <!-- Preguntas Frecuentes -->
+        <div class="mb-5">
+            <h2 class="fw-semibold mb-4"><i class="bi bi-question-circle-fill me-2"></i>Preguntas Frecuentes sobre el TEA</h2>
+
+            <div class="accordion" id="faqAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq1">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="true">
+                            ¿Qué es el Trastorno del Espectro Autista?
+                        </button>
+                    </h2>
+                    <div id="faqCollapse1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Es una condición del neurodesarrollo que afecta la comunicación, la conducta y la interacción social.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq2">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2">
+                            ¿A qué edad se puede detectar?
+                        </button>
+                    </h2>
+                    <div id="faqCollapse2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Puede detectarse desde los 18 meses. Sin embargo, cada caso es diferente y requiere evaluación profesional.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq3">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3">
+                            ¿Este test es diagnóstico?
+                        </button>
+                    </h2>
+                    <div id="faqCollapse3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            No. Este test es solo una herramienta de autoevaluación. Te sugerimos acudir a nuestra clínica para un diagnóstico clínico profesional.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-light p-4 rounded shadow-sm">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Clínica de Evaluación TEA eMind</h5>
+                    <p><i class="bi bi-geo-alt-fill me-2"></i> Santa Ana</p>
+                    <p>
+                        <i class="bi bi-telephone-fill me-2"></i>  (+503) 2401-3421
+                    </p>
+                    <p><i class="bi bi-envelope-fill me-2"></i> eMind@gmail.com</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">© @DateTime.Now.Year Clínica eMind - Todos los derechos reservados</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+﻿body {
+    font-family: 'Inter', sans-serif;
+    background-color: #eaf4fd;
+}
+
+.result-card {
+    background-color: #2196f3;
+    color: white;
+    border-radius: 15px;
+    padding: 40px;
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-top: 50px;
+}
+
+.result-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.score {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.badge-result {
+    font-size: 1.1rem;
+    padding: 10px 20px;
+    border-radius: 10px;
+}
+
+.btn-volver {
+    margin-top: 30px;
+    font-size: 1rem;
+    padding: 10px 20px;
+}
+
+footer h5 {
+    font-weight: 600;
+}
+
+footer p {
+    margin-bottom: 0.3rem;
+}

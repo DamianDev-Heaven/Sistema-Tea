@@ -9,14 +9,6 @@
 <link rel="stylesheet" href="~/css/ListarPsi.css" asp-append-version="true" />
 
 <div class="psych-list-container">
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
-    }
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
-    }
 
     <div class="psych-list-header sticky-top">
         <h2>
@@ -89,8 +81,9 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+       document.addEventListener("DOMContentLoaded", function () {
             const eliminarBtns = document.querySelectorAll(".eliminar-btn");
             const modal = new bootstrap.Modal(document.getElementById("confirmarEliminarModal"));
             const inputId = document.getElementById("rolIdEliminar");
@@ -116,7 +109,34 @@
                     fila.style.display = nombre.includes(texto) ? "" : "none";
                 });
             });
-        });
+
+            // Mostrar mensajes con SweetAlert2
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <text>
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Éxito!',
+                            text: @Html.Raw(Json.Serialize(TempData["SuccessMessage"])),
+                            confirmButtonColor: '#3085d6',
+                            timer: 3000,
+                            timerProgressBar: true
+                        });
+                </text>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <text>
+                        Swal.fire({
+                            icon: 'error',
+                            title: '¡Error!',
+                            text: @Html.Raw(Json.Serialize(TempData["ErrorMessage"])),
+                            confirmButtonColor: '#d33',
+                            timer: 4000,
+                            timerProgressBar: true
+                        });
+                </text>
+            }
+       })
     </script>
 }
-
