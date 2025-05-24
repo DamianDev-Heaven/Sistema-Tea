@@ -1,0 +1,148 @@
+﻿@model List<Sistema_Tea.Models.Tutor>
+
+@{
+    ViewData["Title"] = "Lista de Tutores";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+<link rel="stylesheet" href="~/css/ListarPsi.css" asp-append-version="true" />
+
+<div class="psych-list-container">
+
+    <div class="psych-list-header sticky-top">
+        <h2>
+            <i class="bi bi-people-fill me-2"></i>
+            Tutores Registrados
+        </h2>
+    </div>
+
+    <!-- Buscador -->
+    <div class="mb-3">
+        <input id="buscador" type="text" class="form-control" placeholder="Buscar por DUI..." />
+    </div>
+
+    <div class="table-responsive">
+        <table class="table psych-table align-middle mb-0" id="tablaTutores">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellidos</th>
+                    <th>DUI</th>
+                    <th>Teléfono</th>
+                    <th>Fecha de Nacimiento</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var tutor in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold dui">@tutor.Nombre</td>
+                        <td>@tutor.Apellidos</td>
+                        <td class="dui">@tutor.Dui</td>
+                        <td>@tutor.Telefono</td>
+                        <td>@tutor.FechaNacimiento.ToShortDateString()</td>
+                        <td class="text-center">
+                            <a asp-controller="Paciente" asp-action="Registrar" asp-route-id="@tutor.TutorID" class="btn btn-sm btn-outline-primary rounded-circle" title="Agregar">
+                                <i class="bi bi-plus-circle"></i>
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@tutor.TutorID" class="btn btn-sm btn-outline-primary rounded-circle" title="Editar">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <a asp-action="Create" class="btn btn-primary add-btn-float d-md-none" title="Nuevo Tutor">
+        <i class="bi bi-plus"></i>
+    </a>
+</div>
+
+<div class="modal fade" id="confirmarEliminarModal" tabindex="-1" aria-labelledby="confirmarEliminarLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form asp-action="Delete" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmarEliminarLabel">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar al tutor <strong id="nombreTutor"></strong>?</p>
+                    <input type="hidden" name="id" id="tutorIdEliminar" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const eliminarBtns = document.querySelectorAll(".eliminar-btn");
+            const modal = new bootstrap.Modal(document.getElementById("confirmarEliminarModal"));
+            const inputId = document.getElementById("tutorIdEliminar");
+            const nombreSpan = document.getElementById("nombreTutor");
+
+            eliminarBtns.forEach(btn => {
+                btn.addEventListener("click", function () {
+                    const id = this.getAttribute("data-id");
+                    const nombre = this.getAttribute("data-nombre");
+                    inputId.value = id;
+                    nombreSpan.textContent = nombre;
+                    modal.show();
+                });
+            });
+
+
+
+            const buscador = document.getElementById("buscador");
+            const filas = document.querySelectorAll("#tablaTutores tbody tr");
+
+            buscador.addEventListener("input", function () {
+                const texto = this.value.toLowerCase();
+                filas.forEach(fila => {
+                    const celdas = fila.getElementsByTagName("td");
+                    const dui = celdas[2].textContent.toLowerCase(); // 0 = Nombre, 1 = Apellidos, 2 = DUI
+                    fila.style.display = dui.includes(texto) ? "" : "none";
+                });
+            });
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Éxito!',
+                            text: @Html.Raw(Json.Serialize(TempData["SuccessMessage"])),
+                            confirmButtonColor: '#3085d6',
+                            timer: 3000,
+                            timerProgressBar: true
+                        });
+            </text>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <text>
+                        Swal.fire({
+                            icon: 'error',
+                            title: '¡Error!',
+                            text: @Html.Raw(Json.Serialize(TempData["ErrorMessage"])),
+                            confirmButtonColor: '#d33',
+                            timer: 4000,
+                            timerProgressBar: true
+                        });
+            </text>
+        }
+        });
+    </script>
+}

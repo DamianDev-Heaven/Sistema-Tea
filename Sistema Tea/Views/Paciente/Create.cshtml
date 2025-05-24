@@ -1,0 +1,165 @@
+﻿@model Sistema_Tea.Models.PacienteTutor
+
+@{
+    ViewData["Title"] = "Registrar Paciente";
+}
+
+<link rel="stylesheet" href="~/css/create.css" asp-append-version="true" />
+
+<div class="form-container shadow-sm p-4 rounded-4 mx-auto" style="max-width: 1000px; background: #fff;">
+    <h2 class="mb-4 text-primary fw-bold">Registrar Nuevo Paciente</h2>
+
+    <form asp-action="Create" method="post">
+        <div class="row g-3">
+            <!-- Datos del Paciente -->
+            <div class="col-md-6">
+                <label asp-for="Paciente.Nombre" class="form-label fw-semibold"></label>
+                <input asp-for="Paciente.Nombre" class="form-control" placeholder="Nombre del paciente" />
+                <span asp-validation-for="Paciente.Nombre" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Paciente.Apellidos" class="form-label fw-semibold"></label>
+                <input asp-for="Paciente.Apellidos" class="form-control" placeholder="Apellidos del paciente" />
+                <span asp-validation-for="Paciente.Apellidos" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Paciente.Sexo" class="form-label fw-semibold"></label>
+                <select asp-for="Paciente.Sexo" class="form-select">
+                    <option value="">Seleccione...</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Femenino</option>
+                    <option>Otro</option>
+                </select>
+                <span asp-validation-for="Paciente.Sexo" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Paciente.FechaNacimiento" class="form-label fw-semibold"></label>
+                <input asp-for="Paciente.FechaNacimiento" type="date" class="form-control" />
+                <span asp-validation-for="Paciente.FechaNacimiento" class="text-danger small"></span>
+            </div>
+            <div class="col-12">
+                <label asp-for="Paciente.DiagnosticoPrevio" class="form-label fw-semibold"></label>
+                <textarea asp-for="Paciente.DiagnosticoPrevio" class="form-control" placeholder="Diagnóstico previo"></textarea>
+                <span asp-validation-for="Paciente.DiagnosticoPrevio" class="text-danger small"></span>
+            </div>
+            <!-- Checkbox DUI -->
+            <div class="form-check my-4">
+                <input type="checkbox" class="form-check-input" id="tieneDuiCheck" />
+                <label class="form-check-label fw-semibold" for="tieneDuiCheck">¿Paciente tiene DUI?</label>
+            </div>
+
+            <!-- Campo DUI (opcional) -->
+            <div class="col-md-6" id="duiField" style="display: none;">
+                <label asp-for="Paciente.Dui" class="form-label fw-semibold"></label>
+                <input asp-for="Paciente.Dui" class="form-control" placeholder="DUI del paciente (opcional)"
+                       pattern="\d{9}" maxlength="9" title="Debe contener exactamente 9 dígitos" />
+            </div>
+
+
+        </div>
+
+        <!-- Check para mostrar tutor -->
+        <div class="form-check my-4">
+            <input type="checkbox" class="form-check-input" id="tieneTutorCheck" />
+            <label class="form-check-label fw-semibold" for="tieneTutorCheck">Asignar un tutor</label>
+        </div>
+        <!-- Campos del Tutor -->
+        <div id="tutorFields" style="display: none;">
+            <h5 class="fw-bold text-secondary mb-3">Datos del Tutor</h5>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="Tutor.Nombre" class="form-label fw-semibold"></label>
+                    <input asp-for="Tutor.Nombre" class="form-control" placeholder="Nombre del tutor" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Tutor.Dui" class="form-label fw-semibold"></label>
+                    <input asp-for="Tutor.Dui" class="form-control" placeholder="Ej: 123456789" 
+                           pattern="\d{9}" maxlength="9" title="Debe contener exactamente 9 dígitos" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Tutor.Apellidos" class="form-label fw-semibold"></label>
+                    <input asp-for="Tutor.Apellidos" class="form-control" placeholder="Apellidos del tutor" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Tutor.FechaNacimiento" class="form-label fw-semibold"></label>
+                    <input asp-for="Tutor.FechaNacimiento" type="date" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Tutor.Telefono" class="form-label fw-semibold"></label>
+                    <input asp-for="Tutor.Telefono" class="form-control" placeholder="Ej: 7912 3243"
+                           pattern="\d{4} \d{4}" title="Debe estar en formato 1234 5678" />
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 fw-semibold mt-4">Registrar Paciente</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Mostrar u ocultar campos del tutor
+        document.getElementById("tieneTutorCheck").addEventListener("change", function () {
+            document.getElementById("tutorFields").style.display = this.checked ? "block" : "none";
+        });
+        // Mostrar u ocultar campo DUI
+        document.getElementById("tieneDuiCheck").addEventListener("change", function () {
+            const duiField = document.getElementById("duiField");
+            if (this.checked) {
+                duiField.style.display = "block";
+            } else {
+                duiField.style.display = "none";
+                const duiInput = document.getElementById("Paciente_Dui");
+                if (duiInput) duiInput.value = null;
+            }
+        });
+            document.querySelector("form").addEventListener("submit", function (e) {
+            const pacienteDui = document.getElementById("Paciente_Dui")?.value;
+            const tutorDui = document.getElementById("Tutor_Dui")?.value;
+            const tutorTelefono = document.getElementById("Tutor_Telefono")?.value;
+
+
+            if (pacienteDui && tutorDui && pacienteDui === tutorDui) {
+                alert("El DUI del paciente no puede ser igual al del tutor.");
+                e.preventDefault();
+            }
+            if (tutorTelefono && !/^\d{4} \d{4}$/.test(tutorTelefono)) {
+                alert("El teléfono del tutor debe tener el formato 1234 5678.");
+                e.preventDefault();
+            }
+        });
+
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const pacienteFecha = document.getElementById("Paciente_FechaNacimiento");
+            const tutorFecha = document.getElementById("Tutor_FechaNacimiento");
+
+            const hoy = new Date();
+            const fechaMinTutor = new Date(hoy.getFullYear() - 18, hoy.getMonth(), hoy.getDate());
+            tutorFecha.max = fechaMinTutor.toISOString().split('T')[0];
+
+            const fechaMinPaciente = new Date(hoy.getFullYear(), hoy.getMonth() - 18, hoy.getDate());
+            pacienteFecha.max = fechaMinPaciente.toISOString().split('T')[0];
+
+            pacienteFecha.addEventListener("change", function () {
+                const seleccionada = new Date(this.value);
+                if (seleccionada > fechaMinPaciente) {
+                    alert("El paciente debe tener al menos 18 meses de edad.");
+                    this.value = "";
+                }
+            });
+
+            tutorFecha.addEventListener("change", function () {
+                const seleccionada = new Date(this.value);
+                if (seleccionada > fechaMinTutor) {
+                    alert("El tutor debe tener al menos 18 años de edad.");
+                    this.value = "";
+                }
+            });
+        });
+    </script>
+}
+

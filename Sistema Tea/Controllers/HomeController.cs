@@ -175,6 +175,13 @@ namespace Sistema_Tea.Controllers
                 ViewBag.Roles = new SelectList(roles, "RolID", "NombreRol", model.RolID);
                 return View("Admin/CrearPsicologo", model);
             }
+            if (await _context.Usuario.AnyAsync(u => u.Dui == model.Dui))
+            {
+                ModelState.AddModelError("Dui", "El Dui ya está registrado.");
+                var roles = await _context.Rol.ToListAsync();
+                ViewBag.Roles = new SelectList(roles, "RolID", "NombreRol", model.RolID);
+                return View("Admin/CrearPsicologo", model);
+            }
 
             model.FechaCreacion = DateTime.Now;
             model.Activo = true;
@@ -247,6 +254,12 @@ namespace Sistema_Tea.Controllers
             if (await _context.Usuario.AnyAsync(u => u.Email == model.Email))
             {
                 ModelState.AddModelError("Email", "El correo electrónico ya está registrado.");
+                return View("Admin/CrearCoordinador", model);
+            }
+
+            if (await _context.Usuario.AnyAsync(u => u.Dui == model.Dui))
+            {
+                ModelState.AddModelError("Dui", "El Dui ya está registrado.");
                 return View("Admin/CrearCoordinador", model);
             }
 

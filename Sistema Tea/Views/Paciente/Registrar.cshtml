@@ -1,0 +1,94 @@
+﻿@model Sistema_Tea.Models.Paciente
+
+@{
+    ViewData["Title"] = "Registrar Paciente";
+}
+
+<link rel="stylesheet" href="~/css/create.css" asp-append-version="true" />
+
+<div class="form-container shadow-sm p-4 rounded-4 mx-auto" style="max-width: 1000px; background: #fff;">
+    <h2 class="mb-4 text-primary fw-bold">Registrar Nuevo Paciente</h2>
+
+    <form asp-action="Registrar" method="post" asp-route-id="@ViewBag.TutorId">
+        <input type="hidden" asp-for="TutorID" value="@ViewBag.TutorId" />
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="Nombre" class="form-label fw-semibold"></label>
+                <input asp-for="Nombre" class="form-control" placeholder="Nombre del paciente" />
+                <span asp-validation-for="Nombre" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Apellidos" class="form-label fw-semibold"></label>
+                <input asp-for="Apellidos" class="form-control" placeholder="Apellidos del paciente" />
+                <span asp-validation-for="Apellidos" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Sexo" class="form-label fw-semibold"></label>
+                <select asp-for="Sexo" class="form-select">
+                    <option value="">Seleccione...</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Femenino</option>
+                    <option>Otro</option>
+                </select>
+                <span asp-validation-for="Sexo" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="FechaNacimiento" class="form-label fw-semibold"></label>
+                <input asp-for="FechaNacimiento" type="date" class="form-control" />
+                <span asp-validation-for="FechaNacimiento" class="text-danger small"></span>
+            </div>
+
+            <div class="col-12">
+                <label asp-for="DiagnosticoPrevio" class="form-label fw-semibold"></label>
+                <textarea asp-for="DiagnosticoPrevio" class="form-control" placeholder="Diagnóstico previo"></textarea>
+                <span asp-validation-for="DiagnosticoPrevio" class="text-danger small"></span>
+            </div>
+
+            <div class="form-check my-4">
+                <input type="checkbox" class="form-check-input" id="tieneDuiCheck" />
+                <label class="form-check-label fw-semibold" for="tieneDuiCheck">¿Paciente tiene DUI?</label>
+            </div>
+
+            <div class="col-md-6" id="duiField" style="display: none;">
+                <label asp-for="Dui" class="form-label fw-semibold"></label>
+                <input asp-for="Dui" class="form-control" placeholder="DUI del paciente (opcional)"
+                       pattern="\d{9}" maxlength="9" title="Debe contener exactamente 9 dígitos" />
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 fw-semibold mt-4">Registrar Paciente</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById("tieneDuiCheck").addEventListener("change", function () {
+            const duiField = document.getElementById("duiField");
+            if (this.checked) {
+                duiField.style.display = "block";
+            } else {
+                duiField.style.display = "none";
+                const duiInput = document.getElementById("Dui");
+                if (duiInput) duiInput.value = null;
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const pacienteFecha = document.getElementById("FechaNacimiento");
+            const hoy = new Date();
+            const fechaMinPaciente = new Date(hoy.getFullYear(), hoy.getMonth() - 18, hoy.getDate());
+            pacienteFecha.max = fechaMinPaciente.toISOString().split('T')[0];
+
+            pacienteFecha.addEventListener("change", function () {
+                const seleccionada = new Date(this.value);
+                if (seleccionada > fechaMinPaciente) {
+                    alert("El paciente debe tener al menos 18 meses de edad.");
+                    this.value = "";
+                }
+            });
+        });
+    </script>
+}

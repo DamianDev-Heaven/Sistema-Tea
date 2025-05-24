@@ -1,28 +1,37 @@
-﻿using Sistema_Tea.Models;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-public class Paciente
+namespace Sistema_Tea.Models
 {
-    public int PacienteID { get; set; }
+    public class Paciente
+    {
+        [Key]
+        public int PacienteID { get; set; }
 
-    [Required, StringLength(100)]
-    public string Nombre { get; set; }
+        [Required(ErrorMessage = "El nombre es obligatorio")]
+        [StringLength(100)]
+        public string Nombre { get; set; }
 
-    [Required, StringLength(100)]
-    public string Apellidos { get; set; }
+        [Required(ErrorMessage = "Los apellidos son obligatorios")]
+        [StringLength(100)]
+        public string Apellidos { get; set; }
 
-    public DateTime FechaNacimiento { get; set; }
+        public string? Dui { get; set; }
 
-    [Required]
-    public string Sexo { get; set; }
+        [Required(ErrorMessage = "La fecha de nacimiento es obligatoria")]
+        public DateTime FechaNacimiento { get; set; }
 
-    public string DiagnosticoPrevio { get; set; }
+        [Required(ErrorMessage = "El sexo es obligatorio")]
+        public string Sexo { get; set; }
 
-    public int? TutorID { get; set; }
+        [Required(ErrorMessage = "El diagnostico es obligatorio")]
+        public string DiagnosticoPrevio { get; set; }
 
-    public DateTime FechaRegistro { get; set; } = DateTime.Now;
+        public int? TutorID { get; set; }
 
-    public Tutor Tutor { get; set; }
-    public ICollection<AsignacionPaciente> Asignaciones { get; set; }
+        public DateTime FechaRegistro { get; set; } = DateTime.Now;
+        public bool Activo { get; set; } = true;
 
+        public Tutor Tutor { get; set; }
+    }
 }

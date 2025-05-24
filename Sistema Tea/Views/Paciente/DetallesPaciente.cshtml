@@ -1,0 +1,87 @@
+﻿@model Sistema_Tea.Models.Paciente
+
+@{
+    ViewData["Title"] = "Detalles del paciente";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+<link rel="stylesheet" href="~/css/ListarPsi.css" asp-append-version="true" />
+
+<div class="psych-list-container">
+    <div class="psych-list-header">
+        <h2><i class="bi bi-person-lines-fill me-2"></i>Detalles del Paciente</h2>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Volver a la lista de pacientes
+        </a>
+    </div>
+
+    <div class="card shadow-sm p-4 mt-4">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <h5 class="text-primary fw-semibold">Nombre</h5>
+                <p>@Model.Nombre</p>
+            </div>
+            <div class="col-md-6">
+                <h5 class="text-primary fw-semibold">Apellidos</h5>
+                <p>@Model.Apellidos</p>
+            </div>
+            <div class="col-md-6">
+                <h5 class="text-primary fw-semibold">Dui</h5>
+                @if (Model.Dui != null)
+                {
+                    <p>@Model.Dui</p>
+                }
+                else
+                {
+                    <span class="text-muted">Sin Dui</span>
+                }
+            </div>
+
+            <div class="col-md-6">
+                <h5 class="text-primary fw-semibold">Fecha de Nacimiento</h5>
+                <p>@Model.FechaNacimiento.ToString("dd/MM/yyyy")</p>
+            </div>
+            <div class="col-md-6">
+                <h5 class="text-primary fw-semibold">Sexo</h5>
+                <p>@Model.Sexo</p>
+            </div>
+            <div class="col-md-6">
+                <h5 class="text-primary fw-semibold">Diagnostico previo</h5>
+                <p>@Model.DiagnosticoPrevio</p>
+            </div>
+            <div class="col-md-6">
+                <h5 class="text-primary fw-semibold">Activo</h5>
+                <span class="badge @(@Model.Activo ? "bg-success" : "bg-secondary")">
+                    @(@Model.Activo ? "Sí" : "No")
+                </span>
+
+            </div>
+            <div class="col-md-6">
+                <h5 class="text-primary fw-semibold">Fecha de registro</h5>
+                <p>@Model.FechaRegistro</p>
+            </div>
+            <div class="col-md-6">
+                <h5 class="text-primary fw-semibold">Ver tutor</h5>
+                @if (Model.TutorID != null)
+                {
+                    <div>
+                        <a asp-controller="Paciente" asp-action="VerTutor" asp-route-id="@Model.TutorID"
+                           class="btn btn-sm btn-outline-success ms-2" title="Ver Tutor">
+                            <i class="bi bi-eye-fill"></i> Ver Tutor
+                        </a>
+
+                    </div>
+                }
+                else
+                {
+                    <span class="text-muted">Sin tutor</span>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

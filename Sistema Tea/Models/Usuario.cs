@@ -14,6 +14,12 @@ namespace Sistema_Tea.Models
         [StringLength(200, ErrorMessage = "El nombre no debe superar los 200 caracteres.")]
         public string NombreCompleto { get; set; }
 
+
+        [Required(ErrorMessage = "El dui es obligatorio.")]
+        [RegularExpression(@"^\d{9}$", ErrorMessage = "El dui debe tener exactamente 9 dígitos sin guión.")]
+        [StringLength(100)]
+        public string Dui { get; set; }
+
         [Required(ErrorMessage = "El email es obligatorio.")]
         [EmailAddress(ErrorMessage = "El email no tiene un formato válido.")]
         [StringLength(100)]

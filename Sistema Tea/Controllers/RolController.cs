@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Sistema_Tea.Filters;
 using Sistema_Tea.Models;
 using Sistema_Tea.Models.Data;
 
 namespace Sistema_Tea.Controllers
 {
+    [SesionActiva]
     public class RolController : Controller
     {
         private readonly TeaContext _context;

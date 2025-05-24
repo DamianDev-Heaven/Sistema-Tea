@@ -81,6 +81,16 @@
                         <i class="bi bi-file-text-fill"></i> Consentimientos
                     </a>
                 }
+                else if(rol == "Coordinador"){
+
+                    <a asp-controller="Paciente" asp-action="Index" class="list-group-item list-group-item-action">
+                        <i class="bi bi-person-lines-fill"></i> Pacientes
+                    </a>
+                    <a asp-controller="Paciente" asp-action="IndexTutor" class="list-group-item list-group-item-action">
+                        <i class="bi bi-person-vcard"></i> Tutores
+                    </a>
+
+                }
                 <a asp-controller="Cuenta" asp-action="Logout" class="list-group-item list-group-item-action text-danger">
                     <i class="bi bi-box-arrow-right"></i> Cerrar sesión
                 </a>
