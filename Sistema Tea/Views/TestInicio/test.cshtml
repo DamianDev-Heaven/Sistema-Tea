@@ -11,71 +11,262 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@ViewData["Title"]</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 
-    <link rel="stylesheet" href="~/css/ListarPsi.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/tetstIni.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/testIni.css" asp-append-version="true" />
 
- </head>
+    <style>
+        :root {
+            --primary: #3b49df;
+            --primary-light: #e9ecff;
+            --border-radius: 16px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+            color: #212529;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: var(--primary);
+        }
+
+        .opciones-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .opcion-card {
+            flex: 1 1 calc(50% - 1rem);
+            min-width: 150px;
+            background: #fff;
+            border-radius: var(--border-radius);
+            padding: 1.5rem 1rem;
+            box-shadow: var(--box-shadow);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .opcion-card:hover {
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+                transform: translateY(-2px);
+            }
+
+            .opcion-card.selected {
+                background: var(--primary-light);
+                border-color: var(--primary);
+                color: var(--primary);
+            }
+
+            .opcion-card input {
+                display: none;
+            }
+
+            .opcion-card label {
+                cursor: pointer;
+                font-weight: 500;
+                margin-top: 0.5rem;
+            }
+
+        .opcion-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f0f2ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .opcion-card.selected .opcion-icon {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .question-card {
+            background: #fff;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin: 1.5rem 0;
+            box-shadow: var(--box-shadow);
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+            .question-card:hover {
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+                transform: translateY(-2px);
+            }
+
+        .question-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+
+        .submit-btn {
+            font-weight: 600;
+            font-size: 1.1rem;
+            padding: 0.75rem 2rem;
+            border-radius: var(--border-radius);
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            box-shadow: 0 6px 16px rgba(59, 73, 223, 0.3);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .submit-btn:hover {
+                background: #2c3dbd;
+                box-shadow: 0 8px 24px rgba(44, 61, 189, 0.5);
+            }
+
+        footer {
+            background: #fff;
+            border-top: 1px solid #e9ecef;
+            margin-top: 3rem;
+            padding: 1.5rem 0;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+            .footer-content h5 {
+                font-weight: 600;
+            }
+        @@media (max-width: 768px) {
+            .opcion-card
+
+        {
+            flex: 1 1 100%;
+        }
+
+        }
+    </style>
+</head>
 <body>
     <header>
         <nav class="navbar navbar-expand-sm">
             <div class="container-fluid">
                 <a class="navbar-brand d-flex align-items-center">
-                    <i class="bi bi-hospital me-2"></i> eMind
+                    <i class="bi bi-hospital me-2" aria-hidden="true"></i> eMind
                 </a>
             </div>
         </nav>
     </header>
-    <div class="container py-5">
-        <h2 class="mb-4 fw-bold text-center">Responde con sinceridad</h2>
-        <form asp-action="Resultado" method="post">
-            @for (int i = 0; i < Model.Count; i++)
-            {
-                <div class="question-card">
-                    <div class="question-title">@($"{i + 1}. {Model[i].Texto}")</div>
-                    @for (int j = 0; j < Model[i].Opciones.Count; j++)
+    <main class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h1 class="mb-4 fw-bold text-center">Test de Detección de Autismo</h1>
+                <p class="lead text-center mb-5">Responde con sinceridad cada pregunta</p>
+                <form asp-action="Resultado" method="post" class="needs-validation" novalidate>
+                    @for (int i = 0; i < Model.Count; i++)
                     {
-                        var valor = j == 3 ? 4 : (j == 2 ? 3 : (j == 1 ? 2 : 1)); // A=1, B=2, C=3, D=4
-                        var letra = (char)('A' + j);
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="respuestas[@i]" id="resp_@i@j" value="@valor" required />
-                            <label class="form-check-label" for="resp_@i@j">
-                                <strong>@letra)</strong> @Model[i].Opciones[j]
-                            </label>
+                        <div class="question-card" aria-labelledby="pregunta-@i">
+                            <h2 class="question-title" id="pregunta-@i">@($"{i + 1}. {Model[i].Texto}")</h2>
+                            <div class="opciones-container">
+                                @for (int j = 0; j < Model[i].Opciones.Count; j++)
+                                {
+                                    var valor = j == 3 ? 4 : (j == 2 ? 3 : (j == 1 ? 2 : 1)); // A=1, B=2, C=3, D=4
+                                    var letra = (char)('A' + j);
+                                    var iconos = new[] { "bi-emoji-smile", "bi-emoji-neutral", "bi-emoji-frown", "bi-emoji-dizzy" };
+                                    <div class="opcion-card" onclick="seleccionarOpcion(this, @i, @j)">
+                                        <input type="radio" name="respuestas[@i]" id="resp_@i@j" value="@valor" required />
+                                        <div class="opcion-icon">
+                                            <i class="bi @iconos[j]"></i>
+                                        </div>
+                                        <label for="resp_@i@j">
+                                            <strong>@letra)</strong> @Model[i].Opciones[j]
+                                        </label>
+                                    </div>
+                                }
+                            </div>
                         </div>
                     }
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn submit-btn py-3 px-4">
+                            <i class="bi bi-check2-circle me-2"></i> Ver Resultado
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+    <footer class="bg-light rounded shadow-sm">
+        <div class="container py-4">
+            <div class="footer-content">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Clínica de Evaluación TEA eMind</h5>
+                        <p><i class="bi bi-geo-alt-fill me-2" aria-hidden="true"></i> Santa Ana</p>
+                        <p><i class="bi bi-telephone-fill me-2" aria-hidden="true"></i> (+503) 2401-3421</p>
+                        <p><i class="bi bi-envelope-fill me-2" aria-hidden="true"></i> eMind@gmail.com</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <p class="mb-0">© @DateTime.Now.Year Clínica eMind - Todos los derechos reservados</p>
+                    </div>
                 </div>
-            }
-
-            <div class="text-center">
-                <button type="submit" class="btn btn-light text-primary submit-btn">
-                    <i class="bi bi-check2-circle me-2"></i> Ver Resultado
-                </button>
-            </div>
-        </form>
-    </div>
-    <!-- Footer -->
-    <footer class="bg-light p-4 rounded shadow-sm">
-        <div class="row">
-            <div class="col-md-6">
-                <h5>Clínica de Evaluación TEA eMind</h5>
-                <p><i class="bi bi-geo-alt-fill me-2"></i> Santa Ana</p>
-                <p>
-                    <i class="bi bi-telephone-fill me-2"></i>  (+503) 2401-3421
-                </p>
-                <p><i class="bi bi-envelope-fill me-2"></i> eMind@gmail.com</p>
-            </div>
-            <div class="col-md-6 text-md-end">
-                <p class="mb-0">© @DateTime.Now.Year Clínica eMind - Todos los derechos reservados</p>
             </div>
         </div>
     </footer>
-    </div>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Script para seleccionar opciones -->
+    <script>
+        function seleccionarOpcion(card, pregunta, opcion) {
+            // Deseleccionar todas las opciones de esta pregunta
+            const cards = card.closest('.question-card').querySelectorAll('.opcion-card');
+            cards.forEach(c => c.classList.remove('selected'));
+            // Seleccionar la opción clickeada
+            card.classList.add('selected');
+            // Marcar el radio button
+            const radio = card.querySelector('input[type="radio"]');
+            radio.checked = true;
+        }
+        // Validación de formulario
+        (() => {
+            'use strict';
+            const forms = document.querySelectorAll('.needs-validation');
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        // Mostrar feedback visual si faltan respuestas
+                        const preguntas = form.querySelectorAll('.question-card');
+                        preguntas.forEach(pregunta => {
+                            const seleccionada = pregunta.querySelector('.opcion-card.selected');
+                            if (!seleccionada) {
+                                pregunta.classList.add('shake');
+                                setTimeout(() => pregunta.classList.remove('shake'), 500);
+                            }
+                        });
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+    </script>
 </body>
 </html>

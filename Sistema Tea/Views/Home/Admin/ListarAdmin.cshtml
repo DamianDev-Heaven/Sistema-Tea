@@ -1,0 +1,140 @@
+﻿@model List<Sistema_Tea.Models.Usuario>
+
+@{
+    ViewData["Title"] = "Lista de Administradores";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+<link rel="stylesheet" href="~/css/ListarPsi.css" asp-append-version="true" />
+
+<div class="psych-list-container">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="psych-list-header sticky-top">
+        <h2>
+            <i class="bi bi-shield-lock-fill me-2"></i>
+            Administradores Registrados
+        </h2>
+        <a asp-action="CrearAdministrador" class="btn btn-primary add-btn d-none d-md-flex align-items-center gap-2">
+            <i class="bi bi-plus-circle"></i> Nuevo Administrador
+        </a>
+    </div>
+
+    <!-- Buscador -->
+    <div class="mb-3">
+        <input id="buscadorAdministrador" type="text" class="form-control" placeholder="Buscar por nombre o correo..." />
+    </div>
+
+    <div class="table-responsive">
+        <table class="table psych-table align-middle mb-0" id="tablaAdministradores">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Fecha de Registro</th>
+                    <th>Activo</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var admin in Model)
+                {
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="avatar-circle">
+                                    @admin.NombreCompleto.Substring(0, 1).ToUpper()
+                                </span>
+                                <span class="fw-semibold nombre">@admin.NombreCompleto</span>
+                            </div>
+                        </td>
+                        <td class="text-truncate correo" style="max-width: 220px;">@admin.Email</td>
+                        <td>@admin.FechaCreacion.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <span class="badge @(admin.Activo ? "bg-success" : "bg-secondary")">
+                                @(admin.Activo ? "Sí" : "No")
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <a asp-action="EditarAdministrador" asp-route-id="@admin.UsuarioID"
+                               class="btn btn-sm btn-outline-primary rounded-circle" title="Editar">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <a href="#" class="btn btn-sm btn-outline-danger rounded-circle eliminar-btn"
+                               data-id="@admin.UsuarioID" data-nombre="@admin.NombreCompleto" title="Eliminar">
+                                <i class="bi bi-trash3-fill"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <a asp-action="CrearAdministrador" class="btn btn-primary add-btn-float d-md-none" title="Nuevo Administrador">
+        <i class="bi bi-plus"></i>
+    </a>
+</div>
+
+<div class="modal fade" id="confirmarEliminarModal" tabindex="-1" aria-labelledby="confirmarEliminarLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form asp-action="EliminarAdministrador" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmarEliminarLabel">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar al administrador <strong id="nombreAdministrador"></strong>?</p>
+                    <input type="hidden" name="usuarioId" id="usuarioIdEliminar" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const eliminarBtns = document.querySelectorAll(".eliminar-btn");
+            const modal = new bootstrap.Modal(document.getElementById("confirmarEliminarModal"));
+            const inputId = document.getElementById("usuarioIdEliminar");
+            const nombreSpan = document.getElementById("nombreAdministrador");
+
+            eliminarBtns.forEach(btn => {
+                btn.addEventListener("click", function () {
+                    const id = this.getAttribute("data-id");
+                    const nombre = this.getAttribute("data-nombre");
+                    inputId.value = id;
+                    nombreSpan.textContent = nombre;
+                    modal.show();
+                });
+            });
+
+            const buscador = document.getElementById("buscadorAdministrador");
+            const filas = document.querySelectorAll("#tablaAdministradores tbody tr");
+
+            buscador.addEventListener("input", function () {
+                const texto = this.value.toLowerCase();
+                filas.forEach(fila => {
+                    const nombre = fila.querySelector(".nombre").textContent.toLowerCase();
+                    const correo = fila.querySelector(".correo").textContent.toLowerCase();
+                    fila.style.display = (nombre.includes(texto) || correo.includes(texto)) ? "" : "none";
+                });
+            });
+        });
+    </script>
+}

@@ -23,7 +23,6 @@ namespace Sistema_Tea.Controllers
             return View();
         }
 
-        // === Función para obtener el rango de fechas del mes actual y el mes anterior :D, asi es un poco de canchereo ====
         private (DateTime InicioMesActual, DateTime InicioMesAnterior, DateTime FinMesAnterior) GetDateRanges()
         {
             var now = DateTime.Now;
@@ -48,7 +47,6 @@ namespace Sistema_Tea.Controllers
             {
                 var (inicioMesActual, inicioMesAnterior, finMesAnterior) = GetDateRanges();
 
-                // ==== Psicólogos ====
                 var psicologosMesActual = _context.Usuario
                     .Include(u => u.Rol)
                     .Where(u => u.Rol.NombreRol == "Psicologo" && u.FechaCreacion >= inicioMesActual)
@@ -63,7 +61,6 @@ namespace Sistema_Tea.Controllers
                 ViewBag.TotalPsicologos = psicologosMesActual;
                 ViewBag.CambioPsicologos = CalcularCambioPorcentual(psicologosMesAnterior, psicologosMesActual);
 
-                // ==== Pacientes ====
                 var pacientesMesActual = _context.Paciente
                     .Where(p => p.FechaRegistro >= inicioMesActual)
                     .Count();
@@ -75,7 +72,6 @@ namespace Sistema_Tea.Controllers
                 ViewBag.TotalPacientes = pacientesMesActual;
                 ViewBag.CambioPacientes = CalcularCambioPorcentual(pacientesMesAnterior, pacientesMesActual);
 
-                // ==== Coordinadores Clínicos ====
                 var coordinadoresMesActual = _context.Usuario
                     .Include(u => u.Rol)
                     .Where(u => u.Rol.NombreRol == "Coordinador" && u.FechaCreacion >= inicioMesActual)
@@ -90,7 +86,6 @@ namespace Sistema_Tea.Controllers
                 ViewBag.TotalCoordinadores = coordinadoresMesActual;
                 ViewBag.CambioCoordinadores = CalcularCambioPorcentual(coordinadoresMesAnterior, coordinadoresMesActual);
 
-                // ==== Sesiones ====
                 int sesionesActual = _context.ADOS2_Sesion.Count(s => s.FechaInicio >= inicioMesActual)
                                    + _context.ADIR_Sesion.Count(s => s.FechaInicio >= inicioMesActual)
                                    + _context.CARS2_Sesion.Count(s => s.FechaInicio >= inicioMesActual);
@@ -102,7 +97,6 @@ namespace Sistema_Tea.Controllers
                 ViewBag.TotalSesiones = sesionesActual;
                 ViewBag.CambioSesiones = CalcularCambioPorcentual(sesionesAnterior, sesionesActual);
 
-                // ==== Sesiones Pendientes ====
                 int sesionesPendientes = _context.ADOS2_Sesion.Count(s => s.Estado == "Pendiente")
                                        + _context.ADIR_Sesion.Count(s => s.Estado == "Pendiente")
                                        + _context.CARS2_Sesion.Count(s => s.Estado == "Pendiente");
@@ -123,15 +117,93 @@ namespace Sistema_Tea.Controllers
             return View("Admin/ListarPsicologos", psicologos);
         }
 
-        private string CalcularCambioPorcentual(int anterior, int actual)
+        public IActionResult ListarAdministradores()
         {
-            if (anterior == 0)
-                return actual > 0 ? "+100%" : "0%";
+            var administradores = _context.Usuario
+                .Include(u => u.Rol)
+                .Where(u => u.Rol.NombreRol == "Administrador")
+                .ToList();
+            return View("Admin/ListarAdmin", administradores);
+        }
+        public IActionResult CrearAdministrador()
+        {
+            var roles = _context.Rol.ToList();
+            var rolAdministrador = roles.FirstOrDefault(r => r.NombreRol == "Administrador");
 
-            var cambio = ((double)(actual - anterior) / anterior) * 100;
-            return (cambio >= 0 ? "+" : "") + Math.Round(cambio, 1) + "%";
+            if (rolAdministrador == null)
+            {
+                TempData["ErrorMessage"] = "No se encontró el rol Administrador en la base de datos.";
+                return RedirectToAction("ListarAdministradores");
+            }
+
+            ViewBag.Roles = new SelectList(roles, "RolID", "NombreRol", rolAdministrador.RolID);
+
+            var nuevoAdministrador = new Usuario
+            {
+                RolID = rolAdministrador.RolID
+            };
+
+            return View("Admin/CrearAdministrador", nuevoAdministrador);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CrearAdministrador(Usuario model)
+        {
+            var rolAdministrador = await _context.Rol.FirstOrDefaultAsync(r => r.NombreRol == "Administrador");
+            if (rolAdministrador == null)
+            {
+                ModelState.AddModelError("", "No se encontró el rol Administrador.");
+                return View("Admin/CrearAdministrador", model);
+            }
+
+            model.RolID = rolAdministrador.RolID;
+            ModelState.Remove("RolID");
+
+            if (await _context.Usuario.AnyAsync(u => u.Email == model.Email))
+            {
+                ModelState.AddModelError("Email", "El correo electrónico ya está registrado.");
+                var roles = await _context.Rol.ToListAsync();
+                ViewBag.Roles = new SelectList(roles, "RolID", "NombreRol", model.RolID);
+                return View("Admin/CrearAdministrador", model);
+            }
+
+            if (await _context.Usuario.AnyAsync(u => u.Dui == model.Dui))
+            {
+                ModelState.AddModelError("Dui", "El Dui ya está registrado.");
+                var roles = await _context.Rol.ToListAsync();
+                ViewBag.Roles = new SelectList(roles, "RolID", "NombreRol", model.RolID);
+                return View("Admin/CrearAdministrador", model);
+            }
+
+            model.FechaCreacion = DateTime.Now;
+            model.Activo = true;
+            model.ContrasenaHash = HashPassword(model.ContrasenaHash);
+
+            _context.Usuario.Add(model);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Administrador creado correctamente.";
+            return RedirectToAction("ListarAdministradores");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EliminarAdministrador(int usuarioId)
+        {
+            var administrador = await _context.Usuario.FindAsync(usuarioId);
+            if (administrador == null)
+            {
+                TempData["ErrorMessage"] = "Administrador no encontrado.";
+                return RedirectToAction("ListarAdministradores");
+            }
+
+            _context.Usuario.Remove(administrador);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Administrador eliminado correctamente.";
+            return RedirectToAction("ListarAdministradores");
+        }
         public IActionResult CrearPsicologo()
         {
             var roles = _context.Rol.ToList();
@@ -167,7 +239,6 @@ namespace Sistema_Tea.Controllers
             model.RolID = rolPsicologo.RolID;
             ModelState.Remove("RolID");
 
-            
             if (await _context.Usuario.AnyAsync(u => u.Email == model.Email))
             {
                 ModelState.AddModelError("Email", "El correo electrónico ya está registrado.");
@@ -301,6 +372,15 @@ namespace Sistema_Tea.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        private string CalcularCambioPorcentual(int anterior, int actual)
+        {
+            if (anterior == 0)
+                return actual > 0 ? "+100%" : "0%";
+
+            var cambio = ((double)(actual - anterior) / anterior) * 100;
+            return (cambio >= 0 ? "+" : "") + Math.Round(cambio, 1) + "%";
         }
     }
 }
