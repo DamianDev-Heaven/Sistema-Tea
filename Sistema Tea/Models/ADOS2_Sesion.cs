@@ -1,40 +1,50 @@
-﻿using Sistema_Tea.Models;
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-public class ADOS2_Sesion
+﻿namespace Sistema_Tea.Models
 {
-    [Key]
-    public int SesionID { get; set; }
+    using System;
+    using System.ComponentModel.DataAnnotations;
+    using System.ComponentModel.DataAnnotations.Schema;
 
-    [Required]
-    public int PacienteID { get; set; }
+    public class ADOS2_Sesion
+    {
+        [Key]
+        public int SesionID { get; set; }
 
-    [Required]
-    public int PsicologoID { get; set; }
+        [Required]
+        public int PacienteID { get; set; }
 
-    [Required]
-    [StringLength(2)]
-    public string Modulo { get; set; }
+        [Required]
+        public int PsicologoID { get; set; }
 
-    [Required]
-    [StringLength(20)]
-    public string Estado { get; set; } = "Pendiente";
+        [Required]
+        [StringLength(2)]
+        public string Modulo { get; set; }
 
-    [Required]
-    public DateTime FechaInicio { get; set; } = DateTime.Now;
+        public int? EdadEvaluacionMeses { get; set; }
 
-    public DateTime? FechaFin { get; set; }
+        [Required]
+        [StringLength(20)]
+        public string Estado { get; set; } = "Pendiente";
 
-    public string? Notas { get; set; }
+        [Required]
+        public DateTime FechaInicio { get; set; } = DateTime.Now;
 
-    [StringLength(500)]
-    public string? MotivoPausaCancelacion { get; set; }
+        public DateTime? FechaFin { get; set; }
 
-    [ForeignKey("PacienteID")]
-    public Paciente Paciente { get; set; }
+        public string? NotasGeneralesSesion { get; set; }
 
-    [ForeignKey("PsicologoID")]
-    public Usuario Psicologo { get; set; }
+        [StringLength(500)]
+        public string? MotivoPausaCancelacion { get; set; }
+
+        public int? ConsentimientoID { get; set; }
+
+        // Relaciones
+        [ForeignKey("PacienteID")]
+        public Paciente Paciente { get; set; }
+
+        [ForeignKey("PsicologoID")]
+        public Usuario Psicologo { get; set; }
+
+        [ForeignKey("ConsentimientoID")]
+        public Consentimiento Consentimiento { get; set; }
+    }
 }

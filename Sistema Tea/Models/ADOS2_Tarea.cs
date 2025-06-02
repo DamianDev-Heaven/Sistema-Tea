@@ -1,21 +1,21 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
+[Table("ADOS2_TareaDefinicion")]
 public class ADOS2_Tarea
 {
     [Key]
-    public int TareaID { get; set; }
+    public int TareaDefinicionID { get; set; }
 
     [Required]
     [StringLength(2)]
     public string Modulo { get; set; }
 
     [Required]
-    [StringLength(100)]
+    [StringLength(150)]
     public string NombreTarea { get; set; }
 
-    public string? Instrucciones { get; set; }
+    public string? Descripcion { get; set; }
 
-    [Required]
-    [StringLength(20)]
-    public string TipoRespuesta { get; set; }
+    public string? InstruccionesAdministracion { get; set; }
 }
