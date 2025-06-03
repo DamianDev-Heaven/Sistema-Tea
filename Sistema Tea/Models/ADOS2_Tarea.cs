@@ -1,21 +1,25 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-[Table("ADOS2_TareaDefinicion")]
-public class ADOS2_Tarea
+﻿namespace Sistema_Tea.Models
 {
-    [Key]
-    public int TareaDefinicionID { get; set; }
+    using System.ComponentModel.DataAnnotations;
+    using System.ComponentModel.DataAnnotations.Schema;
 
-    [Required]
-    [StringLength(2)]
-    public string Modulo { get; set; }
+    [Table("ADOS2_TareaDefinicion")]
+    public class ADOS2_Tarea
+    {
+        [Key]
+        public int TareaDefinicionID { get; set; }
 
-    [Required]
-    [StringLength(150)]
-    public string NombreTarea { get; set; }
+        [Required]
+        [StringLength(2)]
+        public string Modulo { get; set; }
 
-    public string? Descripcion { get; set; }
+        [Required]
+        [StringLength(150)]
+        public string NombreTarea { get; set; }
 
-    public string? InstruccionesAdministracion { get; set; }
+        public string? Descripcion { get; set; }
+
+        public string? InstruccionesAdministracion { get; set; }
+    }
 }
+

@@ -63,8 +63,6 @@ namespace Sistema_Tea.Controllers
             return View(new ADOS2_Sesion());
         }
 
-
-
         [HttpPost]
         public async Task<IActionResult> CrearSesion(ADOS2_Sesion nuevaSesion)
         {
@@ -157,8 +155,46 @@ namespace Sistema_Tea.Controllers
         public async Task<IActionResult> IniciarTestADOS2(int id)
         {
             var sesion = await _context.ADOS2_Sesion
-                                      .Include(s => s.Paciente) 
-                                      .FirstOrDefaultAsync(s => s.SesionID == id);
+                                          .Include(s => s.Paciente)
+                                          .Include(s => s.Psicologo)
+                                          .FirstOrDefaultAsync(s => s.SesionID == id);
+            if (sesion == null || sesion.Estado != "Pendiente")
+                return NotFound();
+
+            if (sesion.Modulo == "T")
+            {
+                return View("ModuloT", sesion);
+            }
+            else if (int.Parse(sesion.Modulo) == 1)
+            {
+                return View("Modulo1", sesion);
+
+            }
+            else if (int.Parse(sesion.Modulo) == 2)
+            {
+                return View("Modulo2", sesion);
+
+            }
+            else if (int.Parse(sesion.Modulo) == 3)
+            {
+                return View("Modulo3", sesion);
+
+            }
+            else if (int.Parse(sesion.Modulo) == 4)
+            {
+                return View("IniciarTestADOS2", sesion);
+            }
+
+            return View(sesion);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> ConfirmarSesion(int SesionID)
+        {
+            var sesion = await _context.ADOS2_Sesion
+                                         .Include(s => s.Paciente)
+                                         .FirstOrDefaultAsync(s => s.SesionID == SesionID);
 
             if (sesion == null || sesion.Estado != "Pendiente")
                 return NotFound();
@@ -167,9 +203,87 @@ namespace Sistema_Tea.Controllers
             sesion.FechaInicio = DateTime.Now;
             await _context.SaveChangesAsync();
 
-            return View(sesion);
+            var tareas = await _context.ADOS2_Tarea
+                                       .Where(t => t.Modulo == "T")
+                                       .OrderBy(t => t.TareaDefinicionID)
+                                       .ToListAsync();
+
+            if (tareas == null || tareas.Count == 0)
+                return NotFound("No hay tareas definidas para el módulo T.");
+
+            var primeraTarea = tareas[0];
+
+            ViewBag.SiguienteIndex = 0; 
+            ViewBag.SesionId = SesionID;
+
+            return View("TareasModuloT", primeraTarea);
         }
 
-        
+        [HttpGet]
+        public async Task<IActionResult> TareasModulo(int sesionId, int tareaIndex)
+        {
+            var sesion = await _context.ADOS2_Sesion
+                .Include(s => s.Paciente)
+                .FirstOrDefaultAsync(s => s.SesionID == sesionId);
+            if (sesion == null || sesion.Estado != "EnProgreso")
+                return NotFound();
+
+            var tareas = await _context.ADOS2_Tarea
+                .Where(t => t.Modulo == sesion.Modulo)
+                .OrderBy(t => t.TareaDefinicionID)
+                .ToListAsync();
+
+            if (tareas.Count == 0)
+                return NotFound("No hay tareas definidas para este módulo.");
+
+            if (tareaIndex < 0 || tareaIndex >= tareas.Count)
+            {
+                sesion.Estado = "Completado";
+                sesion.FechaFin = DateTime.Now;
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Index");
+            }
+
+            var tareaActual = tareas[tareaIndex];
+
+            ViewBag.SesionId = sesionId;
+            ViewBag.TareaIndex = tareaIndex;
+            ViewBag.SiguienteIndex = tareaIndex + 1;
+            ViewBag.TotalTareas = tareas.Count;
+
+            return View("TareasModuloT", tareaActual);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GuardarYContinuar(int sesionId, int tareaDefinicionId, int codigoObservado, string notasObservacionItem, int tareaIndex)
+        {
+            var itemPuntuadoExistente = await _context.ADOS2_ItemPuntuado
+                .FirstOrDefaultAsync(i => i.SesionID == sesionId && i.TareaDefinicionID == tareaDefinicionId);
+
+            if (itemPuntuadoExistente != null)
+            {
+                itemPuntuadoExistente.CodigoObservado = codigoObservado;
+                itemPuntuadoExistente.NotasObservacionItem = notasObservacionItem;
+                _context.ADOS2_ItemPuntuado.Update(itemPuntuadoExistente);
+            }
+            else
+            {
+                var nuevoItem = new ADOS2_ItemPuntuado
+                {
+                    SesionID = sesionId,
+                    TareaDefinicionID = tareaDefinicionId,
+                    CodigoObservado = codigoObservado,
+                    NotasObservacionItem = notasObservacionItem
+                };
+                _context.ADOS2_ItemPuntuado.Add(nuevoItem);
+            }
+
+            await _context.SaveChangesAsync();
+
+            int siguienteIndex = tareaIndex + 1;
+
+            return RedirectToAction("TareasModulo", new { sesionId = sesionId, tareaIndex = siguienteIndex });
+        }
     }
+    
 }

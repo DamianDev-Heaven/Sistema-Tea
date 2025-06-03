@@ -71,7 +71,6 @@
             if (!pacienteId) {
                 edadInput.value = "";
                 mensajeDiv.innerHTML = "";
-                // Habilitar todas las opciones
                 Array.from(moduloSelect.options).forEach(option => {
                     if (option.value !== "") {
                         option.disabled = false;
