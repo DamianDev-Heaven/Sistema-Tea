@@ -216,7 +216,7 @@ namespace Sistema_Tea.Controllers
             ViewBag.SiguienteIndex = 0; 
             ViewBag.SesionId = SesionID;
 
-            return View("TareasModuloT", primeraTarea);
+            return View("TareasModulos", primeraTarea);
         }
 
         [HttpGet]
@@ -251,7 +251,7 @@ namespace Sistema_Tea.Controllers
             ViewBag.SiguienteIndex = tareaIndex + 1;
             ViewBag.TotalTareas = tareas.Count;
 
-            return View("TareasModuloT", tareaActual);
+            return View("TareasModulos", tareaActual);
         }
 
         [HttpPost]
