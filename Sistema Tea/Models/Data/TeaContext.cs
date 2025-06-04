@@ -16,19 +16,19 @@ namespace Sistema_Tea.Models.Data
         public DbSet<Consentimiento> Consentimiento { get; set; }
 
         public DbSet<ADOS2_Sesion> ADOS2_Sesion { get; set; }
-        public DbSet<ADOS2_Tarea> ADOS2_Tarea { get; set; }
-        public DbSet<ADOS2_Resultado> ADOS2_Resultado { get; set; }
+        public DbSet<ADOS2_TareaDefinicion> ADOS2_Tarea { get; set; }
+        public DbSet<ADOS2_ResultadoGlobalSesion> ADOS2_Resultado { get; set; }
         public DbSet<ADOS2_ItemPuntuado> ADOS2_ItemPuntuado { get; set; }
 
         public DbSet<ADIR_Sesion> ADIR_Sesion { get; set; }
-        public DbSet<ADIR_Pregunta> ADIR_Pregunta { get; set; }
-        public DbSet<ADIR_Resultado> ADIR_Resultado { get; set; }
+        public DbSet<ADIR_PreguntaDefinicion> ADIR_Pregunta { get; set; }
+        public DbSet<ADIR_ResultadoGlobalSesion> ADIR_Resultado { get; set; }
 
         public DbSet<CARS2_Sesion> CARS2_Sesion { get; set; }
-        public DbSet<CARS2_Item> CARS2_Item { get; set; }
-        public DbSet<CARS2_Resultado> CARS2_Resultado { get; set; }
+        public DbSet<CARS2_ItemDefinicion> CARS2_Item { get; set; }
+        public DbSet<CARS2_ItemPuntuado> CARS2_Resultado { get; set; }
 
-        public DbSet<CARS2_QPC_Pregunta> CARS2_QPC_Pregunta { get; set; }
+        public DbSet<CARS2_QPC_PreguntaDefinicion> CARS2_QPC_Pregunta { get; set; }
         public DbSet<CARS2_QPC_Respuesta> CARS2_QPC_Respuesta { get; set; }
 
         public DbSet<Auditoria> Auditoria { get; set; }

@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Sistema_Tea.Models
 {
+    [Table("ADOS2_ItemPuntuado")]
     public class ADOS2_ItemPuntuado
     {
         [Key]
@@ -10,19 +11,17 @@ namespace Sistema_Tea.Models
 
         [Required]
         public int SesionID { get; set; }
+        [ForeignKey("SesionID")]
+        public virtual ADOS2_Sesion ADOS2_Sesion { get; set; }
 
         [Required]
         public int TareaDefinicionID { get; set; }
+        [ForeignKey("TareaDefinicionID")]
+        public virtual ADOS2_TareaDefinicion TareaDefinicion { get; set; }
 
         [Required]
         public int CodigoObservado { get; set; }
 
-        public string? NotasObservacionItem { get; set; }
-     
-        [ForeignKey("SesionID")]
-        public ADOS2_Sesion Sesion { get; set; }
-
-        [ForeignKey("TareaDefinicionID")]
-        public ADOS2_Tarea TareaDefinicion { get; set; }
+        public string? NotasObservacionItem { get; set; } 
     }
 }
