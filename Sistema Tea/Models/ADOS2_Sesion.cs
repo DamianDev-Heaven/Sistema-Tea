@@ -1,40 +1,58 @@
-﻿using Sistema_Tea.Models;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-public class ADOS2_Sesion
+namespace Sistema_Tea.Models
 {
-    [Key]
-    public int SesionID { get; set; }
+    [Table("ADOS2_Sesion")]
+    public class ADOS2_Sesion
+    {
+        [Key]
+        public int SesionID { get; set; }
 
-    [Required]
-    public int PacienteID { get; set; }
+        [Required]
+        public int PacienteID { get; set; }
+        [ForeignKey("PacienteID")]
+        public virtual Paciente Paciente { get; set; }
 
-    [Required]
-    public int PsicologoID { get; set; }
+        [Required]
+        public int PsicologoID { get; set; }
+        [ForeignKey("PsicologoID")]
+        public virtual Usuario Psicologo { get; set; }
 
-    [Required]
-    [StringLength(2)]
-    public string Modulo { get; set; }
+        [Required]
+        [StringLength(2)]
+        public string Modulo { get; set; }
 
-    [Required]
-    [StringLength(20)]
-    public string Estado { get; set; } = "Pendiente";
+        public int? EdadEvaluacionMeses { get; set; }
 
-    [Required]
-    public DateTime FechaInicio { get; set; } = DateTime.Now;
+        [Required]
+        [StringLength(20)]
+        public string Estado { get; set; }
 
-    public DateTime? FechaFin { get; set; }
+        [Required]
+        public DateTime FechaInicio { get; set; }
 
-    public string? Notas { get; set; }
+        public DateTime? FechaFin { get; set; }
 
-    [StringLength(500)]
-    public string? MotivoPausaCancelacion { get; set; }
+        public string? NotasGeneralesSesion { get; set; } // NVARCHAR(MAX)
 
-    [ForeignKey("PacienteID")]
-    public Paciente Paciente { get; set; }
+        [StringLength(500)]
+        public string? MotivoPausaCancelacion { get; set; }
 
-    [ForeignKey("PsicologoID")]
-    public Usuario Psicologo { get; set; }
+        public int? ConsentimientoID { get; set; }
+        [ForeignKey("ConsentimientoID")]
+        public virtual Consentimiento? Consentimiento { get; set; }
+
+        public virtual ICollection<ADOS2_ItemPuntuado> ItemsPuntuados { get; set; }
+        public virtual ADOS2_ResultadoGlobalSesion? ResultadoGlobalSesion { get; set; } // Para relación 1-a-1
+
+        public ADOS2_Sesion()
+        {
+            FechaInicio = DateTime.Now; // Valor por defecto
+            Estado = "Pendiente"; // Valor por defecto
+            ItemsPuntuados = new HashSet<ADOS2_ItemPuntuado>();
+        }
+    }
 }

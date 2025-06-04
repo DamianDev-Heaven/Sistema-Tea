@@ -1,0 +1,111 @@
+﻿@model Sistema_Tea.Models.ADOS2_Sesion
+@{
+    ViewData["Title"] = "Asignar nueva sesión ADOS-2";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
+<form asp-action="CrearSesion" method="post">
+    <div class="form-group">
+        <label asp-for="PacienteID" class="control-label">Paciente</label>
+        <select asp-for="PacienteID" class="form-control" asp-items="ViewBag.Pacientes" id="PacienteID">
+            <option value="">-- Selecciona un paciente --</option>
+        </select>
+        <span asp-validation-for="PacienteID" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Modulo" class="control-label">Módulo</label>
+        <select asp-for="Modulo" class="form-control" id="Modulo">
+            <option value="">-- Selecciona módulo --</option>
+            <option value="T">T</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+        </select>
+        <span asp-validation-for="Modulo" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="EdadEvaluacionMeses" class="control-label">Edad en meses</label>
+        <input asp-for="EdadEvaluacionMeses" class="form-control" type="number" id="EdadEvaluacionMeses" readonly />
+        <span asp-validation-for="EdadEvaluacionMeses" class="text-danger"></span>
+    </div>
+
+    <div id="mensajeEdad" class="text-info font-weight-bold mb-3"></div>
+
+    <div class="form-group">
+        <label asp-for="NotasGeneralesSesion" class="control-label">Notas generales (opcional)</label>
+        <textarea asp-for="NotasGeneralesSesion" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="NotasGeneralesSesion" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">Guardar sesión</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        document.getElementById("PacienteID").addEventListener("change", function () {
+            const pacienteId = this.value;
+            const moduloSelect = document.getElementById("Modulo");
+            const edadInput = document.getElementById("EdadEvaluacionMeses");
+            const mensajeDiv = document.getElementById("mensajeEdad");
+
+            if (!pacienteId) {
+                edadInput.value = "";
+                mensajeDiv.innerHTML = "";
+                Array.from(moduloSelect.options).forEach(option => {
+                    if (option.value !== "") {
+                        option.disabled = false;
+                    }
+                });
+                return;
+            }
+
+            fetch(`/Ados2/ObtenerEdadYModulos?pacienteId=${pacienteId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                        return;
+                    }
+
+                    // Establecer edad
+                    edadInput.value = data.edadMeses;
+
+                    mensajeDiv.innerHTML = `Módulos recomendados: ${data.modulos.join(', ')}`;
+
+                    Array.from(moduloSelect.options).forEach(option => {
+                        if (option.value !== "") {
+                            option.disabled = !data.modulos.includes(option.value);
+                            if (option.disabled && option.selected) {
+                                option.selected = false;
+                                moduloSelect.value = "";
+                            }
+                        }
+                    });
+                })
+                .catch(err => {
+                    console.error('Error al obtener datos del paciente:', err);
+                    alert('Error al obtener información del paciente');
+                });
+        });
+    </script>
+}

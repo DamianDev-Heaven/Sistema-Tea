@@ -60,7 +60,7 @@
                         <i class="bi bi-boxes"></i> Coordinadores
                     </a>
                     <a asp-controller="Home" asp-action="ListarAdministradores" class="list-group-item list-group-item-action">
-                        <i class="bi bi-boxes"></i> Administradores
+                        <i class="bi bi-award"></i> Administradores
                     </a>
                     <a asp-controller="Rol" asp-action="Index" class="list-group-item list-group-item-action">
                         <i class="bi bi-shield-lock-fill"></i> Roles
@@ -83,6 +83,9 @@
                     <a asp-controller="Consentimiento" asp-action="Index" class="list-group-item list-group-item-action">
                         <i class="bi bi-file-text-fill"></i> Consentimientos
                     </a>
+                    <a asp-controller="Ados2" asp-action="Index" class="list-group-item list-group-item-action">
+                        <i class="bi bi-spellcheck"></i> Test
+                    </a>
                 }
                 else if(rol == "Coordinador"){
 
@@ -91,6 +94,9 @@
                     </a>
                     <a asp-controller="Paciente" asp-action="IndexTutor" class="list-group-item list-group-item-action">
                         <i class="bi bi-person-vcard"></i> Tutores
+                    </a>
+                    <a asp-controller="AsignacionPaciente" asp-action="Index" class="list-group-item list-group-item-action">
+                        <i class="bi bi-person-vcard"></i> Asignaciones
                     </a>
 
                 }

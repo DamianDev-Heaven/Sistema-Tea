@@ -1,17 +1,35 @@
-﻿using Sistema_Tea.Models;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-public class Auditoria
+namespace Sistema_Tea.Models
 {
-    public int AuditoriaID { get; set; }
+    [Table("Auditoria")]
+    public class Auditoria
+    {
+        [Key]
+        public int AuditoriaID { get; set; }
 
-    public int? UsuarioID { get; set; }
+        public int? UsuarioID { get; set; }
+        [ForeignKey("UsuarioID")]
+        public virtual Usuario? Usuario { get; set; }
 
-    public DateTime FechaAccion { get; set; } = DateTime.Now;
+        [Required]
+        public DateTime FechaAccion { get; set; }
 
-    public string TipoAccion { get; set; }
-    public string Tabla { get; set; }
-    public int? RegistroID { get; set; }
-    public string Detalles { get; set; }
+        [StringLength(100)]
+        public string? TipoAccion { get; set; }
 
-    public Usuario Usuario { get; set; }
+        [StringLength(100)]
+        public string? TablaAfectada { get; set; }
+
+        public int? RegistroAfectadoID { get; set; }
+
+        public string? Detalles { get; set; } // NVARCHAR(MAX)
+
+        public Auditoria()
+        {
+            FechaAccion = DateTime.Now; // Valor por defecto
+        }
+    }
 }

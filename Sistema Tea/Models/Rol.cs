@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Sistema_Tea.Models
 {
+    [Table("Rol")]
     public class Rol
     {
         [Key]
@@ -12,6 +14,15 @@ namespace Sistema_Tea.Models
         [StringLength(50)]
         public string NombreRol { get; set; }
 
-       // public ICollection<Usuario> Usuarios { get; set; }
+        public virtual ICollection<Usuario> Usuarios { get; set; }
+
+        public Rol()
+        {
+            Usuarios = new HashSet<Usuario>();
+        }
+
+        public const string Administrador = "Administrador";
+        public const string Psicologo = "Psicologo";
+        public const string Coordinador = "Coordinador";
     }
 }

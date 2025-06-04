@@ -1,42 +1,63 @@
-﻿using Sistema_Tea.Models;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-public class ADIR_Sesion
+namespace Sistema_Tea.Models
 {
-    [Key]
-    public int SesionID { get; set; }
+    [Table("ADIR_Sesion")]
+    public class ADIR_Sesion
+    {
+        [Key]
+        public int SesionID { get; set; }
 
-    [Required]
-    public int PacienteID { get; set; }
+        [Required]
+        public int PacienteID { get; set; }
+        [ForeignKey("PacienteID")]
+        public virtual Paciente Paciente { get; set; }
 
-    [Required]
-    public int PsicologoID { get; set; }
+        [Required]
+        public int PsicologoID { get; set; }
+        [ForeignKey("PsicologoID")]
+        public virtual Usuario Psicologo { get; set; }
 
-    [StringLength(200)]
-    public string? EntrevistadoPor { get; set; }
+        [Required]
+        [StringLength(200)]
+        public string EntrevistadoPorNombre { get; set; }
 
-    [StringLength(100)]
-    public string? RelacionConPaciente { get; set; }
+        [Required]
+        [StringLength(100)]
+        public string RelacionConPaciente { get; set; }
 
-    [Required]
-    [StringLength(20)]
-    public string Estado { get; set; } = "Pendiente";
+        public int? EdadMentalAproximadaAnios { get; set; }
+        public int? EdadMentalAproximadaMeses { get; set; }
 
-    [Required]
-    public DateTime FechaInicio { get; set; } = DateTime.Now;
+        [Required]
+        [StringLength(20)]
+        public string Estado { get; set; }
 
-    public DateTime? FechaFin { get; set; }
+        [Required]
+        public DateTime FechaInicio { get; set; }
+        public DateTime? FechaFin { get; set; }
 
-    public string? Notas { get; set; }
+        public string? NotasGeneralesSesion { get; set; } // NVARCHAR(MAX)
 
-    [StringLength(500)]
-    public string? MotivoPausaCancelacion { get; set; }
+        [StringLength(500)]
+        public string? MotivoPausaCancelacion { get; set; }
 
-    [ForeignKey("PacienteID")]
-    public Paciente Paciente { get; set; }
+        public int? ConsentimientoID { get; set; }
+        [ForeignKey("ConsentimientoID")]
+        public virtual Consentimiento? Consentimiento { get; set; }
 
-    [ForeignKey("PsicologoID")]
-    public Usuario Psicologo { get; set; }
+        public virtual ICollection<ADIR_ItemRespondido> ItemsRespondidos { get; set; }
+        public virtual ADIR_ResultadoGlobalSesion? ResultadoGlobalSesion { get; set; } // Para relación 1-a-1
+
+
+        public ADIR_Sesion()
+        {
+            Estado = "Pendiente"; // Valor por defecto
+            FechaInicio = DateTime.Now; // Valor por defecto
+            ItemsRespondidos = new HashSet<ADIR_ItemRespondido>();
+        }
+    }
 }

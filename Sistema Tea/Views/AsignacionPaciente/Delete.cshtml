@@ -1,0 +1,35 @@
+﻿@model Sistema_Tea.Models.AsignacionPaciente
+
+@{
+    ViewData["Title"] = "Gestionar Asignación";
+    // Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<h3 class="text-danger">¿Está seguro de que desea gestionar/eliminar esta asignación?</h3>
+<div>
+    <h4>Detalles de la Asignación</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">Paciente</dt>
+        <dd class="col-sm-9">@(Model.Paciente?.Nombre) @(Model.Paciente?.Apellidos)</dd>
+
+        <dt class="col-sm-3">Psicólogo</dt>
+        <dd class="col-sm-9">@(Model.Psicologo?.NombreCompleto)</dd>
+
+        <dt class="col-sm-3">Estado Actual</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Estado)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.FechaAsignacion)</dt>
+        <dd class="col-sm-9">@Model.FechaAsignacion.ToString("dd/MM/yyyy HH:mm")</dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="AsignacionID" />
+        @* Si vas a cambiar estado en lugar de borrar, aquí podrías tener un dropdown para el nuevo estado *@
+        @* O simplemente confirmar la acción de "Desasignar/Finalizar" si el controlador lo maneja así *@
+        <input type="submit" value="Confirmar Acción" class="btn btn-danger" /> |
+        <a asp-action="Index" class="btn btn-secondary">Cancelar y Volver al Listado</a>
+    </form>
+</div>

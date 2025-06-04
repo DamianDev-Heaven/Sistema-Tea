@@ -1,30 +1,48 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Sistema_Tea.Models
 {
+    [Table("Tutor")]
     public class Tutor
     {
         [Key]
         public int TutorID { get; set; }
 
-        [Required(ErrorMessage = "El nombre es obligatorio")]
+        [Required]
+        [StringLength(100)]
         public string Nombre { get; set; }
 
-        [Required(ErrorMessage = "Los apellidos son obligatorios")]
+        [Required]
+        [StringLength(100)]
         public string Apellidos { get; set; }
 
-        [Required(ErrorMessage = "El dui es obligatorio.")]
-        [RegularExpression(@"^\d{9}$", ErrorMessage = "El dui debe tener exactamente 9 dígitos sin guión.")]
+        [Required]
         [StringLength(100)]
         public string Dui { get; set; }
 
-        [Required(ErrorMessage = "La fecha de nacimiento es obligatoria")]
+        [Required]
+        [DataType(DataType.Date)]
         public DateTime FechaNacimiento { get; set; }
 
-        [Required(ErrorMessage = "El telefono es obligatorio")]
-        public string Telefono { get; set; }
-        public bool Activo { get; set; } = true;
+        [StringLength(500)]
+        public string? Telefono { get; set; }
 
-        public DateTime FechaRegistro { get; set; } = DateTime.Now;
+        [Required]
+        public bool Activo { get; set; }
+
+        [Required]
+        public DateTime FechaRegistro { get; set; }
+
+        public virtual ICollection<Paciente> Pacientes { get; set; }
+
+        public Tutor()
+        {
+            FechaRegistro = DateTime.Now; // Valor por defecto
+            Activo = true; // Valor por defecto
+            Pacientes = new HashSet<Paciente>();
+        }
     }
 }

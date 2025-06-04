@@ -22,10 +22,13 @@ namespace Sistema_Tea.Controllers
         [HttpPost]
         public IActionResult Login(string email, string contrasena)
         {
-            //las contraseñas aun no estan con hash, buxos
+            // Hashea la contraseña ingresada
+            string hashIngresado = HashPassword(contrasena);
+
+            // Busca el usuario por email y hash
             var usuario = _context.Usuario
                 .Include(u => u.Rol)
-                .FirstOrDefault(u => u.Email == email && u.ContrasenaHash == contrasena && u.Activo);
+                .FirstOrDefault(u => u.Email == email && u.ContrasenaHash == hashIngresado && u.Activo);
 
             if (usuario != null)
             {
@@ -39,6 +42,17 @@ namespace Sistema_Tea.Controllers
             ViewBag.Error = "Credenciales inválidas.";
             return View();
         }
+
+        private string HashPassword(string password)
+        {
+            using (var sha = System.Security.Cryptography.SHA256.Create())
+            {
+                var bytes = System.Text.Encoding.UTF8.GetBytes(password);
+                var hash = sha.ComputeHash(bytes);
+                return Convert.ToBase64String(hash);
+            }
+        }
+
 
         public IActionResult Logout()
         {
