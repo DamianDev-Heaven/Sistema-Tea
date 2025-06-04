@@ -10,7 +10,6 @@ namespace Sistema_Tea.Filters
             var session = context.HttpContext.Session;
             var usuarioId = session.GetInt32("UsuarioID");
 
-            // Si no está logueado y no está en la acción Login, redirige
             var controller = context.RouteData.Values["controller"]?.ToString();
             var action = context.RouteData.Values["action"]?.ToString();
 

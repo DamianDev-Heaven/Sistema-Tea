@@ -42,6 +42,6 @@ app.UseAuthorization();
 // Ruta por defecto
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=TestInicio}/{action=Index}/{id?}");
 
 app.Run();
