@@ -20,5 +20,9 @@ namespace Sistema_Tea.Models
         {
             Usuarios = new HashSet<Usuario>();
         }
+
+        public const string Administrador = "Administrador";
+        public const string Psicologo = "Psicologo";
+        public const string Coordinador = "Coordinador";
     }
 }

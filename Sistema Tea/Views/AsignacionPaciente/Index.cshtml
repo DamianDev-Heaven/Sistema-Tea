@@ -1,0 +1,55 @@
+﻿@model IEnumerable<Sistema_Tea.Models.AsignacionPaciente>
+
+@{
+    ViewData["Title"] = "Listado de Asignaciones Paciente-Psicólogo";
+    // Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Asignar Nuevo Paciente</a>
+</p>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Paciente</th>
+            <th>Psicólogo Asignado</th>
+            <th>Asignado Por</th>
+            <th>Fecha de Asignación</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@(item.Paciente?.Nombre) @(item.Paciente?.Apellidos)</td>
+                <td>@(item.Psicologo?.NombreCompleto)</td>
+                <td>@(item.AsignadoPor?.NombreCompleto)</td>
+                <td>@item.FechaAsignacion.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@Html.DisplayFor(modelItem => item.Estado)</td>
+                <td>
+                    @* Podrías añadir Editar si lo implementas más adelante *@
+                    @* <a asp-action="Edit" asp-route-id="@item.AsignacionID" class="btn btn-sm btn-warning">Editar</a> | *@
+                    <a asp-action="Delete" asp-route-id="@item.AsignacionID" class="btn btn-sm btn-danger">@(item.Estado == "Asignado" ? "Desasignar/Finalizar" : "Eliminar Registro")</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

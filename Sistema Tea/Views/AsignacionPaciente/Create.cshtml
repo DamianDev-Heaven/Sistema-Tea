@@ -1,0 +1,67 @@
+﻿@model Sistema_Tea.Models.AsignacionPaciente
+
+@{
+    ViewData["Title"] = "Asignar Paciente a Psicólogo";
+    // Asegúrate que tu layout principal esté referenciado, ej:
+    // Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>@ViewData["Title"]</h1>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            @if (ViewBag.ErrorRol != null)
+            {
+                <div class="alert alert-danger">@ViewBag.ErrorRol</div>
+            }
+            @if (!ViewData.ModelState.IsValid && ViewData.ModelState[string.Empty] != null)
+            {
+                @foreach (var error in ViewData.ModelState[string.Empty].Errors)
+                {
+                    <div class="alert alert-danger">@error.ErrorMessage</div>
+                }
+            }
+
+
+            <div class="form-group mb-3">
+                <label asp-for="PacienteID" class="control-label">Paciente</label>
+                <select asp-for="PacienteID" class="form-control" asp-items="ViewBag.Pacientes">
+                    <option value="">-- Seleccione un Paciente --</option>
+                </select>
+                <span asp-validation-for="PacienteID" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="PsicologoID" class="control-label">Psicólogo</label>
+                <select asp-for="PsicologoID" class="form-control" asp-items="ViewBag.Psicologos">
+                    <option value="">-- Seleccione un Psicólogo --</option>
+                </select>
+                <span asp-validation-for="PsicologoID" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Estado" class="control-label"></label>
+                <select asp-for="Estado" class="form-control">
+                    <option value="Asignado">Asignado</option>
+                    <option value="Desasignado">Desasignado</option>
+                    <option value="Finalizado">Finalizado</option>
+                </select>
+                <span asp-validation-for="Estado" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3">
+                <input type="submit" value="Guardar Asignación" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Volver al Listado</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
