@@ -1,0 +1,65 @@
+﻿@model List<ADOS2_Sesion>
+
+<h2>Mis sesiones ADOS-2</h2>
+
+<a asp-action="CrearSesion" class="btn btn-primary">Asignar nueva sesión</a>
+<br>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Paciente</th>
+            <th>Módulo</th>
+            <th>Estado</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var sesion in Model)
+        {
+            <tr>
+                <td>@($"{sesion.Paciente?.Nombre} {sesion.Paciente?.Apellidos}")</td>
+                <td>@sesion.Modulo</td>
+                <td>@sesion.Estado</td>
+                <td>@(sesion.FechaInicio.ToShortDateString() ?? "-")</td>
+                <td>@(sesion.FechaFin?.ToShortDateString() ?? "-")</td>
+                <td>
+                    @switch (sesion.Estado)
+                    {
+                        case "Pendiente":
+                            <a asp-action="IniciarTestADOS2" asp-route-id="@sesion.SesionID" class="btn btn-sm btn-success">Iniciar</a>
+                            <a asp-action="CancelarSesion" asp-route-id="@sesion.SesionID" class="btn btn-sm btn-danger">Cancelar</a>
+                            break;
+
+                        case "EnProgreso":
+                            <a asp-action="PausarSesion" asp-route-id="@sesion.SesionID" class="btn btn-sm btn-warning">Pausar</a>
+                            <a asp-action="PuntuarItems" asp-route-sesionId="@sesion.SesionID" class="btn btn-sm btn-primary">Puntuar</a>
+                            break;
+
+                        case "Pausado":
+                            <a asp-action="ReanudarSesion" asp-route-id="@sesion.SesionID" class="btn btn-sm btn-info">Reanudar</a>
+                            <a asp-action="CancelarSesion" asp-route-id="@sesion.SesionID" class="btn btn-sm btn-danger">Cancelar</a>
+                            break;
+
+                        case "Completado":
+                            <a asp-action="ResultadoSesion" asp-route-sesionId="@sesion.SesionID" class="btn btn-sm btn-success">Resultado</a>
+                            <a asp-action="NotasSesion" asp-route-sesionId="@sesion.SesionID" class="btn btn-sm btn-success">Notas Generales</a>
+                            break;
+
+                        case "Cancelado":
+                            <span class="text-muted">Cancelado</span>
+                            <a asp-action="MotivoCancelacionSesion" asp-route-sesionId="@sesion.SesionID" class="btn btn-sm btn-primary">Motivo de Cancelacion</a>
+
+                            break;
+                    }
+
+                    <a asp-action="DetalleSesion" asp-route-id="@sesion.SesionID" class="btn btn-sm btn-secondary">Informacion</a>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+

@@ -18,6 +18,7 @@ namespace Sistema_Tea.Models.Data
         public DbSet<ADOS2_Sesion> ADOS2_Sesion { get; set; }
         public DbSet<ADOS2_Tarea> ADOS2_Tarea { get; set; }
         public DbSet<ADOS2_Resultado> ADOS2_Resultado { get; set; }
+        public DbSet<ADOS2_ItemPuntuado> ADOS2_ItemPuntuado { get; set; }
 
         public DbSet<ADIR_Sesion> ADIR_Sesion { get; set; }
         public DbSet<ADIR_Pregunta> ADIR_Pregunta { get; set; }

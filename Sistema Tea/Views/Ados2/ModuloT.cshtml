@@ -1,0 +1,69 @@
+﻿@model Sistema_Tea.Models.ADOS2_Sesion
+
+@{
+    ViewData["Title"] = "Inicio de Test ADOS-2 Modulo T";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg p-4 rounded">
+        <h2 class="text-center mb-4 text-primary">Test ADOS-2</h2>
+
+        <div class="mb-3">
+            <h4><strong>Paciente:</strong> @Model.Paciente.Nombre @Model.Paciente.Apellidos</h4>
+            <h5><strong>Examinado por:</strong> @Model.Psicologo.NombreCompleto</h5>
+            <h5><strong>Módulo:</strong> @Model.Modulo</h5>
+        </div>
+
+        <div class="card border-0 bg-light shadow-sm p-4 mb-4">
+            <div class="d-flex align-items-start">
+                <i class="bi bi-info-circle-fill text-primary fs-2 me-3"></i>
+                <div>
+                    <h5 class="text-primary">Descripción del Módulo</h5>
+                    <p class="mb-0">
+                        El Módulo T está diseñado para evaluar a niños muy pequeños (de 12 a 30 meses) con poco o ningún lenguaje expresivo. Se centra en la observación de la
+                        comunicación social temprana, juego, reciprocidad e indicadores tempranos de TEA en un entorno de juego natural. Se utilizan materiales altamente motivadores 
+                        y situaciones poco estructuradas que faciliten la interacción espontánea.<hr>
+                        Actividades:
+                        Incluye entre 10 y 12 actividades (como juego libre, burbujas, imitación, respuesta al nombre, seguimiento visual).<hr>
+                        Objetivo:
+                        Observar la iniciativa social, el uso del lenguaje verbal y no verbal, y los comportamientos repetitivos para detectar signos tempranos de TEA.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left-circle"></i> Volver Atrás
+            </a>
+
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmarModal">
+                <i class="bi bi-play-circle"></i> Iniciar Test
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="confirmarModal" tabindex="-1" aria-labelledby="confirmarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content rounded-3 shadow-lg">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="confirmarModalLabel"><i class="bi bi-exclamation-circle-fill me-2"></i>Confirmar Inicio del Test</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que deseas iniciar el test? Una vez iniciado, no se podrá retroceder ni modificar el módulo.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form asp-action="ConfirmarSesion" method="get">
+                    <input type="hidden" name="SesionID" value="@Model.SesionID" />
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> Sí, Iniciar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+

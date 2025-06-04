@@ -1,0 +1,40 @@
+﻿@model Sistema_Tea.Models.ADOS2_Tarea
+
+<h2>@Model.NombreTarea</h2>
+<p><strong>Descripción:</strong> @Model.Descripcion</p>
+<p><strong>Instrucciones:</strong> @Model.InstruccionesAdministracion</p>
+
+<form asp-action="GuardarYContinuar" method="post">
+    <input type="hidden" name="sesionId" value="@ViewBag.SesionId" />
+    <input type="hidden" name="tareaDefinicionId" value="@Model.TareaDefinicionID" />
+    <input type="hidden" name="tareaIndex" value="@ViewBag.TareaIndex" />
+
+    <div class="form-group">
+        <label for="codigoObservado">Puntuación:</label>
+        <select id="codigoObservado" name="codigoObservado" class="form-control" required>
+            <option value="">--Seleccione--</option>
+            <option value="0">0 - Sin evidencia anormal</option>
+            <option value="1">1 - Comportamiento ligeramente anormal</option>
+            <option value="2">2 - Comportamiento moderadamente anormal</option>
+            <option value="3">3 - Comportamiento severamente anormal</option>
+            <option value="7">7 - No aplicable</option>
+            <option value="8">8 - No puntuable</option>
+            <option value="9">9 - No observado</option>
+        </select>       
+    </div>
+
+    <div class="form-group">
+        <label for="notasObservacionItem">Notas de observación (opcional):</label>
+        <textarea id="notasObservacionItem" name="notasObservacionItem" class="form-control" rows="4"
+                  placeholder="Describa comportamientos específicos observados..."></textarea>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Guardar y Continuar con Siguiente Tarea</button>
+        @if (ViewBag.TareaIndex > 0)
+        {
+            <a href="@Url.Action("TareasModulo", new { sesionId = ViewBag.SesionId, tareaIndex = ViewBag.TareaIndex - 1})"
+               class="btn btn-secondary">Tarea Anterior</a>
+        }
+    </div>
+</form>
