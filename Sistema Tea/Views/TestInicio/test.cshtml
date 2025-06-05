@@ -14,7 +14,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 
-    @* Tus estilos CSS provistos anteriormente. Asegúrate de que estén aquí. *@
     <style>
         :root {
             --primary: #3b49df;
@@ -37,14 +36,14 @@
             font-size: 1.4rem;
             color: var(--primary);
         }
-        /* Stepper */
+
         .stepper {
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 0.5rem;
             margin-bottom: 2.5rem;
-            flex-wrap: wrap; /* Para que se ajuste en pantallas pequeñas */
+            flex-wrap: wrap;
         }
 
         .step {
@@ -59,15 +58,15 @@
             justify-content: center;
             transition: background 0.3s, color 0.3s, border 0.3s;
             border: 2px solid var(--primary-light);
-            font-size: 1.05rem; /* Un poco más grande para que se vea bien el número */
-            position: relative; /* Para la línea conectora */
+            font-size: 1.05rem;
+            position: relative;
         }
 
             .step.active {
                 background: var(--primary);
                 color: #fff;
                 border-color: var(--primary);
-                box-shadow: 0 0 0 4px var(--primary-light); /* Efecto de halo */
+                box-shadow: 0 0 0 4px var(--primary-light);
             }
 
             .step.completed {
@@ -76,25 +75,24 @@
                 border-color: var(--primary);
             }
 
-            /* Línea conectora del stepper */
             .step:not(:last-child)::after {
                 content: '';
                 display: block;
-                width: 32px; /* Ancho de la línea */
-                height: 2px; /* Grosor de la línea */
+                width: 32px;
+                height: 2px;
                 background: var(--primary-light);
                 position: absolute;
-                right: -34px; /* Distancia entre el círculo y la línea */
+                right: -34px;
                 top: 50%;
                 transform: translateY(-50%);
-                z-index: -1; /* Detrás del círculo */
+                z-index: -1;
             }
 
             .step.completed:not(:last-child)::after {
-                background: var(--primary); /* Línea completada */
+                background: var(--primary);
             }
 
-        @@media (max-width: 600px) { /* Ajustes responsivos para el stepper */
+        @@media (max-width: 600px) {
             .stepper {
                 gap: 0.2rem;
             }
@@ -114,22 +112,21 @@
             }
         }
 
-        /* Animaciones y tarjetas de preguntas */
         .question-card {
             background: #fff;
             border-radius: var(--border-radius);
             padding: 2rem;
-            margin: 1.5rem auto; /* Centrar la tarjeta de pregunta */
+            margin: 1.5rem auto;
             box-shadow: var(--box-shadow);
-            min-height: 300px; /* Ajustar según necesidad */
+            min-height: 300px;
             transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
             opacity: 0;
             transform: translateY(20px);
             pointer-events: none;
-            position: absolute; /* Para la animación de carrusel */
+            position: absolute;
             left: 0;
             right: 0;
-            width: 100%; /* Asegurar que ocupa el ancho del contenedor */
+            width: 100%;
             z-index: 2;
         }
 
@@ -137,14 +134,13 @@
                 opacity: 1;
                 transform: translateY(0);
                 pointer-events: auto;
-                position: relative; /* Para que ocupe espacio en el flujo normal */
+                position: relative;
                 z-index: 3;
-                /* animation: fadeIn 0.5s; // La transición ya lo hace suave */
             }
 
         .opciones-container {
-            display: grid; /* Usar grid para mejor control de columnas */
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Columnas responsivas */
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 1rem;
             margin-top: 1.5rem;
         }
@@ -152,11 +148,11 @@
         .opcion-card {
             background: #fff;
             border-radius: var(--border-radius);
-            padding: 1.2rem 1rem; /* Ajustar padding */
+            padding: 1.2rem 1rem;
             box-shadow: var(--box-shadow);
             cursor: pointer;
             transition: all 0.2s ease-in-out;
-            border: 2px solid #eee; /* Borde sutil por defecto */
+            border: 2px solid #eee;
             text-align: center;
             display: flex;
             flex-direction: column;
@@ -178,26 +174,26 @@
             }
 
             .opcion-card input[type="radio"] {
-                display: none; /* Ocultar el radio button real */
+                display: none;
             }
 
             .opcion-card label {
                 cursor: pointer;
                 font-weight: 500;
-                margin-top: 0.5rem; /* Espacio entre icono y texto */
-                width: 100%; /* Para que toda la tarjeta sea clickeable */
-                display: block; /* Para que el label ocupe el espacio */
+                margin-top: 0.5rem;
+                width: 100%;
+                display: block;
             }
 
         .opcion-icon {
-            width: 36px; /* Ajustar tamaño */
+            width: 36px;
             height: 36px;
             border-radius: 50%;
             background: #f0f2ff;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 0.75rem; /* Espacio entre icono y texto */
+            margin-bottom: 0.75rem;
             font-size: 1.2rem;
             color: var(--primary);
             transition: all 0.2s ease-in-out;
@@ -210,9 +206,9 @@
 
         .question-title {
             font-weight: 600;
-            font-size: 1.3rem; /* Ajustar tamaño */
-            margin-bottom: 0.5rem; /* Menos espacio si hay ayuda adicional */
-            color: #333; /* Un color más oscuro para el texto de la pregunta */
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: #333;
         }
 
         .question-ayuda {
@@ -234,7 +230,7 @@
         }
 
             .submit-btn:hover {
-                background: #2c3dbd; /* Un poco más oscuro al hacer hover */
+                background: #2c3dbd;
                 box-shadow: 0 8px 24px rgba(44, 61, 189, 0.5);
             }
 
@@ -265,14 +261,13 @@
             }
         }
 
-        .questions-container { /* Contenedor para las tarjetas de preguntas */
-            position: relative; /* Necesario para la animación de las tarjetas */
-            min-height: 360px; /* Altura mínima para evitar saltos de layout */
-            overflow: hidden; /* Para la animación de slide si se quisiera */
+        .questions-container {
+            position: relative;
+            min-height: 360px;
+            overflow: hidden;
         }
 
         footer {
-            /* ... tus estilos de footer ... */
             background: #fff;
             border-top: 1px solid #e9ecef;
             margin-top: 3rem;
@@ -328,13 +323,12 @@
                                     @for (int j = 0; j < pregunta.Opciones.Count; j++)
                                     {
                                         var opcionTexto = pregunta.Opciones[j];
-                                        var scoreParaEstaOpcion = pregunta.ScoresPorOpcion[opcionTexto]; // <-- CAMBIO CLAVE AQUÍ
+                                        var scoreParaEstaOpcion = pregunta.ScoresPorOpcion[opcionTexto];
                                         var inputId = $"resp_{i}_{j}";
 
-                                        // Lógica de iconos más flexible
                                         var iconosDisponibles = new[] { "bi-emoji-sunglasses", "bi-emoji-smile", "bi-emoji-neutral", "bi-emoji-frown", "bi-emoji-dizzy" };
-                                        var iconoActual = iconosDisponibles.Length > j ? iconosDisponibles[j] : "bi-check-circle"; // Icono por defecto si hay más de 5 opciones
-                                        if (pregunta.Opciones.Count == 2) // Para Sí/No
+                                        var iconoActual = iconosDisponibles.Length > j ? iconosDisponibles[j] : "bi-check-circle";
+                                        if (pregunta.Opciones.Count == 2)
                                         {
                                             iconoActual = (opcionTexto.Equals("Sí", StringComparison.OrdinalIgnoreCase)) ? "bi-check-circle-fill" : "bi-x-circle-fill";
                                         }
@@ -409,36 +403,25 @@
         const steps = document.querySelectorAll('.step');
 
         function seleccionarOpcion(cardElement, preguntaIndex) {
-            // Deseleccionar otras opciones en la misma pregunta
             const currentQuestionCard = document.getElementById('question-' + preguntaIndex);
             const cardsInQuestion = currentQuestionCard.querySelectorAll('.opcion-card');
             cardsInQuestion.forEach(c => c.classList.remove('selected'));
 
-            // Seleccionar la actual
             cardElement.classList.add('selected');
             const radioInput = cardElement.querySelector('input[type="radio"]');
             radioInput.checked = true;
-
-            // Opcional: avanzar automáticamente a la siguiente pregunta si no es la última
-            // if (preguntaActualIdx < totalPreguntas - 1) {
-            //     setTimeout(() => cambiarPregunta(preguntaActualIdx + 1), 300);
-            // }
         }
 
         function cambiarPregunta(nuevoIndex) {
-            // Validar si la pregunta actual (si no es la primera vez) ha sido respondida
-            if (nuevoIndex > preguntaActualIdx) { // Solo al avanzar
+            if (nuevoIndex > preguntaActualIdx) {
                  const currentQuestionCard = document.getElementById('question-' + preguntaActualIdx);
                  const isAnswered = currentQuestionCard.querySelector('.opcion-card.selected');
                  if (!isAnswered) {
                      currentQuestionCard.classList.add('shake');
                      setTimeout(() => currentQuestionCard.classList.remove('shake'), 400);
-                     // Opcional: mostrar un mensaje de alerta o notificación
-                     // alert("Por favor, seleccione una opción antes de continuar.");
-                     return; // No avanzar
+                     return;
                  }
             }
-
 
             if (nuevoIndex < 0 || nuevoIndex >= totalPreguntas) return;
 
@@ -464,14 +447,11 @@
             preguntaActualIdx = nuevoIndex;
         }
 
-        // Inicializar el primer step y pregunta
         document.addEventListener('DOMContentLoaded', function() {
             if (steps.length > 0) steps[0].classList.add('active');
             if (questionCards.length > 0) questionCards[0].classList.add('active');
         });
 
-
-        // Bootstrap 5 Form Validation
         (() => {
             'use strict';
             const forms = document.querySelectorAll('.needs-validation');
@@ -483,15 +463,13 @@
                         const seleccionada = preguntaCard.querySelector('.opcion-card.selected');
                         if(!seleccionada){
                             todasRespondidas = false;
-                            // Si la pregunta no respondida es la actual, la hacemos temblar
                             if(i === preguntaActualIdx){
                                 preguntaCard.classList.add('shake');
                                 setTimeout(() => preguntaCard.classList.remove('shake'), 400);
                             } else {
-                                // Si no es la actual, navegamos a ella para que el usuario responda
                                 cambiarPregunta(i);
                             }
-                            break; // Salir del bucle, ya encontramos una sin responder
+                            break;
                         }
                     }
 
@@ -499,13 +477,9 @@
                         event.preventDefault();
                         event.stopPropagation();
                         if(!todasRespondidas && preguntaActualIdx === totalPreguntas -1){
-                             // Si está en la última pregunta y no ha respondido todas las anteriores
                              alert("Por favor, asegúrate de responder todas las preguntas antes de ver el resultado.");
                         }
                     }
-                    // Bootstrap añade 'was-validated' si se usa su validación,
-                    // pero nuestra lógica personalizada de 'todasRespondidas' es más importante aquí.
-                    // form.classList.add('was-validated'); // Puedes mantenerlo si usas atributos de validación de BS
                 }, false);
             });
         })();

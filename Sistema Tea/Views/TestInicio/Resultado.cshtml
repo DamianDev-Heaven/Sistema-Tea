@@ -16,21 +16,21 @@
 
     <style>
         :root {
-            --emind-primary: #3b49df; /* Tu color principal */
-            --emind-primary-rgb: 59, 73, 223; /* Para usar con opacidad RGBA */
+            --emind-primary: #3b49df;
+            --emind-primary-rgb: 59, 73, 223; 
             --emind-primary-dark: #2f3aae;
             --emind-primary-light: #e9ecff;
-            --emind-success: #198754; /* Verde de Bootstrap para "Baja" */
-            --emind-warning: #ffc107; /* Amarillo de Bootstrap para "Media" */
-            --emind-danger: #dc3545; /* Rojo de Bootstrap para "Alta" */
+            --emind-success: #198754; 
+            --emind-warning: #ffc107; 
+            --emind-danger: #dc3545; 
 
             --emind-text-dark: #212529;
             --emind-text-light: #495057;
             --emind-text-muted: #6c757d;
-            --emind-bg-light: #f8f9fa; /* Un fondo general muy claro */
+            --emind-bg-light: #f8f9fa;
             --emind-bg-card: #ffffff;
-            --emind-border-radius-lg: 1rem; /* 16px */
-            --emind-border-radius-md: 0.75rem; /* 12px */
+            --emind-border-radius-lg: 1rem; 
+            --emind-border-radius-md: 0.75rem;
             --emind-border-color: #dee2e6;
             --emind-shadow-sm: 0 2px 8px rgba(var(--emind-primary-rgb), 0.08);
             --emind-shadow-md: 0 6px 16px rgba(var(--emind-primary-rgb), 0.12);
@@ -44,37 +44,36 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            font-size: 16px; /* Base font size */
+            font-size: 16px;
             line-height: 1.6;
         }
 
         .navbar-brand {
             font-weight: 700;
-            font-size: 1.6rem; /* Un poco más grande */
+            font-size: 1.6rem;
             color: var(--emind-primary);
         }
 
             .navbar-brand i {
-                font-size: 1.8rem; /* Icono más grande */
+                font-size: 1.8rem; 
             }
 
-        /* Main Content & Result Card */
-        .result-container { /* Nuevo wrapper para centrar mejor */
-            max-width: 760px; /* Un poco más de espacio */
-            margin: 2.5rem auto 3rem; /* Ajustar márgenes */
-            padding: 0 15px; /* Espacio en móviles */
+        .result-container { 
+            max-width: 760px;
+            margin: 2.5rem auto 3rem;
+            padding: 0 15px; 
         }
 
         .result-card {
             background: var(--emind-bg-card);
-            padding: 2rem 2.5rem; /* Más padding interno */
+            padding: 2rem 2.5rem;
             border-radius: var(--emind-border-radius-lg);
             box-shadow: var(--emind-shadow-md);
             border: 1px solid var(--emind-border-color);
         }
 
         .result-title {
-            font-size: 2.25rem; /* Título más impactante */
+            font-size: 2.25rem;
             font-weight: 700;
             color: var(--emind-primary);
             margin-bottom: 0.5rem;
@@ -82,25 +81,24 @@
         }
 
         .cuestionario-aplicado-subtitle {
-            font-size: 1.1rem; /* Más legible */
-            font-style: normal; /* Menos itálica, más formal */
+            font-size: 1.1rem;
+            font-style: normal;
             font-weight: 500;
             color: var(--emind-text-light);
             text-align: center;
             margin-bottom: 2rem;
         }
 
-        /* Sección de Puntaje y Nivel de Probabilidad */
         .score-probability-section {
-            background-color: var(--emind-primary-light); /* Fondo suave para destacar */
+            background-color: var(--emind-primary-light);
             border-radius: var(--emind-border-radius-md);
             padding: 1.5rem;
             margin-bottom: 2rem;
             text-align: center;
         }
 
-            .score-probability-section .alert-heading { /* Para el texto "Probabilidad Alta/Media/Baja" */
-                font-size: 1.75rem; /* Más grande */
+            .score-probability-section .alert-heading { 
+                font-size: 1.75rem; 
                 font-weight: 600;
                 margin-bottom: 0.75rem;
             }
@@ -109,7 +107,7 @@
                 font-size: 1.2rem;
                 font-weight: 500;
                 color: var(--emind-text-dark);
-                margin-bottom: 0; /* Ya está en su propia sección */
+                margin-bottom: 0;
             }
 
             .score-probability-section strong {
@@ -117,7 +115,6 @@
                 font-weight: 700;
             }
 
-        /* Colores dinámicos para el título de probabilidad */
         .text-alta {
             color: var(--emind-danger);
         }
@@ -125,34 +122,31 @@
         .text-media {
             color: var(--emind-warning);
         }
-        /* Bootstrap usa negro para texto en warning, podemos forzarlo */
         .text-baja {
             color: var(--emind-success);
         }
 
 
         .interpretacion-texto {
-            margin-top: 1.5rem; /* Espacio antes de la interpretación */
-            color: var(--emind-text-light); /* Texto un poco más suave */
-            font-size: 1.05rem; /* Ligeramente más grande para legibilidad */
+            margin-top: 1.5rem;
+            color: var(--emind-text-light);
+            font-size: 1.05rem;
             text-align: justify;
         }
 
             .interpretacion-texto p {
-                margin-bottom: 1rem; /* Espacio entre párrafos de interpretación */
+                margin-bottom: 1rem;
             }
 
-        /* Tarjeta de Consideraciones Importantes */
         .consideraciones-card {
-            border-color: var(--emind-warning); /* Borde de advertencia */
+            border-color: var(--emind-warning);
             margin-top: 2.5rem;
             border-width: 1px;
             border-radius: var(--emind-border-radius-md);
         }
 
             .consideraciones-card .card-header {
-                background-color: rgba(var(--emind-warning-rgb), 0.1); /* Fondo muy sutil de advertencia */
-                /* Si --emind-warning-rgb no está definido, usar un color fijo: #fff3cd */
+                background-color: rgba(var(--emind-warning-rgb), 0.1);
                 border-bottom: 1px solid var(--emind-warning);
                 font-weight: 600;
                 color: var(--emind-text-dark);
@@ -163,7 +157,7 @@
                 }
 
             .consideraciones-card .card-text {
-                font-size: 0.95rem; /* Texto un poco más pequeño pero claro */
+                font-size: 0.95rem; 
                 color: var(--emind-text-light);
             }
 
@@ -172,23 +166,23 @@
                 font-weight: 600;
             }
 
-        /* Botones */
-        .btn-actions-container { /* Renombrado de btn-volver-container */
+       
+        .btn-actions-container {
             text-align: center;
             margin-top: 2.5rem;
-            display: flex; /* Para espaciar botones */
-            gap: 1rem; /* Espacio entre botones */
+            display: flex;
+            gap: 1rem;
             justify-content: center;
-            flex-wrap: wrap; /* Para móviles */
+            flex-wrap: wrap;
         }
 
-        .btn-action { /* Renombrado de btn-volver */
+        .btn-action { 
             font-weight: 600;
-            font-size: 1rem; /* Ligeramente más pequeño para consistencia */
-            padding: 0.75rem 1.5rem; /* Padding ajustado */
+            font-size: 1rem;
+            padding: 0.75rem 1.5rem;
             border-radius: var(--emind-border-radius-md);
             transition: all 0.3s ease;
-            min-width: 180px; /* Ancho mínimo */
+            min-width: 180px;
         }
 
             .btn-action.btn-primary {
@@ -220,10 +214,10 @@
 
         /* Footer */
         footer {
-            background-color: var(--emind-bg-card); /* Fondo blanco también para el footer */
+            background-color: var(--emind-bg-card); 
             border-top: 1px solid var(--emind-border-color);
-            padding: 2rem 0; /* Más padding vertical */
-            margin-top: auto; /* Asegura que esté al final */
+            padding: 2rem 0;
+            margin-top: auto;
             font-size: 0.9rem;
             color: var(--emind-text-muted);
         }
@@ -231,11 +225,11 @@
             footer h5 {
                 font-weight: 600;
                 color: var(--emind-primary);
-                margin-bottom: 1rem; /* Espacio debajo del título del footer */
+                margin-bottom: 1rem;
             }
 
             footer p {
-                margin-bottom: 0.5rem; /* Espacio entre líneas del footer */
+                margin-bottom: 0.5rem;
                 font-size: 0.9rem;
                 color: var(--emind-text-light);
             }
@@ -249,7 +243,6 @@
                     text-decoration: underline;
                 }
 
-        /* Media Queries (Ajustes finos para móviles) */
         @@media (max-width: 768px) {
             .result-title {
                 font-size: 1.8rem;
@@ -288,7 +281,6 @@
             .btn-actions-container {
                 flex-direction: column;
             }
-            /* Botones uno debajo del otro */
             .btn-action {
                 width: 100%;
                 margin-bottom: 0.5rem;
@@ -297,7 +289,6 @@
                 .btn-action.ms-2 {
                     margin-left: 0 !important;
                 }
-            /* Remover margen si se apilan */
         }
 
     </style>

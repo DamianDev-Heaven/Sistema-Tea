@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Iniciar Test: Seleccionar Edad"; // Título más descriptivo
+    ViewData["Title"] = "Iniciar Test: Seleccionar Edad";
     Layout = null;
 }
 
@@ -20,20 +20,19 @@
             --emind-primary-rgb: 59, 73, 223;
             --emind-primary-dark: #2f3aae;
             --emind-primary-light: #e9ecff;
-            --emind-primary-hover: #f0f2ff; /* Un hover aún más claro para tarjetas */
-
+            --emind-primary-hover: #f0f2ff;
             --emind-text-dark: #212529;
             --emind-text-light: #495057;
             --emind-text-muted: #6c757d;
             --emind-bg-page: #f8f9fc;
             --emind-bg-card: #ffffff;
-            --emind-border-radius-lg: 1rem; /* 16px */
-            --emind-border-radius-xl: 1.25rem; /* 20px para tarjetas más grandes */
+            --emind-border-radius-lg: 1rem;
+            --emind-border-radius-xl: 1.25rem;
             --emind-border-color: #dee2e6;
             --emind-border-color-light: #eef0f3;
             --emind-shadow-sm: 0 2px 8px rgba(var(--emind-primary-rgb), 0.06);
-            --emind-shadow-md: 0 6px 16px rgba(var(--emind-primary-rgb), 0.08); /* Sombra más suave */
-            --emind-shadow-lg: 0 10px 30px rgba(var(--emind-primary-rgb), 0.1); /* Sombra más pronunciada */
+            --emind-shadow-md: 0 6px 16px rgba(var(--emind-primary-rgb), 0.08);
+            --emind-shadow-lg: 0 10px 30px rgba(var(--emind-primary-rgb), 0.1);
         }
 
         body {
@@ -51,7 +50,6 @@
             background-color: var(--emind-bg-card);
             box-shadow: var(--emind-shadow-sm);
             padding: 0.75rem 1rem;
-
         }
 
         .navbar-brand-custom {
@@ -69,7 +67,7 @@
             }
 
         .page-container {
-            max-width: 900px; 
+            max-width: 900px;
             margin: 2.5rem auto 4rem;
             padding: 0 15px;
         }
@@ -85,12 +83,12 @@
             font-size: 1.2rem;
             font-weight: 400;
             color: var(--emind-text-light);
-            margin-bottom: 3rem; 
+            margin-bottom: 3rem;
         }
 
         .age-selection-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); 
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 1.75rem;
         }
 
@@ -103,24 +101,23 @@
             text-decoration: none;
             color: var(--emind-text-dark);
             box-shadow: var(--emind-shadow-md);
-            border: 2px solid transparent; 
+            border: 2px solid transparent;
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             position: relative;
-            overflow: hidden; 
+            overflow: hidden;
         }
 
             .age-card:hover, .age-card:focus-visible {
                 transform: translateY(-6px) scale(1.02);
                 box-shadow: var(--emind-shadow-lg);
                 border-color: var(--emind-primary);
-                color: var(--emind-text-dark); 
+                color: var(--emind-text-dark);
                 outline: none;
             }
 
-            .age-card:focus-visible { 
+            .age-card:focus-visible {
                 box-shadow: 0 0 0 3px rgba(var(--emind-primary-rgb), 0.3), var(--emind-shadow-lg);
             }
-
 
         .age-card-icon-wrapper {
             width: 64px;
@@ -143,14 +140,14 @@
         }
 
         .age-card-icon-wrapper i {
-            font-size: 2.25rem; 
+            font-size: 2.25rem;
         }
 
         .age-card-title {
             font-size: 1.5rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
-            color: var(--emind-primary); 
+            color: var(--emind-primary);
         }
 
         .age-card-range {
@@ -164,7 +161,7 @@
             font-size: 0.9rem;
             color: var(--emind-text-muted);
             line-height: 1.5;
-            flex-grow: 1; 
+            flex-grow: 1;
         }
 
         .age-card-arrow {
@@ -261,7 +258,7 @@
 
         @@media (max-width: 576px) {
             .age-selection-grid {
-                grid-template-columns: 1fr; 
+                grid-template-columns: 1fr;
             }
 
             .page-title {
