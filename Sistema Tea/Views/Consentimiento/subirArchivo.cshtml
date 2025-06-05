@@ -1,0 +1,32 @@
+﻿@model Sistema_Tea.Models.ConsentimientoUserPacie
+
+<h2>Subir Consentimiento Firmado</h2>
+
+<video id="video" width="320" height="240" autoplay></video>
+<canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
+
+<form method="post" asp-action="SubirConsentimientoFirmado" enctype="multipart/form-data">
+    <input type="hidden" name="pacienteId" value="@ViewBag.PacienteID" />
+    <input type="hidden" name="imagenBase64" id="imagenBase64" />
+    <button type="button" id="capturar">📸 Capturar</button>
+    <button type="submit">📤 Subir Imagen</button>
+</form>
+
+<script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const base64Input = document.getElementById('imagenBase64');
+    const context = canvas.getContext('2d');
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        video.srcObject = stream;
+      });
+
+    document.getElementById('capturar').addEventListener('click', () => {
+      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/png');
+      base64Input.value = dataUrl;
+      alert("✅ Imagen capturada, lista para enviar.");
+    });
+</script>

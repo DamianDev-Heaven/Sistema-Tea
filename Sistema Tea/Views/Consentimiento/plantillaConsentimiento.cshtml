@@ -1,0 +1,120 @@
+﻿@model Sistema_Tea.Models.ConsentimientoUserPacie
+
+@{
+    ViewBag.Title = "Consentimiento Informado";
+}
+<link rel="stylesheet" href="~/css/create.css" asp-append-version="true" />
+
+<div class="form-container shadow-sm p-4 rounded-4 mx-auto" style="max-width: 1000px; background: #fff;">
+    <h2>Consentimiento Informado</h2>
+
+    <form method="get" asp-action="GenerarConsentimientoPDF" target="_blank">
+        <div class="row">
+            <div class="col-md-6">
+                <label for="pacienteId">Seleccionar Paciente:</label>
+                <select class="form-control" name="pacienteId" id="pacienteId" required>
+                    <option value="">-- Selecciona --</option>
+                    @foreach (var paciente in Model.Pacientes)
+                    {
+                        <option value="@paciente.PacienteID"
+                                data-dui="@paciente.Dui"
+                                data-fecha="@paciente.FechaNacimiento.ToString("dd/MM/yyyy")"
+                                data-sexo="@paciente.Sexo"
+                                data-diagnostico="@paciente.DiagnosticoPrevio"
+                                data-tutor="@paciente.Tutor?.Nombre"
+                                data-tutor-apellido="@paciente.Tutor?.Apellidos"
+                                data-tutor-dui="@paciente.Tutor?.Dui">
+                            @paciente.Nombre @paciente.Apellidos
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label for="psicologoId">Seleccionar Psicólogo:</label>
+                <select class="form-control" name="psicologoId" id="psicologoId" required>
+                    <option value="">-- Selecciona --</option>
+                    @foreach (var psicologo in Model.Psicologos)
+                    {
+                        <option value="@psicologo.UsuarioID"
+                                data-nombrecompleto="@psicologo.NombreCompleto ">
+                            @psicologo.NombreCompleto
+                        </option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="card p-4 mt-3">
+            <h4 class="text-center">CLÍNICA eMind: Consentimiento Informado para la Evaluación del Trastorno del Espectro Autista con ADOS-2 y ADI-R</h4>
+			<br />
+
+            <p><strong>Fecha y hora:</strong> @DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</p>
+
+            <p><strong>Paciente:</strong> <span id="nombrePaciente">[Selecciona un paciente]</span></p>
+            <p><strong>DUI:</strong> <span id="duiPaciente">-</span></p>
+            <p><strong>Fecha de Nacimiento:</strong> <span id="fechaNacimiento">-</span></p>
+            <p><strong>Sexo:</strong> <span id="sexoPaciente">-</span></p>
+            <p><strong>Diagnóstico Previo:</strong> <span id="diagnosticoPaciente">-</span></p>
+            <p><strong>Tutor Legal:</strong> <span id="tutorPaciente">[No aplica]</span></p>
+            <p><strong>Apellido del Tutor:</strong> <span id="tutorApellido">-</span></p>
+            <p><strong>DUI del Tutor:</strong> <span id="tutorDui">-</span></p>
+
+            <p><strong>Psicólogo Responsable:</strong> <span id="nombrePsicologo">[Selecciona un psicólogo]</span></p>
+
+            <br />
+
+            <p>
+                Declaro que he sido informado(a) clara y detalladamente sobre el proceso de intervención psicológica que recibiré.
+                Entiendo los objetivos de las evaluaciones, las técnicas a emplearse, así como los beneficios y posibles riesgos asociados.
+            </p>
+            <p>
+                Me comprometo a colaborar activamente en las sesiones, respetando los acuerdos establecidos con el/la psicólogo/a.
+                Sé que tengo derecho a interrumpir el proceso terapéutico si así lo decido.
+            </p>
+            <p>
+                Acepto que la información compartida durante la terapia será tratada con estricta confidencialidad y no será divulgada a terceros sin mi consentimiento, salvo en situaciones contempladas por la ley o cuando exista riesgo para mi integridad o la de otros.
+            </p>
+            <p>
+                Conforme a la Ley de Protección de Datos Personales vigente en El Salvador, autorizo el tratamiento responsable de mis datos personales únicamente para fines clínicos y administrativos relacionados con esta atención.
+            </p>
+
+            <p class="mt-4"><strong>Firma del paciente o tutor legal:</strong> ___________________________</p>
+            <p><strong>Firma del psicólogo:</strong> ___________________________</p>
+        </div>
+
+        <button type="submit" class="btn btn-success mt-3">Generar PDF</button>
+        
+    </form>
+    <form method="get" asp-action="subirArchivo" class="mt-3">
+		<button type="submit" class="btn btn-secondary">Añadir consentimiento</button>
+	</form>
+</div>
+
+
+
+@section Scripts {
+    <script>
+        document.getElementById('pacienteId').addEventListener('change', function () {
+            const selectedOption = this.options[this.selectedIndex];
+
+            document.getElementById('nombrePaciente').innerText = selectedOption.text;
+            document.getElementById('duiPaciente').innerText = selectedOption.getAttribute('data-dui') || 'N/A';
+            document.getElementById('fechaNacimiento').innerText = selectedOption.getAttribute('data-fecha') || 'N/A';
+            document.getElementById('sexoPaciente').innerText = selectedOption.getAttribute('data-sexo') || 'N/A';
+            document.getElementById('diagnosticoPaciente').innerText = selectedOption.getAttribute('data-diagnostico') || 'Sin diagnóstico';
+            document.getElementById('tutorPaciente').innerText = selectedOption.getAttribute('data-tutor') || 'No aplica';
+            document.getElementById('tutorApellido').innerText = selectedOption.getAttribute('data-tutor-apellido') || '-';
+            document.getElementById('tutorDui').innerText = selectedOption.getAttribute('data-tutor-dui') || '-';
+        });
+
+        document.getElementById('psicologoId').addEventListener('change', function () {
+            const selectedOption = this.options[this.selectedIndex];
+            const nombreCompleto = selectedOption.getAttribute('data-nombrecompleto');
+            document.getElementById('nombrePsicologo').innerText = nombreCompleto || '[Selecciona un psicólogo]';
+        });
+    </script>
+}
+
