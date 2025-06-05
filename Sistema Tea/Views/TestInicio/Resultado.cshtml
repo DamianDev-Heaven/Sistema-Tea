@@ -1,6 +1,6 @@
 ﻿@{
     Layout = null;
-    ViewData["Title"] = "Resultado del Test";
+    ViewData["Title"] = "Resultado del Test Preliminar";
 }
 
 <!DOCTYPE html>
@@ -8,265 +8,390 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>@ViewData["Title"]</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-
-    <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/resultadoTestIni.css" asp-append-version="true" />
+    <title>@ViewData["Title"] - eMind</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
     <style>
         :root {
-            --primary: #3b49df;
-            --success: #198754;
-            --warning: #ffc107;
-            --danger: #dc3545;
-            --light: #f9fafb;
-            --border-radius: 16px;
-            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --emind-primary: #3b49df;
+            --emind-primary-rgb: 59, 73, 223; 
+            --emind-primary-dark: #2f3aae;
+            --emind-primary-light: #e9ecff;
+            --emind-success: #198754; 
+            --emind-warning: #ffc107; 
+            --emind-danger: #dc3545; 
+
+            --emind-text-dark: #212529;
+            --emind-text-light: #495057;
+            --emind-text-muted: #6c757d;
+            --emind-bg-light: #f8f9fa;
+            --emind-bg-card: #ffffff;
+            --emind-border-radius-lg: 1rem; 
+            --emind-border-radius-md: 0.75rem;
+            --emind-border-color: #dee2e6;
+            --emind-shadow-sm: 0 2px 8px rgba(var(--emind-primary-rgb), 0.08);
+            --emind-shadow-md: 0 6px 16px rgba(var(--emind-primary-rgb), 0.12);
+            --emind-shadow-lg: 0 10px 30px rgba(var(--emind-primary-rgb), 0.18);
+
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--light);
-            color: #212529;
+
+            background-color: var(--emind-bg-light);
+            color: var(--emind-text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-size: 16px;
+            line-height: 1.6;
         }
 
         .navbar-brand {
             font-weight: 700;
-            font-size: 1.4rem;
-            color: var(--primary);
+            font-size: 1.6rem;
+            color: var(--emind-primary);
+        }
+
+            .navbar-brand i {
+                font-size: 1.8rem; 
+            }
+
+        .result-container { 
+            max-width: 760px;
+            margin: 2.5rem auto 3rem;
+            padding: 0 15px; 
         }
 
         .result-card {
-            background: #fff;
-            border-radius: var(--border-radius);
-            padding: 3rem;
-            margin: 3rem auto;
-            max-width: 640px;
-            box-shadow: var(--box-shadow);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: var(--emind-bg-card);
+            padding: 2rem 2.5rem;
+            border-radius: var(--emind-border-radius-lg);
+            box-shadow: var(--emind-shadow-md);
+            border: 1px solid var(--emind-border-color);
+        }
+
+        .result-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--emind-primary);
+            margin-bottom: 0.5rem;
             text-align: center;
         }
 
-            .result-card:hover {
-                transform: translateY(-4px);
-                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-            }
-
-        .result-title {
-            font-weight: 700;
-            font-size: 1.8rem;
-            margin-bottom: 2rem;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-            .result-title i {
-                font-size: 2rem;
-            }
-
-        .score-box {
-            background: rgba(59, 73, 223, 0.1);
-            border-radius: var(--border-radius);
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-        }
-
-        .score {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-            .score i {
-                margin-right: 0.5rem;
-                font-size: 1.7rem;
-            }
-
-        .probability-box {
-            margin-bottom: 1.5rem;
-        }
-
-        .probability-label {
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
+        .cuestionario-aplicado-subtitle {
+            font-size: 1.1rem;
+            font-style: normal;
             font-weight: 500;
-            color: #333;
+            color: var(--emind-text-light);
+            text-align: center;
+            margin-bottom: 2rem;
         }
 
-        .badge-result {
-            font-size: 1.1rem;
-            padding: 0.75rem 1.5rem;
-            border-radius: 24px;
-            font-weight: 600;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            display: inline-flex;
-            align-items: center;
-        }
-
-            .badge-result i {
-                margin-right: 0.5rem;
-                font-size: 1.3rem;
-            }
-
-        .result-message {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin: 2rem 0;
-            color: #444;
-            background: rgba(59, 73, 223, 0.1);
-            border-radius: var(--border-radius);
+        .score-probability-section {
+            background-color: var(--emind-primary-light);
+            border-radius: var(--emind-border-radius-md);
             padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+            .score-probability-section .alert-heading { 
+                font-size: 1.75rem; 
+                font-weight: 600;
+                margin-bottom: 0.75rem;
+            }
+
+            .score-probability-section .score {
+                font-size: 1.2rem;
+                font-weight: 500;
+                color: var(--emind-text-dark);
+                margin-bottom: 0;
+            }
+
+            .score-probability-section strong {
+                color: var(--emind-primary);
+                font-weight: 700;
+            }
+
+        .text-alta {
+            color: var(--emind-danger);
+        }
+
+        .text-media {
+            color: var(--emind-warning);
+        }
+        .text-baja {
+            color: var(--emind-success);
+        }
+
+
+        .interpretacion-texto {
+            margin-top: 1.5rem;
+            color: var(--emind-text-light);
+            font-size: 1.05rem;
+            text-align: justify;
+        }
+
+            .interpretacion-texto p {
+                margin-bottom: 1rem;
+            }
+
+        .consideraciones-card {
+            border-color: var(--emind-warning);
+            margin-top: 2.5rem;
+            border-width: 1px;
+            border-radius: var(--emind-border-radius-md);
+        }
+
+            .consideraciones-card .card-header {
+                background-color: rgba(var(--emind-warning-rgb), 0.1);
+                border-bottom: 1px solid var(--emind-warning);
+                font-weight: 600;
+                color: var(--emind-text-dark);
+            }
+
+                .consideraciones-card .card-header i {
+                    color: var(--emind-warning);
+                }
+
+            .consideraciones-card .card-text {
+                font-size: 0.95rem; 
+                color: var(--emind-text-light);
+            }
+
+            .consideraciones-card strong {
+                color: var(--emind-text-dark);
+                font-weight: 600;
+            }
+
+       
+        .btn-actions-container {
+            text-align: center;
+            margin-top: 2.5rem;
             display: flex;
-            align-items: center;
+            gap: 1rem;
             justify-content: center;
+            flex-wrap: wrap;
         }
 
-            .result-message i {
-                font-size: 1.5rem;
-                margin-right: 0.75rem;
-            }
-
-        .btn-volver {
+        .btn-action { 
             font-weight: 600;
-            font-size: 1.1rem;
-            padding: 0.75rem 2rem;
-            border-radius: var(--border-radius);
-            background: #fff;
-            border: 2px solid var(--primary);
-            color: var(--primary);
-            box-shadow: 0 4px 12px rgba(59, 73, 223, 0.2);
+            font-size: 1rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--emind-border-radius-md);
             transition: all 0.3s ease;
+            min-width: 180px;
         }
 
-            .btn-volver:hover {
-                background: var(--primary);
+            .btn-action.btn-primary {
+                background-color: var(--emind-primary);
+                border-color: var(--emind-primary);
                 color: #fff;
-                box-shadow: 0 8px 24px rgba(59, 73, 223, 0.4);
+                box-shadow: var(--emind-shadow-sm);
             }
 
+                .btn-action.btn-primary:hover {
+                    background-color: var(--emind-primary-dark);
+                    border-color: var(--emind-primary-dark);
+                    box-shadow: var(--emind-shadow-md);
+                    transform: translateY(-2px);
+                }
+
+            .btn-action.btn-outline-secondary {
+                border-color: var(--emind-border-color);
+                color: var(--emind-text-light);
+            }
+
+                .btn-action.btn-outline-secondary:hover {
+                    background-color: var(--emind-bg-light);
+                    color: var(--emind-primary);
+                    border-color: var(--emind-primary-light);
+                    transform: translateY(-2px);
+                }
         footer {
-            background: #fff;
-            border-top: 1px solid #e9ecef;
-            margin-top: 3rem;
+            background-color: var(--emind-bg-card); 
+            border-top: 1px solid var(--emind-border-color);
             padding: 2rem 0;
+            margin-top: auto;
+            font-size: 0.9rem;
+            color: var(--emind-text-muted);
         }
+
+            footer h5 {
+                font-weight: 600;
+                color: var(--emind-primary);
+                margin-bottom: 1rem;
+            }
+
+            footer p {
+                margin-bottom: 0.5rem;
+                font-size: 0.9rem;
+                color: var(--emind-text-light);
+            }
+
+            footer a {
+                color: var(--emind-primary);
+                text-decoration: none;
+            }
+
+                footer a:hover {
+                    text-decoration: underline;
+                }
+
         @@media (max-width: 768px) {
-            .result-card
+            .result-title {
+                font-size: 1.8rem;
+            }
 
-        {
-            padding: 2rem 1.5rem;
-            margin: 2rem 1rem;
+            .cuestionario-aplicado-subtitle {
+                font-size: 1rem;
+            }
+
+            .score-probability-section .alert-heading {
+                font-size: 1.5rem;
+            }
+
+            .score-probability-section .score {
+                font-size: 1.1rem;
+            }
+
+            .interpretacion-texto {
+                font-size: 0.95rem;
+            }
+
+            .result-card {
+                padding: 1.5rem;
+            }
         }
 
-        .result-title {
-            font-size: 1.5rem;
+        @@media (max-width: 576px) {
+            .result-container {
+                margin: 1.5rem auto 2rem;
+            }
+
+            .result-card {
+                padding: 1.5rem 1rem;
+            }
+
+            .btn-actions-container {
+                flex-direction: column;
+            }
+            .btn-action {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+
+                .btn-action.ms-2 {
+                    margin-left: 0 !important;
+                }
         }
 
-        .score {
-            font-size: 1.3rem;
-        }
-
-        .badge-result {
-            font-size: 1rem;
-            padding: 0.6rem 1.2rem;
-        }
-
-        }
     </style>
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-sm">
             <div class="container-fluid">
-                <a class="navbar-brand d-flex align-items-center">
-                    <i class="bi bi-hospital me-2" aria-hidden="true"></i> eMind
+
+                <a asp-controller="TestInicio" asp-action="Index" class="navbar-brand d-flex align-items-center">
+                    <i class="bi bi-hospital me-2"></i> eMind
                 </a>
             </div>
         </nav>
     </header>
-    <main class="container py-5">
-        <div class="result-card">
-            <div class="result-title">
-                <i class="bi bi-clipboard2-pulse"></i>
-                <span class="ms-3">Resultado del Test</span>
-            </div>
-            <div class="score-box">
-                <p class="score">
-                    <i class="bi bi-star-fill"></i>
-                    <span>Puntaje Total Obtenido: <strong>@ViewBag.Puntaje</strong></span>
+    <main class="flex-grow-1 result-container">
+        <section class="result-card" role="region" aria-labelledby="resultTitle">
+            <h1 id="resultTitle" class="result-title">Resultado del Test Preliminar</h1>
+            @if (!string.IsNullOrEmpty(ViewBag.CuestionarioAplicado))
+            {
+                <p class="cuestionario-aplicado-subtitle">(@ViewBag.CuestionarioAplicado)</p>
+            }
+
+            @{
+                string probabilidadClassText = "";
+                if (ViewBag.Resultado == "Probabilidad Alta") { probabilidadClassText = "text-alta"; }
+                else if (ViewBag.Resultado == "Probabilidad Media") { probabilidadClassText = "text-media"; }
+                else { probabilidadClassText = "text-baja"; }
+            }
+
+            <div class="score-probability-section">
+                <h2 class="alert-heading @probabilidadClassText">@ViewBag.Resultado</h2>
+                <p class="score mb-0">
+                    Puntaje Total Obtenido: <strong>@ViewBag.Puntaje</strong>
                 </p>
             </div>
-            <div class="probability-box">
-                <div class="probability-label">Nivel de probabilidad de TEA:</div>
-                @if (ViewBag.Resultado == "Probabilidad Alta")
+
+            <div class="interpretacion-texto">
+                @if (!string.IsNullOrEmpty(ViewBag.InterpretacionDetallada))
                 {
-                    <span class="badge bg-danger badge-result">
-                        <i class="bi bi-exclamation-triangle-fill"></i>
-                        Alta
-                    </span>
-                    <div class="result-message mt-3">
-                        <i class="bi bi-exclamation-circle-fill"></i>
-                        Recomendamos acudir a una evaluación profesional.
-                    </div>
-                }
-                else if (ViewBag.Resultado == "Probabilidad Media")
-                {
-                    <span class="badge bg-warning badge-result text-dark">
-                        <i class="bi bi-info-circle-fill"></i>
-                        Media
-                    </span>
-                    <div class="result-message mt-3">
-                        <i class="bi bi-info-circle-fill"></i>
-                        Podría ser útil una valoración profesional para mayor certeza.
-                    </div>
-                }
-                else
-                {
-                    <span class="badge bg-success badge-result">
-                        <i class="bi bi-check-circle-fill"></i>
-                        Baja
-                    </span>
-                    <div class="result-message mt-3">
-                        <i class="bi bi-check-circle-fill"></i>
-                        No se detectan señales claras de TEA, pero siempre es recomendable consultar con un especialista.
-                    </div>
+                    @Html.Raw(ViewBag.InterpretacionDetallada.Replace("\n", "<p></p>"))
                 }
             </div>
-            <div class="result-message">
-                <i class="bi bi-info-circle-fill text-primary"></i>
-                <span>Este resultado es solo una orientación. Te recomendamos visitar nuestra Clínica de Evaluación TEA eMind, donde contamos con profesionales especializados para una evaluación completa.</span>
+
+            <div class="consideraciones-card card mt-4">
+                <div class="card-header">
+                    <i class="bi bi-info-circle-fill me-2"></i><strong>Consideraciones Importantes</strong>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Este test es una herramienta de detección preliminar y <strong>no constituye un diagnóstico definitivo</strong>. Su propósito es ayudar a identificar si existen rasgos o comportamientos que justifiquen una evaluación más completa por parte de profesionales especializados.</p>
+                    <p class="card-text mb-0">Si los resultados de este test indican una posible probabilidad de TEA, o si usted tiene preocupaciones significativas (independientemente del resultado del test), le recomendamos encarecidamente buscar asesoramiento y una evaluación formal con un especialista.</p>
+                </div>
             </div>
-            <a asp-controller="TestInicio" asp-action="Index" class="btn btn-volver">
-                <i class="bi bi-arrow-left-circle me-2"></i>
-                Volver al inicio
-            </a>
-        </div>
+
+            <div class="btn-actions-container">
+                <a asp-controller="TestInicio" asp-action="ElegirEdad" class="btn btn-primary btn-action" role="button">
+                    <i class="bi bi-arrow-repeat me-2"></i> Realizar Otro Test
+                </a>
+                <a asp-controller="TestInicio" asp-action="Index" class="btn btn-outline-secondary btn-action ms-sm-2" role="button">
+                    <i class="bi bi-house-door-fill me-2"></i> Volver al Inicio
+                </a>
+            </div>
+        </section>
     </main>
-    <footer class="bg-light rounded shadow-sm">
-        <div class="container">
+
+    <footer class="text-center text-lg-start">
+        <div class="container p-4">
             <div class="row">
-                <div class="col-md-6">
-                    <h5>Clínica de Evaluación TEA eMind</h5>
-                    <p><i class="bi bi-geo-alt-fill me-2" aria-hidden="true"></i> Santa Ana</p>
-                    <p><i class="bi bi-telephone-fill me-2" aria-hidden="true"></i> (+503) 2401-3421</p>
-                    <p><i class="bi bi-envelope-fill me-2" aria-hidden="true"></i> eMind@gmail.com</p>
+                <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                    <h5 class="text-uppercase"><i class="bi bi-shield-check-fill me-1"></i> Clínica eMind</h5>
+                    <p>
+                        Comprometidos con tu bienestar y el de tu familia. Ofrecemos evaluaciones especializadas en TEA.
+                    </p>
+                    <p><i class="bi bi-geo-alt-fill me-2"></i> Santa Ana, El Salvador</p>
                 </div>
-                <div class="col-md-6 text-md-end">
-                    <p class="mb-0">© @DateTime.Now.Year Clínica eMind - Todos los derechos reservados</p>
+
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">Contacto</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li>
+                            <i class="bi bi-telephone-fill me-2"></i> (+503) 2401-3421
+                        </li>
+                        <li>
+                            <i class="bi bi-envelope-fill me-2"></i> eMind.info.sv@gmail.com
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">Legal</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li>
+                            <a href="#!" class="text-reset">Política de Privacidad</a>
+                        </li>
+                        <li>
+                            <a href="#!" class="text-reset">Términos de Uso</a>
+                        </li>
+                    </ul>
                 </div>
             </div>
+        </div>
+        <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
+            © @DateTime.Now.Year Clínica eMind - Todos los derechos reservados.
         </div>
     </footer>
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 </html>

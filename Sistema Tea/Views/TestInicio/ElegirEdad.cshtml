@@ -1,0 +1,391 @@
+﻿@{
+    ViewData["Title"] = "Iniciar Test: Seleccionar Edad";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - eMind</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --emind-primary: #3b49df;
+            --emind-primary-rgb: 59, 73, 223;
+            --emind-primary-dark: #2f3aae;
+            --emind-primary-light: #e9ecff;
+            --emind-primary-hover: #f0f2ff;
+            --emind-text-dark: #212529;
+            --emind-text-light: #495057;
+            --emind-text-muted: #6c757d;
+            --emind-bg-page: #f8f9fc;
+            --emind-bg-card: #ffffff;
+            --emind-border-radius-lg: 1rem;
+            --emind-border-radius-xl: 1.25rem;
+            --emind-border-color: #dee2e6;
+            --emind-border-color-light: #eef0f3;
+            --emind-shadow-sm: 0 2px 8px rgba(var(--emind-primary-rgb), 0.06);
+            --emind-shadow-md: 0 6px 16px rgba(var(--emind-primary-rgb), 0.08);
+            --emind-shadow-lg: 0 10px 30px rgba(var(--emind-primary-rgb), 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--emind-bg-page);
+            color: var(--emind-text-dark);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .navbar-custom {
+            background-color: var(--emind-bg-card);
+            box-shadow: var(--emind-shadow-sm);
+            padding: 0.75rem 1rem;
+        }
+
+        .navbar-brand-custom {
+            font-weight: 700;
+            font-size: 1.6rem;
+            color: var(--emind-primary);
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+            .navbar-brand-custom i {
+                margin-right: 0.6rem;
+                font-size: 1.8rem;
+            }
+
+        .page-container {
+            max-width: 900px;
+            margin: 2.5rem auto 4rem;
+            padding: 0 15px;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--emind-text-dark);
+            margin-bottom: 0.75rem;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: var(--emind-text-light);
+            margin-bottom: 3rem;
+        }
+
+        .age-selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.75rem;
+        }
+
+        .age-card {
+            display: flex;
+            flex-direction: column;
+            background-color: var(--emind-bg-card);
+            border-radius: var(--emind-border-radius-xl);
+            padding: 2rem;
+            text-decoration: none;
+            color: var(--emind-text-dark);
+            box-shadow: var(--emind-shadow-md);
+            border: 2px solid transparent;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .age-card:hover, .age-card:focus-visible {
+                transform: translateY(-6px) scale(1.02);
+                box-shadow: var(--emind-shadow-lg);
+                border-color: var(--emind-primary);
+                color: var(--emind-text-dark);
+                outline: none;
+            }
+
+            .age-card:focus-visible {
+                box-shadow: 0 0 0 3px rgba(var(--emind-primary-rgb), 0.3), var(--emind-shadow-lg);
+            }
+
+        .age-card-icon-wrapper {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background-color: var(--emind-primary-light);
+            color: var(--emind-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .age-card:hover .age-card-icon-wrapper,
+        .age-card:focus-visible .age-card-icon-wrapper {
+            background-color: var(--emind-primary);
+            color: #fff;
+            transform: rotate(-10deg) scale(1.1);
+        }
+
+        .age-card-icon-wrapper i {
+            font-size: 2.25rem;
+        }
+
+        .age-card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--emind-primary);
+        }
+
+        .age-card-range {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--emind-text-light);
+            margin-bottom: 0.75rem;
+        }
+
+        .age-card-description {
+            font-size: 0.9rem;
+            color: var(--emind-text-muted);
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+
+        .age-card-arrow {
+            font-size: 1.5rem;
+            color: var(--emind-primary);
+            align-self: flex-end;
+            margin-top: 1rem;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+
+        .age-card:hover .age-card-arrow,
+        .age-card:focus-visible .age-card-arrow {
+            opacity: 1;
+        }
+
+        .alert-custom {
+            border-radius: var(--emind-border-radius-md);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            margin-top: 2rem;
+        }
+
+            .alert-custom i {
+                font-size: 1.3rem;
+                margin-right: 0.75rem;
+            }
+
+        footer {
+            background-color: var(--emind-bg-card);
+            border-top: 1px solid var(--emind-border-color-light);
+            padding: 2rem 0;
+            margin-top: auto;
+            font-size: 0.9rem;
+            color: var(--emind-text-muted);
+        }
+
+            footer h5 {
+                font-weight: 600;
+                color: var(--emind-primary);
+                margin-bottom: 1rem;
+            }
+
+            footer p {
+                margin-bottom: 0.5rem;
+                font-size: 0.9rem;
+                color: var(--emind-text-light);
+            }
+
+            footer a {
+                color: var(--emind-primary);
+                text-decoration: none;
+            }
+
+                footer a:hover {
+                    text-decoration: underline;
+                    color: var(--emind-primary-dark);
+                }
+
+        @@media (max-width: 768px) {
+            .page-container {
+                margin-top: 1.5rem;
+                margin-bottom: 2.5rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .page-subtitle {
+                font-size: 1.1rem;
+                margin-bottom: 2rem;
+            }
+
+            .age-card {
+                padding: 1.5rem;
+            }
+
+            .age-card-title {
+                font-size: 1.3rem;
+            }
+
+            .age-card-icon-wrapper {
+                width: 56px;
+                height: 56px;
+            }
+
+                .age-card-icon-wrapper i {
+                    font-size: 1.8rem;
+                }
+        }
+
+        @@media (max-width: 576px) {
+            .age-selection-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title {
+                font-size: 1.75rem;
+            }
+
+            .page-subtitle {
+                font-size: 1rem;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-custom">
+            <div class="container-fluid">
+                <a asp-controller="TestInicio" asp-action="Index" class="navbar-brand-custom">
+                    <i class="bi bi-hospital me-2"></i>eMind
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="flex-grow-1 page-container">
+        <div class="text-center">
+            <h1 class="page-title">Test Preliminar de Detección TEA</h1>
+            <p class="page-subtitle">Para comenzar, por favor selecciona el grupo de edad de la persona que será evaluada. Esto nos ayudará a presentarte el cuestionario más adecuado.</p>
+        </div>
+
+        <div class="age-selection-grid">
+            <a asp-controller="TestInicio" asp-action="Test" asp-route-grupoEdad="ninosPequenos" class="age-card" aria-label="Iniciar test para niños pequeños, 18 a 47 meses">
+                <div class="age-card-icon-wrapper">
+                    <i class="bi bi-cake"></i>
+                </div>
+                <h2 class="age-card-title">Niños Pequeños</h2>
+                <p class="age-card-range">18 a 47 meses</p>
+                <p class="age-card-description">Este cuestionario es para ser respondido por los padres o cuidadores principales del niño/a.</p>
+                <div class="age-card-arrow ms-auto">
+                    <i class="bi bi-arrow-right-circle-fill"></i>
+                </div>
+            </a>
+
+            <a asp-controller="TestInicio" asp-action="Test" asp-route-grupoEdad="ninosEscolares" class="age-card" aria-label="Iniciar test para niños en edad escolar, 4 a 11 años">
+                <div class="age-card-icon-wrapper">
+                    <i class="bi bi-book-half"></i>
+                </div>
+                <h2 class="age-card-title">Niños Escolares</h2>
+                <p class="age-card-range">4 a 11 años</p>
+                <p class="age-card-description">Este cuestionario está diseñado para que lo completen los padres o cuidadores del niño/a.</p>
+                <div class="age-card-arrow ms-auto">
+                    <i class="bi bi-arrow-right-circle-fill"></i>
+                </div>
+            </a>
+
+            <a asp-controller="TestInicio" asp-action="Test" asp-route-grupoEdad="adolescentesAdultos" class="age-card" aria-label="Iniciar test para adolescentes y adultos, 12 años en adelante">
+                <div class="age-card-icon-wrapper">
+                    <i class="bi bi-person-arms-up"></i>
+                </div>
+                <h2 class="age-card-title">Adolescentes y Adultos</h2>
+                <p class="age-card-range">12 años en adelante</p>
+                <p class="age-card-description">Este cuestionario es una autoevaluación para ser respondida por la persona interesada.</p>
+                <div class="age-card-arrow ms-auto">
+                    <i class="bi bi-arrow-right-circle-fill"></i>
+                </div>
+            </a>
+        </div>
+
+        @if (TempData["ErrorTest"] != null)
+        {
+            <div class="alert alert-warning alert-dismissible fade show alert-custom" role="alert">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span>@TempData["ErrorTest"]</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["ErrorResultado"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show alert-custom" role="alert">
+                <i class="bi bi-exclamation-octagon-fill"></i>
+                <span>@TempData["ErrorResultado"]</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+    </main>
+
+    <footer class="text-center text-lg-start">
+        <div class="container p-4">
+            <div class="row">
+                <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                    <h5 class="text-uppercase"><i class="bi bi-shield-check-fill me-1"></i> Clínica eMind</h5>
+                    <p>
+                        Comprometidos con tu bienestar y el de tu familia. Ofrecemos evaluaciones especializadas en TEA en El Salvador.
+                    </p>
+                    <p><i class="bi bi-geo-alt-fill me-2"></i> Santa Ana, El Salvador</p>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">Contacto</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li>
+                            <i class="bi bi-telephone-fill me-2"></i> (+503) 2401-3421
+                        </li>
+                        <li>
+                            <i class="bi bi-envelope-fill me-2"></i> eMind.info.sv@gmail.com
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">Legal</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li>
+                            <a asp-controller="Home" asp-action="Privacy" class="text-reset">Política de Privacidad</a>
+                        </li>
+                        <li>
+                            <a href="#!" class="text-reset">Términos de Uso</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="text-center p-3" style="background-color: rgba(var(--emind-primary-rgb), 0.03);">
+            © @DateTime.Now.Year Clínica eMind - Todos los derechos reservados.
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>
