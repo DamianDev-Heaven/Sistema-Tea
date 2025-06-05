@@ -1,7 +1,7 @@
 ﻿@model List<Sistema_Tea.Models.TestInicial>
 @{
     Layout = null;
-    ViewData["Title"] = "Test de Detección de Autismo";
+    ViewData["Title"] = ViewBag.CuestionarioTitulo ?? "Test de Detección de Autismo";
 }
 
 <!DOCTYPE html>
@@ -9,15 +9,12 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>@ViewData["Title"]</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+    <title>@ViewData["Title"] - eMind</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 
-    <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/testIni.css" asp-append-version="true" />
-
+    @* Tus estilos CSS provistos anteriormente. Asegúrate de que estén aquí. *@
     <style>
         :root {
             --primary: #3b49df;
@@ -30,6 +27,9 @@
             font-family: 'Inter', sans-serif;
             background-color: #f9fafb;
             color: #212529;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
         .navbar-brand {
@@ -37,24 +37,126 @@
             font-size: 1.4rem;
             color: var(--primary);
         }
+        /* Stepper */
+        .stepper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap; /* Para que se ajuste en pantallas pequeñas */
+        }
+
+        .step {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s, color 0.3s, border 0.3s;
+            border: 2px solid var(--primary-light);
+            font-size: 1.05rem; /* Un poco más grande para que se vea bien el número */
+            position: relative; /* Para la línea conectora */
+        }
+
+            .step.active {
+                background: var(--primary);
+                color: #fff;
+                border-color: var(--primary);
+                box-shadow: 0 0 0 4px var(--primary-light); /* Efecto de halo */
+            }
+
+            .step.completed {
+                background: var(--primary);
+                color: #fff;
+                border-color: var(--primary);
+            }
+
+            /* Línea conectora del stepper */
+            .step:not(:last-child)::after {
+                content: '';
+                display: block;
+                width: 32px; /* Ancho de la línea */
+                height: 2px; /* Grosor de la línea */
+                background: var(--primary-light);
+                position: absolute;
+                right: -34px; /* Distancia entre el círculo y la línea */
+                top: 50%;
+                transform: translateY(-50%);
+                z-index: -1; /* Detrás del círculo */
+            }
+
+            .step.completed:not(:last-child)::after {
+                background: var(--primary); /* Línea completada */
+            }
+
+        @@media (max-width: 600px) { /* Ajustes responsivos para el stepper */
+            .stepper {
+                gap: 0.2rem;
+            }
+
+            .step, .step:not(:last-child)::after {
+                width: 24px;
+                height: 24px;
+            }
+
+                .step:not(:last-child)::after {
+                    right: -26px;
+                    width: 24px;
+                }
+
+            .step {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Animaciones y tarjetas de preguntas */
+        .question-card {
+            background: #fff;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin: 1.5rem auto; /* Centrar la tarjeta de pregunta */
+            box-shadow: var(--box-shadow);
+            min-height: 300px; /* Ajustar según necesidad */
+            transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            position: absolute; /* Para la animación de carrusel */
+            left: 0;
+            right: 0;
+            width: 100%; /* Asegurar que ocupa el ancho del contenedor */
+            z-index: 2;
+        }
+
+            .question-card.active {
+                opacity: 1;
+                transform: translateY(0);
+                pointer-events: auto;
+                position: relative; /* Para que ocupe espacio en el flujo normal */
+                z-index: 3;
+                /* animation: fadeIn 0.5s; // La transición ya lo hace suave */
+            }
 
         .opciones-container {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid; /* Usar grid para mejor control de columnas */
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Columnas responsivas */
             gap: 1rem;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
         }
 
         .opcion-card {
-            flex: 1 1 calc(50% - 1rem);
-            min-width: 150px;
             background: #fff;
             border-radius: var(--border-radius);
-            padding: 1.5rem 1rem;
+            padding: 1.2rem 1rem; /* Ajustar padding */
             box-shadow: var(--box-shadow);
             cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
+            transition: all 0.2s ease-in-out;
+            border: 2px solid #eee; /* Borde sutil por defecto */
             text-align: center;
             display: flex;
             flex-direction: column;
@@ -63,37 +165,42 @@
         }
 
             .opcion-card:hover {
-                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-                transform: translateY(-2px);
+                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+                transform: translateY(-3px);
+                border-color: #ccc;
             }
 
             .opcion-card.selected {
                 background: var(--primary-light);
                 border-color: var(--primary);
                 color: var(--primary);
+                box-shadow: 0 4px 12px rgba(59, 73, 223, 0.2);
             }
 
-            .opcion-card input {
-                display: none;
+            .opcion-card input[type="radio"] {
+                display: none; /* Ocultar el radio button real */
             }
 
             .opcion-card label {
                 cursor: pointer;
                 font-weight: 500;
-                margin-top: 0.5rem;
+                margin-top: 0.5rem; /* Espacio entre icono y texto */
+                width: 100%; /* Para que toda la tarjeta sea clickeable */
+                display: block; /* Para que el label ocupe el espacio */
             }
 
         .opcion-icon {
-            width: 40px;
-            height: 40px;
+            width: 36px; /* Ajustar tamaño */
+            height: 36px;
             border-radius: 50%;
             background: #f0f2ff;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 0.5rem;
-            font-size: 1.25rem;
+            margin-bottom: 0.75rem; /* Espacio entre icono y texto */
+            font-size: 1.2rem;
             color: var(--primary);
+            transition: all 0.2s ease-in-out;
         }
 
         .opcion-card.selected .opcion-icon {
@@ -101,25 +208,17 @@
             color: #fff;
         }
 
-        .question-card {
-            background: #fff;
-            border-radius: var(--border-radius);
-            padding: 2rem;
-            margin: 1.5rem 0;
-            box-shadow: var(--box-shadow);
-            transition: box-shadow 0.3s ease, transform 0.3s ease;
-        }
-
-            .question-card:hover {
-                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-                transform: translateY(-2px);
-            }
-
         .question-title {
             font-weight: 600;
-            font-size: 1.2rem;
+            font-size: 1.3rem; /* Ajustar tamaño */
+            margin-bottom: 0.5rem; /* Menos espacio si hay ayuda adicional */
+            color: #333; /* Un color más oscuro para el texto de la pregunta */
+        }
+
+        .question-ayuda {
+            font-size: 0.9rem;
+            color: #6c757d;
             margin-bottom: 1.5rem;
-            color: var(--primary);
         }
 
         .submit-btn {
@@ -131,142 +230,286 @@
             color: #fff;
             border: none;
             box-shadow: 0 6px 16px rgba(59, 73, 223, 0.3);
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            transition: background-color 0.3s, box-shadow 0.3s;
         }
 
             .submit-btn:hover {
-                background: #2c3dbd;
+                background: #2c3dbd; /* Un poco más oscuro al hacer hover */
                 box-shadow: 0 8px 24px rgba(44, 61, 189, 0.5);
             }
 
+        .nav-btn {
+            min-width: 120px;
+            font-weight: 500;
+        }
+
+        .shake {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @@keyframes shake {
+            10%, 90% {
+                transform: translateX(-1px);
+            }
+
+            20%, 80% {
+                transform: translateX(2px);
+            }
+
+            30%, 50%, 70% {
+                transform: translateX(-3px);
+            }
+
+            40%, 60% {
+                transform: translateX(3px);
+            }
+        }
+
+        .questions-container { /* Contenedor para las tarjetas de preguntas */
+            position: relative; /* Necesario para la animación de las tarjetas */
+            min-height: 360px; /* Altura mínima para evitar saltos de layout */
+            overflow: hidden; /* Para la animación de slide si se quisiera */
+        }
+
         footer {
+            /* ... tus estilos de footer ... */
             background: #fff;
             border-top: 1px solid #e9ecef;
             margin-top: 3rem;
             padding: 1.5rem 0;
         }
 
-        .footer-content {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
+        .footer-content h5 {
+            font-weight: 600;
+            color: var(--primary);
         }
 
-            .footer-content h5 {
-                font-weight: 600;
-            }
-        @@media (max-width: 768px) {
-            .opcion-card
-
-        {
-            flex: 1 1 100%;
-        }
-
-        }
     </style>
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-sm">
             <div class="container-fluid">
-                <a class="navbar-brand d-flex align-items-center">
-                    <i class="bi bi-hospital me-2" aria-hidden="true"></i> eMind
+                <a asp-controller="TestInicio" asp-action="Index" class="navbar-brand d-flex align-items-center">
+                    <i class="bi bi-hospital me-2"></i> eMind
                 </a>
             </div>
         </nav>
     </header>
-    <main class="container py-5">
+
+    <main class="container py-4">
         <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <h1 class="mb-4 fw-bold text-center">Test de Detección de Autismo</h1>
-                <p class="lead text-center mb-5">Responde con sinceridad cada pregunta</p>
-                <form asp-action="Resultado" method="post" class="needs-validation" novalidate>
+            <div class="col-lg-9 col-xl-8">
+                <h1 class="mb-3 fw-bold text-center display-6">@ViewData["Title"]</h1>
+                @if (!string.IsNullOrEmpty(ViewBag.CuestionarioTitulo) && (string)ViewData["Title"] != (string)ViewBag.CuestionarioTitulo)
+                {
+                    <p class="lead text-center text-muted mb-4">@ViewBag.CuestionarioTitulo</p>
+                }
+
+                <div class="stepper" id="stepper">
                     @for (int i = 0; i < Model.Count; i++)
                     {
-                        <div class="question-card" aria-labelledby="pregunta-@i">
-                            <h2 class="question-title" id="pregunta-@i">@($"{i + 1}. {Model[i].Texto}")</h2>
-                            <div class="opciones-container">
-                                @for (int j = 0; j < Model[i].Opciones.Count; j++)
-                                {
-                                    var valor = j == 3 ? 4 : (j == 2 ? 3 : (j == 1 ? 2 : 1)); // A=1, B=2, C=3, D=4
-                                    var letra = (char)('A' + j);
-                                    var iconos = new[] { "bi-emoji-smile", "bi-emoji-neutral", "bi-emoji-frown", "bi-emoji-dizzy" };
-                                    <div class="opcion-card" onclick="seleccionarOpcion(this, @i, @j)">
-                                        <input type="radio" name="respuestas[@i]" id="resp_@i@j" value="@valor" required />
-                                        <div class="opcion-icon">
-                                            <i class="bi @iconos[j]"></i>
-                                        </div>
-                                        <label for="resp_@i@j">
-                                            <strong>@letra)</strong> @Model[i].Opciones[j]
-                                        </label>
-                                    </div>
-                                }
-                            </div>
-                        </div>
+                        <div class="step @(i == 0 ? "active" : "")" id="step-@i" data-step-index="@i">@(i + 1)</div>
                     }
-                    <div class="text-center mt-4">
-                        <button type="submit" class="btn submit-btn py-3 px-4">
-                            <i class="bi bi-check2-circle me-2"></i> Ver Resultado
-                        </button>
+                </div>
+
+                <form asp-controller="TestInicio" asp-action="Resultado" method="post" class="needs-validation" novalidate autocomplete="off">
+                    <div class="questions-container" id="questionsContainer">
+                        @for (int i = 0; i < Model.Count; i++)
+                        {
+                            var pregunta = Model[i];
+                            <div class="question-card @(i == 0 ? "active" : "")" aria-labelledby="pregunta-titulo-@i" id="question-@i">
+                                <h2 class="question-title" id="pregunta-titulo-@i">@pregunta.Texto</h2>
+                                @if (!string.IsNullOrEmpty(pregunta.AyudaAdicional))
+                                {
+                                    <p class="question-ayuda">@pregunta.AyudaAdicional</p>
+                                }
+                                <div class="opciones-container">
+                                    @for (int j = 0; j < pregunta.Opciones.Count; j++)
+                                    {
+                                        var opcionTexto = pregunta.Opciones[j];
+                                        var scoreParaEstaOpcion = pregunta.ScoresPorOpcion[opcionTexto]; // <-- CAMBIO CLAVE AQUÍ
+                                        var inputId = $"resp_{i}_{j}";
+
+                                        // Lógica de iconos más flexible
+                                        var iconosDisponibles = new[] { "bi-emoji-sunglasses", "bi-emoji-smile", "bi-emoji-neutral", "bi-emoji-frown", "bi-emoji-dizzy" };
+                                        var iconoActual = iconosDisponibles.Length > j ? iconosDisponibles[j] : "bi-check-circle"; // Icono por defecto si hay más de 5 opciones
+                                        if (pregunta.Opciones.Count == 2) // Para Sí/No
+                                        {
+                                            iconoActual = (opcionTexto.Equals("Sí", StringComparison.OrdinalIgnoreCase)) ? "bi-check-circle-fill" : "bi-x-circle-fill";
+                                        }
+
+                                        <div class="opcion-card" tabindex="0" onclick="seleccionarOpcion(this, @i)" onkeydown="if(event.key==='Enter' || event.key===' '){ seleccionarOpcion(this, @i); event.preventDefault(); }">
+                                            <input type="radio" name="respuestas[@i]" id="@inputId" value="@scoreParaEstaOpcion" required />
+                                            <div class="opcion-icon">
+                                                <i class="bi @iconoActual"></i>
+                                            </div>
+                                            <label for="@inputId" class="mb-0">
+                                                @opcionTexto
+                                            </label>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                                    @if (i > 0)
+                                    {
+                                        <button type="button" class="btn btn-outline-secondary nav-btn" onclick="cambiarPregunta(@(i - 1))">
+                                            <i class="bi bi-arrow-left me-1"></i> Anterior
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <div></div>
+                                    }
+
+                                    @if (i < Model.Count - 1)
+                                    {
+                                        <button type="button" class="btn btn-primary nav-btn" onclick="cambiarPregunta(@(i + 1))">
+                                            Siguiente <i class="bi bi-arrow-right ms-1"></i>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="submit" class="btn submit-btn nav-btn">
+                                            <i class="bi bi-check2-circle me-2"></i> Ver Resultado
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        }
                     </div>
                 </form>
             </div>
         </div>
     </main>
-    <footer class="bg-light rounded shadow-sm">
+
+    <footer class="bg-light">
         <div class="container py-4">
-            <div class="footer-content">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h5>Clínica de Evaluación TEA eMind</h5>
-                        <p><i class="bi bi-geo-alt-fill me-2" aria-hidden="true"></i> Santa Ana</p>
-                        <p><i class="bi bi-telephone-fill me-2" aria-hidden="true"></i> (+503) 2401-3421</p>
-                        <p><i class="bi bi-envelope-fill me-2" aria-hidden="true"></i> eMind@gmail.com</p>
-                    </div>
-                    <div class="col-md-6 text-md-end">
-                        <p class="mb-0">© @DateTime.Now.Year Clínica eMind - Todos los derechos reservados</p>
-                    </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="fw-bold" style="color:var(--primary);">Clínica de Evaluación TEA eMind</h5>
+                    <p class="mb-1"><i class="bi bi-geo-alt-fill me-2"></i> Santa Ana, El Salvador</p>
+                    <p class="mb-1"><i class="bi bi-telephone-fill me-2"></i> (+503) 2401-3421</p>
+                    <p class="mb-1"><i class="bi bi-envelope-fill me-2"></i> eMind.info.sv@gmail.com</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-1">© @DateTime.Now.Year Clínica eMind</p>
+                    <p class="mb-0"><small>Todos los derechos reservados.</small></p>
+                    <a href="#" class="text-decoration-none text-secondary"><small>Política de Privacidad</small></a>
                 </div>
             </div>
         </div>
     </footer>
-    <!-- Bootstrap JS -->
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Script para seleccionar opciones -->
     <script>
-        function seleccionarOpcion(card, pregunta, opcion) {
-            // Deseleccionar todas las opciones de esta pregunta
-            const cards = card.closest('.question-card').querySelectorAll('.opcion-card');
-            cards.forEach(c => c.classList.remove('selected'));
-            // Seleccionar la opción clickeada
-            card.classList.add('selected');
-            // Marcar el radio button
-            const radio = card.querySelector('input[type="radio"]');
-            radio.checked = true;
+        let preguntaActualIdx = 0;
+        const totalPreguntas = @Model.Count;
+        const questionCards = document.querySelectorAll('.question-card');
+        const steps = document.querySelectorAll('.step');
+
+        function seleccionarOpcion(cardElement, preguntaIndex) {
+            // Deseleccionar otras opciones en la misma pregunta
+            const currentQuestionCard = document.getElementById('question-' + preguntaIndex);
+            const cardsInQuestion = currentQuestionCard.querySelectorAll('.opcion-card');
+            cardsInQuestion.forEach(c => c.classList.remove('selected'));
+
+            // Seleccionar la actual
+            cardElement.classList.add('selected');
+            const radioInput = cardElement.querySelector('input[type="radio"]');
+            radioInput.checked = true;
+
+            // Opcional: avanzar automáticamente a la siguiente pregunta si no es la última
+            // if (preguntaActualIdx < totalPreguntas - 1) {
+            //     setTimeout(() => cambiarPregunta(preguntaActualIdx + 1), 300);
+            // }
         }
-        // Validación de formulario
+
+        function cambiarPregunta(nuevoIndex) {
+            // Validar si la pregunta actual (si no es la primera vez) ha sido respondida
+            if (nuevoIndex > preguntaActualIdx) { // Solo al avanzar
+                 const currentQuestionCard = document.getElementById('question-' + preguntaActualIdx);
+                 const isAnswered = currentQuestionCard.querySelector('.opcion-card.selected');
+                 if (!isAnswered) {
+                     currentQuestionCard.classList.add('shake');
+                     setTimeout(() => currentQuestionCard.classList.remove('shake'), 400);
+                     // Opcional: mostrar un mensaje de alerta o notificación
+                     // alert("Por favor, seleccione una opción antes de continuar.");
+                     return; // No avanzar
+                 }
+            }
+
+
+            if (nuevoIndex < 0 || nuevoIndex >= totalPreguntas) return;
+
+            questionCards.forEach((card, index) => {
+                if (index === nuevoIndex) {
+                    card.classList.add('active');
+                    card.style.zIndex = 3;
+                } else {
+                    card.classList.remove('active');
+                    card.style.zIndex = 2;
+                }
+            });
+
+            steps.forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                if (index < nuevoIndex) {
+                    step.classList.add('completed');
+                }
+                if (index === nuevoIndex) {
+                    step.classList.add('active');
+                }
+            });
+            preguntaActualIdx = nuevoIndex;
+        }
+
+        // Inicializar el primer step y pregunta
+        document.addEventListener('DOMContentLoaded', function() {
+            if (steps.length > 0) steps[0].classList.add('active');
+            if (questionCards.length > 0) questionCards[0].classList.add('active');
+        });
+
+
+        // Bootstrap 5 Form Validation
         (() => {
             'use strict';
             const forms = document.querySelectorAll('.needs-validation');
             Array.from(forms).forEach(form => {
                 form.addEventListener('submit', event => {
-                    if (!form.checkValidity()) {
+                    let todasRespondidas = true;
+                    for(let i=0; i < totalPreguntas; i++){
+                        const preguntaCard = document.getElementById('question-' + i);
+                        const seleccionada = preguntaCard.querySelector('.opcion-card.selected');
+                        if(!seleccionada){
+                            todasRespondidas = false;
+                            // Si la pregunta no respondida es la actual, la hacemos temblar
+                            if(i === preguntaActualIdx){
+                                preguntaCard.classList.add('shake');
+                                setTimeout(() => preguntaCard.classList.remove('shake'), 400);
+                            } else {
+                                // Si no es la actual, navegamos a ella para que el usuario responda
+                                cambiarPregunta(i);
+                            }
+                            break; // Salir del bucle, ya encontramos una sin responder
+                        }
+                    }
+
+                    if (!form.checkValidity() || !todasRespondidas) {
                         event.preventDefault();
                         event.stopPropagation();
-                        // Mostrar feedback visual si faltan respuestas
-                        const preguntas = form.querySelectorAll('.question-card');
-                        preguntas.forEach(pregunta => {
-                            const seleccionada = pregunta.querySelector('.opcion-card.selected');
-                            if (!seleccionada) {
-                                pregunta.classList.add('shake');
-                                setTimeout(() => pregunta.classList.remove('shake'), 500);
-                            }
-                        });
+                        if(!todasRespondidas && preguntaActualIdx === totalPreguntas -1){
+                             // Si está en la última pregunta y no ha respondido todas las anteriores
+                             alert("Por favor, asegúrate de responder todas las preguntas antes de ver el resultado.");
+                        }
                     }
-                    form.classList.add('was-validated');
+                    // Bootstrap añade 'was-validated' si se usa su validación,
+                    // pero nuestra lógica personalizada de 'todasRespondidas' es más importante aquí.
+                    // form.classList.add('was-validated'); // Puedes mantenerlo si usas atributos de validación de BS
                 }, false);
             });
         })();
+
     </script>
 </body>
 </html>

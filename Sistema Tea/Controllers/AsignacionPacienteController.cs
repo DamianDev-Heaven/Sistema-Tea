@@ -58,14 +58,14 @@ namespace Sistema_Tea.Controllers // Asegúrate que este sea tu namespace de con
             ModelState.Remove("AsignadoPor");
 
             // Obtener el UsuarioID del usuario logueado (quien asigna)
-            var asignadoPorUsuarioIdStr = HttpContext.Session.GetString("IdUsuario"); // Asume que "IdUsuario" es la key en sesión
-            if (string.IsNullOrEmpty(asignadoPorUsuarioIdStr) || !int.TryParse(asignadoPorUsuarioIdStr, out int asignadoPorUsuarioId))
+            var asignadoPorUsuarioId = HttpContext.Session.GetInt32("UsuarioID");
+            if (asignadoPorUsuarioId == null)
             {
                 ModelState.AddModelError(string.Empty, "No se pudo identificar al usuario que realiza la asignación. Inicie sesión nuevamente.");
                 await PopulateDropdownsAsync(asignacionPaciente);
                 return View(asignacionPaciente);
             }
-            asignacionPaciente.AsignadoPorID = asignadoPorUsuarioId;
+            asignacionPaciente.AsignadoPorID = asignadoPorUsuarioId.Value;
             asignacionPaciente.FechaAsignacion = DateTime.Now;
             // El estado "Asignado" ya debería venir del GET o estar en el bind. Si no, asígnalo:
             // if (string.IsNullOrEmpty(asignacionPaciente.Estado)) asignacionPaciente.Estado = "Asignado";

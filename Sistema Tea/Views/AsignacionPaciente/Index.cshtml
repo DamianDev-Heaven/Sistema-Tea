@@ -1,55 +1,567 @@
 ﻿@model IEnumerable<Sistema_Tea.Models.AsignacionPaciente>
 
 @{
-    ViewData["Title"] = "Listado de Asignaciones Paciente-Psicólogo";
-    // Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Listado de Asignaciones"; // Título más corto para la pestaña
 }
 
-<h1>@ViewData["Title"]</h1>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - eMind</title>
 
-<p>
-    <a asp-action="Create" class="btn btn-success">Asignar Nuevo Paciente</a>
-</p>
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">
-        @TempData["SuccessMessage"]
-    </div>
-}
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger">
-        @TempData["ErrorMessage"]
-    </div>
-}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/ListarPsi.css" asp-append-version="true" />
 
-<table class="table table-striped table-hover">
-    <thead>
-        <tr>
-            <th>Paciente</th>
-            <th>Psicólogo Asignado</th>
-            <th>Asignado Por</th>
-            <th>Fecha de Asignación</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@(item.Paciente?.Nombre) @(item.Paciente?.Apellidos)</td>
-                <td>@(item.Psicologo?.NombreCompleto)</td>
-                <td>@(item.AsignadoPor?.NombreCompleto)</td>
-                <td>@item.FechaAsignacion.ToString("dd/MM/yyyy HH:mm")</td>
-                <td>@Html.DisplayFor(modelItem => item.Estado)</td>
-                <td>
-                    @* Podrías añadir Editar si lo implementas más adelante *@
-                    @* <a asp-action="Edit" asp-route-id="@item.AsignacionID" class="btn btn-sm btn-warning">Editar</a> | *@
-                    <a asp-action="Delete" asp-route-id="@item.AsignacionID" class="btn btn-sm btn-danger">@(item.Estado == "Asignado" ? "Desasignar/Finalizar" : "Eliminar Registro")</a>
-                </td>
-            </tr>
+    <style>
+        :root {
+            --emind-primary: #3b49df;
+            --emind-primary-rgb: 59, 73, 223;
+            --emind-primary-dark: #2f3aae;
+            --emind-primary-light: #e9ecff;
+            --emind-success: #198754;
+            --emind-success-bg: #d1e7dd;
+            --emind-warning: #ffc107;
+            --emind-warning-bg: #fff3cd;
+            --emind-danger: #dc3545;
+            --emind-danger-bg: #f8d7da;
+            --emind-info: #0dcaf0;
+            --emind-info-bg: #cff4fc;
+            --emind-secondary: #6c757d;
+            --emind-secondary-bg: #e2e3e5;
+            --emind-text-dark: #212529;
+            --emind-text-light: #495057;
+            --emind-text-muted: #6c757d;
+            --emind-bg-page: #f9fafb;
+            --emind-bg-card: #ffffff;
+            --emind-border-radius-xl: 22px;
+            --emind-border-radius-lg: 16px;
+            --emind-border-radius-md: 14px;
+            --emind-border-color: #dee2e6;
+            --emind-shadow-subtle: 0 1.5px 3px 0 rgba(var(--emind-primary-rgb),0.02);
+            --emind-shadow-sm: 0 2px 8px rgba(var(--emind-primary-rgb), 0.04);
+            --emind-shadow-md: 0 8px 24px rgba(var(--emind-primary-rgb),0.13);
+            --emind-shadow-lg: 0 10px 32px 0 rgba(var(--emind-primary-rgb),0.07);
         }
-    </tbody>
-</table>
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--emind-bg-page);
+            color: var(--emind-text-dark);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .navbar-custom { /* Estilo para el navbar si lo tuvieras en esta página sin layout */
+            background-color: var(--emind-bg-card);
+            box-shadow: var(--emind-shadow-sm);
+            padding: 0.75rem 1rem; /* Ajustar según tu layout general */
+        }
+
+        .navbar-brand-custom {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--emind-primary);
+            display: flex;
+            align-items: center;
+        }
+
+            .navbar-brand-custom i {
+                margin-right: 0.5rem;
+                font-size: 1.6rem;
+            }
+
+        .psych-list-container {
+            max-width: 1100px; /* Aumentado ligeramente para más espacio */
+            margin: 2rem auto; /* Margen reducido un poco */
+            padding: 2rem; /* Padding ajustado */
+            background: var(--emind-bg-card);
+            border-radius: var(--emind-border-radius-xl);
+            box-shadow: var(--emind-shadow-lg), var(--emind-shadow-subtle);
+            position: relative;
+        }
+
+        .psych-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.8rem; /* Reducido */
+            padding-bottom: 1.2rem; /* Reducido */
+            border-bottom: 1px solid var(--emind-border-color);
+        }
+
+            .psych-list-header h1 { /* Cambiado de h2 a h1 para el título principal de la página */
+                font-weight: 700;
+                font-size: 1.8rem; /* Ajustado */
+                color: var(--emind-primary);
+                margin: 0;
+                letter-spacing: 0.02em; /* Sutil espaciado */
+            }
+
+        .add-btn, .add-btn-float {
+            background-color: var(--emind-primary);
+            color: #fff;
+            font-weight: 600;
+            font-size: 1rem; /* Ajustado */
+            padding: 0.55rem 1.2rem; /* Ajustado */
+            border-radius: var(--emind-border-radius-md);
+            box-shadow: 0 4px 16px rgba(var(--emind-primary-rgb), 0.2); /* Sombra más sutil */
+            transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+            text-decoration: none;
+            border: none;
+        }
+
+            .add-btn:hover, .add-btn:focus,
+            .add-btn-float:hover, .add-btn-float:focus {
+                background: var(--emind-primary-dark);
+                box-shadow: 0 6px 20px rgba(var(--emind-primary-rgb), 0.25);
+                transform: translateY(-1px);
+                color: #fff; /* Asegurar color de texto en hover */
+                outline: none;
+            }
+
+            .add-btn i, .add-btn-float i {
+                margin-right: 0.4rem;
+            }
+
+        .add-btn-float {
+            position: fixed;
+            right: 1.7rem;
+            bottom: 2.2rem;
+            width: 56px; /* Tamaño aumentado */
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem; /* Tamaño del icono */
+            z-index: 1050;
+            padding: 0; /* Reset padding para el flotante */
+            box-shadow: 0 6px 18px rgba(var(--emind-primary-rgb),0.28);
+        }
+
+            .add-btn-float i {
+                margin-right: 0;
+            }
+        /* No necesita margen el icono dentro del FAB */
+
+
+        .psych-table {
+            /* background: transparent; No es necesario si las filas tienen fondo */
+            border-collapse: separate; /* Para que el border-spacing funcione */
+            border-spacing: 0 0.75rem; /* Espacio vertical entre filas */
+            margin-top: -0.75rem; /* Compensar el primer border-spacing */
+            width: 100%;
+        }
+
+            .psych-table thead tr th {
+                background: #f0f4ff; /* Tu color original */
+                border: none;
+                font-weight: 600; /* Un poco menos bold que 700 */
+                color: var(--emind-primary);
+                text-transform: uppercase;
+                letter-spacing: 0.04em; /* Aumentado ligeramente */
+                font-size: 0.8rem; /* Más pequeño para cabeceras */
+                padding: 0.9rem 1rem; /* Padding ajustado */
+                text-align: left; /* Asegurar alineación */
+            }
+
+                .psych-table thead tr th:first-child {
+                    border-radius: var(--emind-border-radius-md) 0 0 var(--emind-border-radius-md);
+                }
+
+                .psych-table thead tr th:last-child {
+                    border-radius: 0 var(--emind-border-radius-md) var(--emind-border-radius-md) 0;
+                    text-align: right;
+                    padding-right: 1.5rem;
+                }
+
+
+            .psych-table tbody tr {
+                background: var(--emind-bg-card);
+                border-radius: var(--emind-border-radius-md); /* Bordes redondeados para cada fila */
+                box-shadow: var(--emind-shadow-sm); /* Sombra sutil para cada fila */
+                transition: box-shadow 0.2s ease, transform 0.2s ease;
+            }
+
+                .psych-table tbody tr:hover {
+                    box-shadow: var(--emind-shadow-md); /* Sombra más pronunciada al hacer hover */
+                    transform: translateY(-3px); /* Efecto de elevación sutil */
+                }
+
+            .psych-table td {
+                vertical-align: middle;
+                font-size: 0.95rem; /* Tamaño de fuente para el contenido de la tabla */
+                padding: 1rem; /* Padding ajustado */
+                color: var(--emind-text-light);
+                border: none; /* Quitar bordes por defecto de Bootstrap si se usa .table */
+                /* background: transparent; No es necesario si la fila tiene fondo */
+            }
+
+                .psych-table td:first-child {
+                    border-radius: var(--emind-border-radius-md) 0 0 var(--emind-border-radius-md);
+                }
+
+                .psych-table td:last-child {
+                    border-radius: 0 var(--emind-border-radius-md) var(--emind-border-radius-md) 0;
+                    text-align: right;
+                    padding-right: 1.5rem;
+                }
+
+                .psych-table td .data-main {
+                    font-weight: 500;
+                    color: var(--emind-text-dark);
+                }
+
+                .psych-table td .data-sub {
+                    font-size: 0.85rem;
+                    color: var(--emind-text-muted);
+                    display: block; /* Para que ocupe su propia línea */
+                    margin-top: 0.15rem;
+                }
+
+
+        .avatar-initials { /* Renombrado de avatar-circle para más claridad */
+            width: 36px; /* Ligeramente más pequeño */
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--emind-primary) 0%, #5e6bfa 100%); /* Gradiente ajustado */
+            color: #fff;
+            font-weight: 600; /* Menos bold */
+            font-size: 0.9rem; /* Ajustado */
+            display: inline-flex; /* Para alinear con texto */
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem; /* Espacio al lado del nombre */
+            box-shadow: 0 1px 3px rgba(var(--emind-primary-rgb),0.2);
+            vertical-align: middle;
+        }
+
+        .badge-status { /* Estilo base para todos los badges de estado */
+            font-weight: 600; /* Menos bold que 700 */
+            border-radius: var(--emind-border-radius-md);
+            font-size: 0.8rem; /* Más pequeño */
+            padding: 0.35em 0.8em; /* Padding ajustado */
+            /* box-shadow: 0 1px 3px rgba(0,0,0,0.1); Sombra sutil */
+            border: 1px solid transparent;
+            min-width: 100px;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .badge-status-asignado {
+            background-color: var(--emind-success-bg) !important;
+            color: var(--emind-success) !important;
+            border-color: var(--emind-success) !important;
+        }
+
+        .badge-status-desasignado {
+            background-color: var(--emind-secondary-bg) !important;
+            color: var(--emind-secondary) !important;
+            border-color: var(--emind-secondary) !important;
+        }
+
+        .badge-status-finalizado {
+            background-color: var(--emind-info-bg) !important;
+            color: var(--emind-info) !important;
+            border-color: var(--emind-info) !important;
+        }
+
+
+        .action-btn { /* Estilo para botones de acción en la tabla */
+            color: var(--emind-text-muted);
+            background-color: transparent;
+            border: 1px solid transparent; /* Para mantener tamaño en hover */
+            border-radius: var(--emind-border-radius-md); /* Bordes redondeados */
+            padding: 0.35rem 0.6rem;
+            margin-left: 0.3rem;
+            font-size: 0.9rem; /* Para que el icono no se vea tan grande */
+            transition: all 0.2s ease;
+        }
+
+            .action-btn:hover {
+                background-color: var(--emind-primary-light);
+                color: var(--emind-primary);
+                border-color: var(--emind-primary-light);
+            }
+
+            .action-btn.btn-danger-custom:hover { /* Un color específico para hover de delete */
+                background-color: var(--emind-danger-bg);
+                color: var(--emind-danger);
+                border-color: var(--emind-danger-bg);
+            }
+
+            .action-btn i {
+                font-size: 1rem;
+                vertical-align: middle;
+            }
+        /* Tamaño del icono */
+
+
+        .text-truncate-custom { /* Tu clase text-truncate */
+            display: inline-block; /* Necesario para que max-width funcione con text-overflow */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 180px; /* O el ancho que necesites */
+            vertical-align: middle; /* Para alinear con avatar si se usa */
+        }
+
+        .alert {
+            border-radius: var(--emind-border-radius-md);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+
+            .alert i {
+                font-size: 1.5rem;
+                margin-right: 0.75rem;
+            }
+
+        .table-responsive-custom { /* Contenedor para scroll horizontal */
+            overflow-x: auto;
+        }
+
+
+        @@media (max-width: 992px) {
+            .psych-list-container {
+                padding: 1.5rem; /* Menos padding */
+                margin: 1.5rem auto;
+            }
+
+            .psych-list-header h1 {
+                font-size: 1.5rem;
+            }
+            /* Título más pequeño */
+            .add-btn {
+                font-size: 0.9rem;
+                padding: 0.5rem 1rem;
+            }
+
+            .psych-table thead th {
+                font-size: 0.75rem;
+                padding: 0.8rem 0.75rem;
+            }
+
+            .psych-table td {
+                font-size: 0.9rem;
+                padding: 0.9rem 0.75rem;
+            }
+
+            .avatar-initials {
+                width: 32px;
+                height: 32px;
+                font-size: 0.85rem;
+                margin-right: 0.5rem;
+            }
+
+            .text-truncate-custom {
+                max-width: 120px;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .psych-list-header {
+                flex-direction: column;
+                align-items: stretch; /* Para que el botón ocupe todo el ancho */
+                gap: 1rem; /* Espacio entre título y botón */
+            }
+
+            .add-btn {
+                width: 100%;
+            }
+            /* Botón ocupa todo el ancho */
+
+            .psych-table thead {
+                display: none;
+            }
+            /* Ocultar cabecera tradicional en móviles */
+            .psych-table tbody tr {
+                display: block; /* Cada fila como un bloque */
+                margin-bottom: 1rem; /* Espacio entre tarjetas de fila */
+                border-radius: var(--emind-border-radius-lg); /* Mantener redondeo */
+                box-shadow: var(--emind-shadow-md); /* Sombra más visible para cada tarjeta */
+                border: 1px solid var(--emind-border-color);
+            }
+
+            .psych-table tbody td {
+                display: flex; /* Usar flex para alinear etiqueta y valor */
+                justify-content: space-between; /* Espaciar etiqueta y valor */
+                padding: 0.6rem 1rem; /* Padding para celdas */
+                text-align: right; /* Valor a la derecha */
+                border-bottom: 1px dotted var(--emind-border-color); /* Separador sutil */
+                background: none; /* Quitar fondo para que se vea el de la tr */
+            }
+
+                .psych-table tbody td:last-child {
+                    border-bottom: none; /* Sin borde para la última celda (acciones) */
+                    justify-content: flex-end; /* Alinear acciones a la derecha */
+                    padding-top: 0.8rem;
+                    padding-bottom: 0.8rem;
+                }
+
+                .psych-table tbody td::before { /* Añadir etiquetas de columna como pseudo-elementos */
+                    content: attr(data-label); /* Usar data-label del HTML */
+                    font-weight: 600;
+                    color: var(--emind-primary);
+                    margin-right: 1rem; /* Espacio entre etiqueta y valor */
+                    text-align: left;
+                    flex-basis: 40%; /* Ancho para la etiqueta */
+                }
+
+            .psych-table td:first-child, .psych-table td:last-child {
+                border-radius: 0;
+            }
+            /* Resetear redondeos de celda en modo tarjeta */
+
+            .psych-table td .data-sub {
+                font-size: 0.8rem;
+                text-align: right;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .psych-list-container {
+                padding: 1rem; /* Aún menos padding */
+                margin: 1rem auto;
+                border-radius: var(--emind-border-radius-lg);
+            }
+
+            .psych-table td, .psych-table th {
+                padding: 0.6rem 0.5rem;
+                font-size: 0.85rem;
+            }
+
+            .add-btn-float {
+                right: 1rem;
+                bottom: 1rem;
+                width: 50px;
+                height: 50px;
+                font-size: 1.6rem;
+            }
+
+            .psych-table tbody td::before {
+                flex-basis: 45%;
+                margin-right: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="psych-list-container">
+        <div class="psych-list-header">
+            <h1>@ViewData["Title"]</h1>
+            <a asp-action="Create" class="btn add-btn">
+                <i class="bi bi-plus-circle-dotted"></i>Asignar Nuevo
+            </a>
+        </div>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill"></i> @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill"></i> @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        @if (!Model.Any())
+        {
+            <div class="text-center p-5 my-5">
+                <i class="bi bi-person-lines-fill" style="font-size: 5rem; color: var(--emind-text-muted);"></i>
+                <h3 class="mt-4" style="color: var(--emind-text-muted);">No hay asignaciones registradas.</h3>
+                <p class="text-muted lead">Comienza por asignar un paciente a un psicólogo usando el botón "Asignar Nuevo".</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive-custom">
+                @* Envoltura para scroll horizontal si es necesario *@
+                <table class="psych-table">
+                    @* Clase principal para la tabla *@
+                    <thead>
+                        <tr>
+                            <th>Paciente</th>
+                            <th>Psicólogo Asignado</th>
+                            <th>Asignado Por</th>
+                            <th>Fecha de Asignación</th>
+                            <th class="text-center">Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td data-label="Paciente:">
+                                    <div class="d-flex align-items-center">
+                                        <span class="avatar-initials">
+                                            @(!string.IsNullOrEmpty(item.Paciente?.Nombre) ? item.Paciente.Nombre[0].ToString().ToUpper() : "")@(!string.IsNullOrEmpty(item.Paciente?.Apellidos) ? item.Paciente.Apellidos[0].ToString().ToUpper() : "P")
+                                        </span>
+                                        <div>
+                                            <span class="data-main text-truncate-custom" title="@(item.Paciente?.Nombre) @(item.Paciente?.Apellidos)">@(item.Paciente?.Nombre) @(item.Paciente?.Apellidos)</span>
+                                            @if (!string.IsNullOrEmpty(item.Paciente?.Dui))
+                                            {
+                                                <span class="data-sub">DUI: @item.Paciente.Dui</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </td>
+                                <td data-label="Psicólogo:">
+                                    <div class="d-flex align-items-center">
+                                        <span class="avatar-initials">
+                                            @(!string.IsNullOrEmpty(item.Psicologo?.NombreCompleto) && item.Psicologo.NombreCompleto.Contains(' ') ? item.Psicologo.NombreCompleto.Split(' ')[0][0].ToString().ToUpper() + item.Psicologo.NombreCompleto.Split(' ')[1][0].ToString().ToUpper() : (!string.IsNullOrEmpty(item.Psicologo?.NombreCompleto) ? item.Psicologo.NombreCompleto.Substring(0, Math.Min(2, item.Psicologo.NombreCompleto.Length)).ToUpper() : "Psi"))
+                                        </span>
+                                        <div>
+                                            <span class="data-main text-truncate-custom" title="@item.Psicologo?.NombreCompleto">@(item.Psicologo?.NombreCompleto)</span>
+                                            @if (!string.IsNullOrEmpty(item.Psicologo?.Email))
+                                            {
+                                                <span class="data-sub">@item.Psicologo.Email</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </td>
+                                <td data-label="Asignado Por:">
+                                    <span class="text-truncate-custom" title="@item.AsignadoPor?.NombreCompleto">@(item.AsignadoPor?.NombreCompleto ?? "N/A")</span>
+                                </td>
+                                <td data-label="Fecha:">@item.FechaAsignacion.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td data-label="Estado:" class="text-center">
+                                    @{
+                                        string badgeClass = "badge-status-desasignado"; // Default
+                                        string estadoDisplay = item.Estado ?? "Indefinido";
+                                        if (estadoDisplay == "Asignado") { badgeClass = "badge-status-asignado"; }
+                                        else if (estadoDisplay == "Finalizado") { badgeClass = "badge-status-finalizado"; }
+                                    }
+                                    <span class="badge-status @badgeClass">@estadoDisplay</span>
+                                </td>
+                                <td data-label="Acciones:">
+                                    @* <a asp-action="Edit" asp-route-id="@item.AsignacionID" class="btn action-btn" title="Editar">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a> *@
+                                    <a asp-action="Delete" asp-route-id="@item.AsignacionID" class="btn action-btn @(item.Estado == "Asignado" ? "btn-warning-custom-hover" : "btn-danger-custom-hover")" title="@(item.Estado == "Asignado" ? "Desasignar o Finalizar Asignación" : "Eliminar Registro de Asignación")">
+                                        <i class="bi @(item.Estado == "Asignado" ? "bi-person-x-fill" : "bi-trash3-fill")"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>

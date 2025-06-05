@@ -1,6 +1,6 @@
 ﻿@{
     Layout = null;
-    ViewData["Title"] = "Resultado del Test";
+    ViewData["Title"] = "Resultado del Test Preliminar"; // Título más descriptivo para la pestaña del navegador
 }
 
 <!DOCTYPE html>
@@ -8,73 +8,402 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>@ViewData["Title"]</title>
+    <title>@ViewData["Title"] - eMind</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="~/css/ListarPsi.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/resultadoTestIni.css" asp-append-version="true" />
+    <style>
+        :root {
+            --emind-primary: #3b49df; /* Tu color principal */
+            --emind-primary-rgb: 59, 73, 223; /* Para usar con opacidad RGBA */
+            --emind-primary-dark: #2f3aae;
+            --emind-primary-light: #e9ecff;
+            --emind-success: #198754; /* Verde de Bootstrap para "Baja" */
+            --emind-warning: #ffc107; /* Amarillo de Bootstrap para "Media" */
+            --emind-danger: #dc3545; /* Rojo de Bootstrap para "Alta" */
+
+            --emind-text-dark: #212529;
+            --emind-text-light: #495057;
+            --emind-text-muted: #6c757d;
+            --emind-bg-light: #f8f9fa; /* Un fondo general muy claro */
+            --emind-bg-card: #ffffff;
+            --emind-border-radius-lg: 1rem; /* 16px */
+            --emind-border-radius-md: 0.75rem; /* 12px */
+            --emind-border-color: #dee2e6;
+            --emind-shadow-sm: 0 2px 8px rgba(var(--emind-primary-rgb), 0.08);
+            --emind-shadow-md: 0 6px 16px rgba(var(--emind-primary-rgb), 0.12);
+            --emind-shadow-lg: 0 10px 30px rgba(var(--emind-primary-rgb), 0.18);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--emind-bg-light);
+            color: var(--emind-text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-size: 16px; /* Base font size */
+            line-height: 1.6;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.6rem; /* Un poco más grande */
+            color: var(--emind-primary);
+        }
+
+            .navbar-brand i {
+                font-size: 1.8rem; /* Icono más grande */
+            }
+
+        /* Main Content & Result Card */
+        .result-container { /* Nuevo wrapper para centrar mejor */
+            max-width: 760px; /* Un poco más de espacio */
+            margin: 2.5rem auto 3rem; /* Ajustar márgenes */
+            padding: 0 15px; /* Espacio en móviles */
+        }
+
+        .result-card {
+            background: var(--emind-bg-card);
+            padding: 2rem 2.5rem; /* Más padding interno */
+            border-radius: var(--emind-border-radius-lg);
+            box-shadow: var(--emind-shadow-md);
+            border: 1px solid var(--emind-border-color);
+        }
+
+        .result-title {
+            font-size: 2.25rem; /* Título más impactante */
+            font-weight: 700;
+            color: var(--emind-primary);
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .cuestionario-aplicado-subtitle {
+            font-size: 1.1rem; /* Más legible */
+            font-style: normal; /* Menos itálica, más formal */
+            font-weight: 500;
+            color: var(--emind-text-light);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        /* Sección de Puntaje y Nivel de Probabilidad */
+        .score-probability-section {
+            background-color: var(--emind-primary-light); /* Fondo suave para destacar */
+            border-radius: var(--emind-border-radius-md);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+            .score-probability-section .alert-heading { /* Para el texto "Probabilidad Alta/Media/Baja" */
+                font-size: 1.75rem; /* Más grande */
+                font-weight: 600;
+                margin-bottom: 0.75rem;
+            }
+
+            .score-probability-section .score {
+                font-size: 1.2rem;
+                font-weight: 500;
+                color: var(--emind-text-dark);
+                margin-bottom: 0; /* Ya está en su propia sección */
+            }
+
+            .score-probability-section strong {
+                color: var(--emind-primary);
+                font-weight: 700;
+            }
+
+        /* Colores dinámicos para el título de probabilidad */
+        .text-alta {
+            color: var(--emind-danger);
+        }
+
+        .text-media {
+            color: var(--emind-warning);
+        }
+        /* Bootstrap usa negro para texto en warning, podemos forzarlo */
+        .text-baja {
+            color: var(--emind-success);
+        }
+
+
+        .interpretacion-texto {
+            margin-top: 1.5rem; /* Espacio antes de la interpretación */
+            color: var(--emind-text-light); /* Texto un poco más suave */
+            font-size: 1.05rem; /* Ligeramente más grande para legibilidad */
+            text-align: justify;
+        }
+
+            .interpretacion-texto p {
+                margin-bottom: 1rem; /* Espacio entre párrafos de interpretación */
+            }
+
+        /* Tarjeta de Consideraciones Importantes */
+        .consideraciones-card {
+            border-color: var(--emind-warning); /* Borde de advertencia */
+            margin-top: 2.5rem;
+            border-width: 1px;
+            border-radius: var(--emind-border-radius-md);
+        }
+
+            .consideraciones-card .card-header {
+                background-color: rgba(var(--emind-warning-rgb), 0.1); /* Fondo muy sutil de advertencia */
+                /* Si --emind-warning-rgb no está definido, usar un color fijo: #fff3cd */
+                border-bottom: 1px solid var(--emind-warning);
+                font-weight: 600;
+                color: var(--emind-text-dark);
+            }
+
+                .consideraciones-card .card-header i {
+                    color: var(--emind-warning);
+                }
+
+            .consideraciones-card .card-text {
+                font-size: 0.95rem; /* Texto un poco más pequeño pero claro */
+                color: var(--emind-text-light);
+            }
+
+            .consideraciones-card strong {
+                color: var(--emind-text-dark);
+                font-weight: 600;
+            }
+
+        /* Botones */
+        .btn-actions-container { /* Renombrado de btn-volver-container */
+            text-align: center;
+            margin-top: 2.5rem;
+            display: flex; /* Para espaciar botones */
+            gap: 1rem; /* Espacio entre botones */
+            justify-content: center;
+            flex-wrap: wrap; /* Para móviles */
+        }
+
+        .btn-action { /* Renombrado de btn-volver */
+            font-weight: 600;
+            font-size: 1rem; /* Ligeramente más pequeño para consistencia */
+            padding: 0.75rem 1.5rem; /* Padding ajustado */
+            border-radius: var(--emind-border-radius-md);
+            transition: all 0.3s ease;
+            min-width: 180px; /* Ancho mínimo */
+        }
+
+            .btn-action.btn-primary {
+                background-color: var(--emind-primary);
+                border-color: var(--emind-primary);
+                color: #fff;
+                box-shadow: var(--emind-shadow-sm);
+            }
+
+                .btn-action.btn-primary:hover {
+                    background-color: var(--emind-primary-dark);
+                    border-color: var(--emind-primary-dark);
+                    box-shadow: var(--emind-shadow-md);
+                    transform: translateY(-2px);
+                }
+
+            .btn-action.btn-outline-secondary {
+                border-color: var(--emind-border-color);
+                color: var(--emind-text-light);
+            }
+
+                .btn-action.btn-outline-secondary:hover {
+                    background-color: var(--emind-bg-light);
+                    color: var(--emind-primary);
+                    border-color: var(--emind-primary-light);
+                    transform: translateY(-2px);
+                }
+
+
+        /* Footer */
+        footer {
+            background-color: var(--emind-bg-card); /* Fondo blanco también para el footer */
+            border-top: 1px solid var(--emind-border-color);
+            padding: 2rem 0; /* Más padding vertical */
+            margin-top: auto; /* Asegura que esté al final */
+            font-size: 0.9rem;
+            color: var(--emind-text-muted);
+        }
+
+            footer h5 {
+                font-weight: 600;
+                color: var(--emind-primary);
+                margin-bottom: 1rem; /* Espacio debajo del título del footer */
+            }
+
+            footer p {
+                margin-bottom: 0.5rem; /* Espacio entre líneas del footer */
+                font-size: 0.9rem;
+                color: var(--emind-text-light);
+            }
+
+            footer a {
+                color: var(--emind-primary);
+                text-decoration: none;
+            }
+
+                footer a:hover {
+                    text-decoration: underline;
+                }
+
+        /* Media Queries (Ajustes finos para móviles) */
+        @@media (max-width: 768px) {
+            .result-title {
+                font-size: 1.8rem;
+            }
+
+            .cuestionario-aplicado-subtitle {
+                font-size: 1rem;
+            }
+
+            .score-probability-section .alert-heading {
+                font-size: 1.5rem;
+            }
+
+            .score-probability-section .score {
+                font-size: 1.1rem;
+            }
+
+            .interpretacion-texto {
+                font-size: 0.95rem;
+            }
+
+            .result-card {
+                padding: 1.5rem;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .result-container {
+                margin: 1.5rem auto 2rem;
+            }
+
+            .result-card {
+                padding: 1.5rem 1rem;
+            }
+
+            .btn-actions-container {
+                flex-direction: column;
+            }
+            /* Botones uno debajo del otro */
+            .btn-action {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+
+                .btn-action.ms-2 {
+                    margin-left: 0 !important;
+                }
+            /* Remover margen si se apilan */
+        }
+
+    </style>
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-sm">
             <div class="container-fluid">
-                <a class="navbar-brand d-flex align-items-center">
+                <a asp-controller="TestInicio" asp-action="Index" class="navbar-brand d-flex align-items-center">
                     <i class="bi bi-hospital me-2"></i> eMind
                 </a>
             </div>
         </nav>
     </header>
-    <div class="result-card">
-        <div class="result-title">Resultado del Test</div>
 
-        <p class="score">Puntaje Total Obtenido: <strong>@ViewBag.Puntaje</strong></p>
-
-        <p>
-            Nivel de probabilidad de TEA:
-            @if (ViewBag.Resultado == "Probabilidad Alta")
+    <main class="flex-grow-1 result-container">
+        <section class="result-card" role="region" aria-labelledby="resultTitle">
+            <h1 id="resultTitle" class="result-title">Resultado del Test Preliminar</h1>
+            @if (!string.IsNullOrEmpty(ViewBag.CuestionarioAplicado))
             {
-                <span class="badge bg-danger badge-result">Alta</span>
+                <p class="cuestionario-aplicado-subtitle">(@ViewBag.CuestionarioAplicado)</p>
             }
-            else if (ViewBag.Resultado == "Probabilidad Media")
-            {
-                <span class="badge bg-warning text-dark badge-result">Media</span>
-            }
-            else
-            {
-                <span class="badge bg-success badge-result">Baja</span>
-            }
-        </p>
 
-        <p class="mt-4">
-            Este resultado es solo una orientación. Te recomendamos visitar nuestra Clínica de Evaluación TEA eMind en la cual contamos con profesionales especializados para una evaluación completa.
-        </p>
+            @{
+                string probabilidadClassText = "";
+                if (ViewBag.Resultado == "Probabilidad Alta") { probabilidadClassText = "text-alta"; }
+                else if (ViewBag.Resultado == "Probabilidad Media") { probabilidadClassText = "text-media"; }
+                else { probabilidadClassText = "text-baja"; }
+            }
 
-        <a asp-controller="TestInicio" asp-action="Index" class="btn btn-light text-primary btn-volver">
-            <i class="bi bi-arrow-left-circle me-2"></i> Volver al inicio
-        </a>
-    </div>
-    <!-- Footer -->
-    <footer class="bg-light p-4 rounded shadow-sm">
-        <div class="row">
-            <div class="col-md-6">
-                <h5>Clínica de Evaluación TEA eMind</h5>
-                <p><i class="bi bi-geo-alt-fill me-2"></i> Santa Ana</p>
-                <p>
-                    <i class="bi bi-telephone-fill me-2"></i>  (+503) 2401-3421
+            <div class="score-probability-section">
+                <h2 class="alert-heading @probabilidadClassText">@ViewBag.Resultado</h2>
+                <p class="score mb-0">
+                    Puntaje Total Obtenido: <strong>@ViewBag.Puntaje</strong>
                 </p>
-                <p><i class="bi bi-envelope-fill me-2"></i> eMind@gmail.com</p>
             </div>
-            <div class="col-md-6 text-md-end">
-                <p class="mb-0">© @DateTime.Now.Year Clínica eMind - Todos los derechos reservados</p>
+
+            <div class="interpretacion-texto">
+                @if (!string.IsNullOrEmpty(ViewBag.InterpretacionDetallada))
+                {
+                    @Html.Raw(ViewBag.InterpretacionDetallada.Replace("\n", "<p></p>"))
+                }
+            </div>
+
+            <div class="consideraciones-card card mt-4">
+                <div class="card-header">
+                    <i class="bi bi-info-circle-fill me-2"></i><strong>Consideraciones Importantes</strong>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Este test es una herramienta de detección preliminar y <strong>no constituye un diagnóstico definitivo</strong>. Su propósito es ayudar a identificar si existen rasgos o comportamientos que justifiquen una evaluación más completa por parte de profesionales especializados.</p>
+                    <p class="card-text mb-0">Si los resultados de este test indican una posible probabilidad de TEA, o si usted tiene preocupaciones significativas (independientemente del resultado del test), le recomendamos encarecidamente buscar asesoramiento y una evaluación formal con un especialista.</p>
+                </div>
+            </div>
+
+            <div class="btn-actions-container">
+                <a asp-controller="TestInicio" asp-action="ElegirEdad" class="btn btn-primary btn-action" role="button">
+                    <i class="bi bi-arrow-repeat me-2"></i> Realizar Otro Test
+                </a>
+                <a asp-controller="TestInicio" asp-action="Index" class="btn btn-outline-secondary btn-action ms-sm-2" role="button">
+                    <i class="bi bi-house-door-fill me-2"></i> Volver al Inicio
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center text-lg-start">
+        <div class="container p-4">
+            <div class="row">
+                <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                    <h5 class="text-uppercase"><i class="bi bi-shield-check-fill me-1"></i> Clínica eMind</h5>
+                    <p>
+                        Comprometidos con tu bienestar y el de tu familia. Ofrecemos evaluaciones especializadas en TEA.
+                    </p>
+                    <p><i class="bi bi-geo-alt-fill me-2"></i> Santa Ana, El Salvador</p>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">Contacto</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li>
+                            <i class="bi bi-telephone-fill me-2"></i> (+503) 2401-3421
+                        </li>
+                        <li>
+                            <i class="bi bi-envelope-fill me-2"></i> eMind.info.sv@gmail.com
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">Legal</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li>
+                            <a href="#!" class="text-reset">Política de Privacidad</a>
+                        </li>
+                        <li>
+                            <a href="#!" class="text-reset">Términos de Uso</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
+        <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
+            © @DateTime.Now.Year Clínica eMind - Todos los derechos reservados.
+        </div>
     </footer>
-    </div>
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 </html>
