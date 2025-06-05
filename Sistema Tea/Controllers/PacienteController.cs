@@ -104,7 +104,11 @@ namespace Sistema_Tea.Controllers
             return View("DetallesPaciente",paciente);
         }
 
-
+        public IActionResult Test()
+        {
+            ViewData["Title"] = "Seleccionar Instrumento de Evaluación";
+            return View();
+        }
 
 
         // GET: Pacientes/Delete/5
