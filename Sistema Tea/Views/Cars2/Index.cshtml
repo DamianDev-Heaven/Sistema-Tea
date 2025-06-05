@@ -1,14 +1,15 @@
-﻿@model List<Sistema_Tea.Models.ADOS2_Sesion>
+﻿@model List<Sistema_Tea.Models.CARS2_Sesion>
+
 @{
-    ViewData["Title"] = "Listado de Sesiones ADOS-2";
+    ViewData["Title"] = "Listado de Sesiones CARS-2";
 }
 <link rel="stylesheet" href="~/css/InTest.css" asp-append-version="true" />
 
 <div class="emind-list-container">
     <div class="emind-list-header">
-        <h1><i class="bi bi-puzzle-fill"></i> @ViewData["Title"]</h1>
-        <a asp-controller="Ados2" asp-action="CrearSesion" class="btn emind-btn-primary">
-            <i class="bi bi-plus-circle-fill"></i>Nueva Sesión ADOS-2
+        <h1><i class="bi bi-card-checklist"></i> @ViewData["Title"]</h1>
+        <a asp-controller="Cars2" asp-action="CrearSesion" class="btn emind-btn-primary">
+            <i class="bi bi-plus-circle-fill"></i>Nueva Sesión CARS-2
         </a>
     </div>
 
@@ -30,21 +31,21 @@
     @if (Model == null || !Model.Any())
     {
         <div class="text-center p-4 p-md-5 my-4 empty-state-container">
-            <i class="bi bi-folder-x"></i>
-            <h4 class="mt-3">No hay sesiones ADOS-2 registradas.</h4>
-            <p>Puedes asignar una nueva sesión haciendo clic en "Nueva Sesión ADOS-2".</p>
+            <i class="bi bi-journal-bookmark-fill"></i>
+            <h4 class="mt-3">No hay sesiones CARS-2 registradas.</h4>
+            <p>Puedes asignar una nueva sesión haciendo clic en "Nueva Sesión CARS-2".</p>
         </div>
     }
     else
     {
         <div class="emind-table-wrapper">
             <div class="table-responsive-custom">
-                <table class="table emind-table" id="tablaSesionesAdos2">
+                <table class="table emind-table" id="tablaSesionesCars2">
                     <thead>
                         <tr>
                             <th>Paciente</th>
                             <th>Psicólogo Evaluador</th>
-                            <th class="text-center">Módulo</th>
+                            <th class="text-center">Versión CARS</th>
                             <th>Fechas</th>
                             <th class="text-center">Estado</th>
                             <th class="text-end">Acciones</th>
@@ -80,8 +81,8 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td data-label="Módulo:" class="text-center">
-                                    <span class="data-main modulo-text">@sesion.Modulo</span>
+                                <td data-label="Versión:" class="text-center">
+                                    <span class="data-main version-cars-text">CARS-2 @sesion.VersionCARS</span>
                                 </td>
                                 <td data-label="Fechas:">
                                     <span class="data-main">@(sesion.FechaInicio != DateTime.MinValue ? sesion.FechaInicio.ToString("dd/MM/yy HH:mm") : "-")</span>
@@ -117,48 +118,48 @@
                                         @switch (sesion.Estado?.ToLower().Replace(" ", ""))
                                         {
                                             case "pendiente":
-                                                <a asp-controller="Ados2" asp-action="IniciarTestADOS2" asp-route-id="@sesion.SesionID" class="btn action-btn action-iniciar" title="Iniciar Test">
+                                                <a asp-controller="Cars2" asp-action="IniciarEvaluacionCARS2" asp-route-sesionId="@sesion.SesionID" class="btn action-btn action-iniciar" title="Iniciar Evaluación">
                                                     <i class="bi bi-play-circle-fill"></i> Iniciar
                                                 </a>
                                                 <a href="#" class="btn action-btn action-cancelar" title="Cancelar Sesión"
-                                                   data-bs-toggle="modal" data-bs-target="#cancelarModalADOS2"
+                                                   data-bs-toggle="modal" data-bs-target="#cancelarModalCARS2"
                                                    data-sesionid="@sesion.SesionID" data-pacientenombre="@nombreCompletoPaciente">
                                                     <i class="bi bi-x-lg"></i>
                                                 </a>
                                                 break;
                                             case "enprogreso":
-                                                <a asp-controller="Ados2" asp-action="PuntuarItems" asp-route-sesionId="@sesion.SesionID" class="btn action-btn action-puntuar" title="Puntuar Ítems">
+                                                <a asp-controller="Cars2" asp-action="PuntuarItemsCARS2" asp-route-sesionId="@sesion.SesionID" class="btn action-btn action-puntuar" title="Puntuar Ítems CARS-2">
                                                     <i class="bi bi-pencil-square"></i> Puntuar
                                                 </a>
-                                                <a asp-controller="Ados2" asp-action="PausarSesion" asp-route-id="@sesion.SesionID" class="btn action-btn action-pausar" title="Pausar Sesión">
+                                                <a asp-controller="Cars2" asp-action="PausarSesion" asp-route-id="@sesion.SesionID" class="btn action-btn action-pausar" title="Pausar Sesión">
                                                     <i class="bi bi-pause-circle-fill"></i>
                                                 </a>
                                                 break;
                                             case "pausado":
-                                                <a asp-controller="Ados2" asp-action="ReanudarSesion" asp-route-id="@sesion.SesionID" class="btn action-btn action-reanudar" title="Reanudar Sesión">
+                                                <a asp-controller="Cars2" asp-action="ReanudarSesion" asp-route-id="@sesion.SesionID" class="btn action-btn action-reanudar" title="Reanudar Evaluación">
                                                     <i class="bi bi-play-fill"></i> Reanudar
                                                 </a>
                                                 <a href="#" class="btn action-btn action-cancelar" title="Cancelar Sesión"
-                                                   data-bs-toggle="modal" data-bs-target="#cancelarModalADOS2"
+                                                   data-bs-toggle="modal" data-bs-target="#cancelarModalCARS2"
                                                    data-sesionid="@sesion.SesionID" data-pacientenombre="@nombreCompletoPaciente">
                                                     <i class="bi bi-x-lg"></i>
                                                 </a>
                                                 break;
                                             case "completado":
-                                                <a asp-controller="Ados2" asp-action="ResultadoSesion" asp-route-sesionId="@sesion.SesionID" class="btn action-btn action-resultado" title="Ver Resultado">
+                                                <a asp-controller="Cars2" asp-action="ResultadoSesionCARS2" asp-route-sesionId="@sesion.SesionID" class="btn action-btn action-resultado" title="Ver Resultado CARS-2">
                                                     <i class="bi bi-clipboard2-data-fill"></i> Resultado
                                                 </a>
-                                                <a asp-controller="Ados2" asp-action="NotasSesion" asp-route-sesionId="@sesion.SesionID" class="btn action-btn action-notas" title="Ver Notas Generales">
-                                                    <i class="bi bi-journal-text"></i> Notas
+                                                <a asp-controller="Cars2" asp-action="VerQPCyNotas" asp-route-sesionId="@sesion.SesionID" class="btn action-btn action-notas" title="Ver QPC y Notas">
+                                                    <i class="bi bi-journals"></i> QPC/Notas
                                                 </a>
                                                 break;
                                             case "cancelado":
-                                                <a asp-controller="Ados2" asp-action="MotivoCancelacionSesion" asp-route-sesionId="@sesion.SesionID" class="btn action-btn action-motivo" title="Ver Motivo de Cancelación">
+                                                <a asp-controller="Cars2" asp-action="MotivoCancelacionSesion" asp-route-sesionId="@sesion.SesionID" class="btn action-btn action-motivo" title="Ver Motivo de Cancelación">
                                                     <i class="bi bi-info-circle-fill"></i> Motivo
                                                 </a>
                                                 break;
                                         }
-                                        <a asp-controller="Ados2" asp-action="DetalleSesion" asp-route-id="@sesion.SesionID" class="btn action-btn action-detalles" title="Más Información">
+                                        <a asp-controller="Cars2" asp-action="DetalleSesion" asp-route-id="@sesion.SesionID" class="btn action-btn action-detalles" title="Más Información">
                                             <i class="bi bi-eye-fill"></i>
                                         </a>
                                     </div>
@@ -172,21 +173,21 @@
     }
 </div>
 
-<div class="modal fade" id="cancelarModalADOS2" tabindex="-1" aria-labelledby="cancelarModalADOS2Label" aria-hidden="true">
+<div class="modal fade" id="cancelarModalCARS2" tabindex="-1" aria-labelledby="cancelarModalCARS2Label" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <form id="formCancelarSesionADOS2" asp-controller="Ados2" asp-action="CancelarSesionConfirmado" method="post">
+            <form id="formCancelarSesionCARS2" asp-controller="Cars2" asp-action="CancelarSesionConfirmado" method="post">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="cancelarModalADOS2Label"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Confirmar Cancelación</h5>
+                    <h5 class="modal-title" id="cancelarModalCARS2Label"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Confirmar Cancelación</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    <p>¿Estás seguro de que deseas cancelar la sesión ADOS-2 para el paciente <strong id="modalPacienteNombreADOS2"></strong>?</p>
+                    <p>¿Estás seguro de que deseas cancelar la sesión CARS-2 para el paciente <strong id="modalPacienteNombreCARS2"></strong>?</p>
                     <p class="text-muted small">Esta acción marcará la sesión como 'Cancelada'.</p>
-                    <input type="hidden" name="sesionId" id="modalSesionIdADOS2" />
+                    <input type="hidden" name="sesionId" id="modalSesionIdCARS2" />
                     <div class="mb-3">
-                        <label for="modalMotivoCancelacionADOS2" class="form-label fw-semibold">Motivo de la cancelación (requerido):</label>
-                        <textarea class="form-control" id="modalMotivoCancelacionADOS2" name="motivoCancelacion" rows="3" required></textarea>
+                        <label for="modalMotivoCancelacionCARS2" class="form-label fw-semibold">Motivo de la cancelación (requerido):</label>
+                        <textarea class="form-control" id="modalMotivoCancelacionCARS2" name="motivoCancelacion" rows="3" required></textarea>
                         <div class="invalid-feedback">Por favor, ingrese un motivo para la cancelación.</div>
                     </div>
                 </div>
@@ -202,36 +203,37 @@
 @section Scripts {
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Script para el modal de cancelación
-            const cancelarModalElementADOS2 = document.getElementById('cancelarModalADOS2');
-            if (cancelarModalElementADOS2) {
-                const inputSesionIdCancelarADOS2 = document.getElementById('modalSesionIdADOS2');
-                const nombrePacienteSpanADOS2 = document.getElementById('modalPacienteNombreADOS2');
-                const formCancelarADOS2 = document.getElementById('formCancelarSesionADOS2');
+            const cancelarModalElementCARS2 = document.getElementById('cancelarModalCARS2');
+            if (cancelarModalElementCARS2) {
+                const inputSesionIdCancelarCARS2 = document.getElementById('modalSesionIdCARS2');
+                const nombrePacienteSpanCARS2 = document.getElementById('modalPacienteNombreCARS2');
+                const formCancelarCARS2 = document.getElementById('formCancelarSesionCARS2');
 
-                document.querySelectorAll('.action-btn[data-bs-target="#cancelarModalADOS2"]').forEach(btn => {
+                document.querySelectorAll('.action-btn[data-bs-target="#cancelarModalCARS2"]').forEach(btn => {
                     btn.addEventListener('click', function (event) {
                         const id = this.getAttribute('data-sesionid');
                         const nombre = this.getAttribute('data-pacientenombre');
-                        if(inputSesionIdCancelarADOS2) inputSesionIdCancelarADOS2.value = id;
-                        if(nombrePacienteSpanADOS2) nombrePacienteSpanADOS2.textContent = nombre;
+                        if(inputSesionIdCancelarCARS2) inputSesionIdCancelarCARS2.value = id;
+                        if(nombrePacienteSpanCARS2) nombrePacienteSpanCARS2.textContent = nombre;
                     });
                 });
 
-                if(formCancelarADOS2) {
-                    formCancelarADOS2.addEventListener('submit', function(event) {
-                        if (!formCancelarADOS2.checkValidity()) {
+                if(formCancelarCARS2) {
+                    formCancelarCARS2.addEventListener('submit', function(event) {
+                        if (!formCancelarCARS2.checkValidity()) {
                             event.preventDefault();
                             event.stopPropagation();
                         }
-                        formCancelarADOS2.classList.add('was-validated');
+                        formCancelarCARS2.classList.add('was-validated');
                     });
                 }
             }
+
             @{
                     var successMessage = TempData["SuccessMessage"] as string;
                     var errorMessage = TempData["ErrorMessage"] as string;
             }
+
             @if (!string.IsNullOrEmpty(successMessage))
             {
                     <text>

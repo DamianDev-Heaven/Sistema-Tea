@@ -1,0 +1,293 @@
+﻿:root {
+    /* Re-definiendo algunas variables o añadiendo nuevas para este diseño específico */
+    --emind-primary: #3b49df; /* Manteniendo tu color primario */
+    --emind-primary-rgb: 59, 73, 223;
+    --emind-primary-dark: #2c37bd; /* Ligeramente más oscuro para hover profundo */
+    --emind-primary-light: #e0e7ff; /* Un light más suave */
+    --emind-primary-glow: rgba(var(--emind-primary-rgb), 0.3);
+    --emind-card-bg: #ffffff;
+    --emind-card-hover-bg: #fdfdff; /* Casi blanco, para efectos sutiles */
+    --emind-card-border: var(--emind-border-color-light);
+    --emind-card-shadow: 0 4px 15px rgba(var(--emind-primary-rgb), 0.05);
+    --emind-card-hover-shadow: 0 12px 35px rgba(var(--emind-primary-rgb), 0.12);
+    --emind-icon-bg-ados: #c3f5eb; /* Verde menta claro */
+    --emind-icon-color-ados: #0d8a68;
+    --emind-icon-bg-adir: #ffe4c2; /* Durazno claro */
+    --emind-icon-color-adir: #e07c00;
+    --emind-icon-bg-cars: #d9d8ff; /* Lavanda claro */
+    --emind-icon-color-cars: #5a55d1;
+    --emind-transition-fast: all 0.2s ease-out;
+    --emind-transition-smooth: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.instrument-selection-page-container {
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+    overflow: hidden; /* Para contener elementos con overflow visual */
+}
+
+.page-main-title {
+    font-size: clamp(2rem, 5vw, 3rem); /* Más grande y audaz */
+    font-weight: 700;
+    color: var(--emind-text-dark);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+}
+
+    .page-main-title i {
+        color: var(--emind-primary);
+        font-size: 0.9em;
+        text-shadow: none; /* No aplicar sombra de texto al icono */
+        margin-right: 0.75rem; /* Más espacio */
+    }
+
+.page-main-subtitle {
+    font-size: clamp(1.05rem, 3vw, 1.25rem); /* Más legible */
+    font-weight: 400;
+    color: var(--emind-text-light);
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.7; /* Mayor interlineado */
+}
+
+.instrument-selection-grid .row {
+    /* Bootstrap 'gy-4' ya da buen espaciado, podemos añadir más si es necesario */
+}
+
+.instrument-card {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(145deg, var(--emind-card-bg) 0%, #fdfdff 100%); /* Sutil gradiente de fondo */
+    border-radius: var(--emind-border-radius-xl); /* 20px */
+    padding: 2rem 1.75rem; /* Padding ajustado */
+    text-decoration: none;
+    color: var(--emind-text-dark);
+    box-shadow: var(--emind-card-shadow);
+    border: 1px solid var(--emind-card-border);
+    transition: var(--emind-transition-smooth);
+    height: 100%;
+    position: relative; /* Para pseudo-elementos si se necesitan */
+    overflow: hidden; /* Para efectos contenidos */
+}
+
+    .instrument-card::before { /* Pseudo-elemento para un borde de color en hover */
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: var(--emind-border-radius-xl);
+        border: 3px solid transparent;
+        box-sizing: border-box; /* Para que el borde no aumente el tamaño */
+        transition: border-color 0.3s ease-in-out;
+        pointer-events: none; /* Para que no interfiera con el click */
+        z-index: 1;
+    }
+
+    .instrument-card:hover,
+    .instrument-card:focus-visible {
+        transform: translateY(-10px) scale(1.03); /* Elevación más pronunciada */
+        box-shadow: var(--emind-card-hover-shadow);
+        color: var(--emind-text-dark);
+        outline: none;
+    }
+
+        .instrument-card:hover::before {
+            border-color: var(--emind-primary); /* Borde de color primario en hover */
+        }
+
+    .instrument-card:focus-visible { /* Mantener el borde en focus para accesibilidad */
+        border-color: var(--emind-primary);
+        box-shadow: 0 0 0 4px rgba(var(--emind-primary-rgb), 0.25), var(--emind-card-hover-shadow);
+    }
+
+
+.instrument-card-icon-wrapper {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--emind-border-radius-lg); /* Más cuadrado */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem; /* Más espacio */
+    transition: var(--emind-transition-smooth);
+    position: relative; /* Para efectos */
+    z-index: 2;
+}
+
+    /* Fondos y colores de iconos específicos */
+    .instrument-card-icon-wrapper.icon-ados {
+        background-image: linear-gradient(135deg, var(--emind-icon-bg-ados) 0%, #e0fff5 100%);
+        color: var(--emind-icon-color-ados);
+        box-shadow: 0 4px 12px rgba(var(--emind-icon-color-ados, var(--emind-primary-rgb)), 0.2);
+    }
+
+    .instrument-card-icon-wrapper.icon-adir {
+        background-image: linear-gradient(135deg, var(--emind-icon-bg-adir) 0%, #fff0e0 100%);
+        color: var(--emind-icon-color-adir);
+        box-shadow: 0 4px 12px rgba(var(--emind-icon-color-adir, var(--emind-primary-rgb)), 0.2);
+    }
+
+    .instrument-card-icon-wrapper.icon-cars {
+        background-image: linear-gradient(135deg, var(--emind-icon-bg-cars) 0%, #efebff 100%);
+        color: var(--emind-icon-color-cars);
+        box-shadow: 0 4px 12px rgba(var(--emind-icon-color-cars, var(--emind-primary-rgb)), 0.2);
+    }
+
+.instrument-card:hover .instrument-card-icon-wrapper {
+    transform: translateY(-4px) scale(1.15) rotate(-8deg); /* Animación más dinámica */
+    box-shadow: 0 8px 20px rgba(var(--emind-primary-rgb), 0.25); /* Sombra más fuerte en el icono */
+}
+
+.instrument-card-icon-wrapper i {
+    font-size: 2.2rem; /* Iconos más grandes y visibles */
+    transition: transform 0.3s ease-out;
+}
+
+.instrument-card:hover .instrument-card-icon-wrapper i {
+    transform: scale(0.9); /* El icono se encoge un poco para dar efecto de profundidad */
+}
+
+
+.instrument-card-title {
+    font-size: 1.5rem; /* Más grande */
+    font-weight: 700; /* Más bold */
+    margin-bottom: 0.75rem;
+    color: var(--emind-text-dark);
+    transition: color 0.3s ease;
+    z-index: 2;
+    position: relative;
+}
+
+.instrument-card:hover .instrument-card-title {
+    color: var(--emind-primary);
+}
+
+.instrument-card-description {
+    font-size: 0.95rem; /* Un poco más grande para legibilidad */
+    color: var(--emind-text-light);
+    line-height: 1.65; /* Mayor interlineado */
+    flex-grow: 1;
+    margin-bottom: 1.25rem;
+    z-index: 2;
+    position: relative;
+}
+
+.instrument-card-action {
+    font-size: 1rem; /* Más prominente */
+    font-weight: 600;
+    color: var(--emind-primary);
+    align-self: flex-start;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 0; /* Padding vertical */
+    border-radius: var(--emind-border-radius-md);
+    transition: var(--emind-transition-fast);
+    z-index: 2;
+    position: relative;
+}
+
+    .instrument-card-action span {
+        position: relative; /* Para el efecto de subrayado */
+    }
+
+        .instrument-card-action span::after { /* Subrayado animado */
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -3px;
+            left: 0;
+            background-color: var(--emind-primary-dark);
+            transition: width 0.3s ease-out;
+        }
+
+.instrument-card:hover .instrument-card-action span::after {
+    width: 100%;
+}
+
+.instrument-card-action i {
+    margin-left: 0.6rem; /* Más espacio para el icono */
+    font-size: 1.3em; /* Icono más grande */
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Easing con rebote */
+}
+
+.instrument-card:hover .instrument-card-action i {
+    transform: translateX(6px) scale(1.1); /* Mover y escalar */
+}
+
+
+/* Estilos para alertas TempData (si los usas en esta página) */
+.alert {
+    border-radius: var(--emind-border-radius-md);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    box-shadow: var(--emind-shadow-sm);
+}
+
+    .alert i {
+        font-size: 1.3rem;
+        margin-right: 0.8rem;
+    }
+
+/* Media Queries para responsividad */
+@@media (max-width: 992px) {
+    .instrument-selection-grid {
+        gap: 1.5rem;
+    }
+
+    .instrument-card {
+        padding: 1.5rem;
+    }
+}
+
+@@media (max-width: 768px) {
+    .page-main-title {
+        margin-bottom: 0.5rem;
+    }
+
+    .page-main-subtitle {
+        margin-bottom: 2rem;
+    }
+
+    .instrument-card-title {
+        font-size: 1.3rem;
+    }
+
+    .instrument-card-icon-wrapper {
+        width: 50px;
+        height: 50px;
+    }
+
+        .instrument-card-icon-wrapper i {
+            font-size: 1.7rem;
+        }
+}
+
+@@media (max-width: 576px) {
+    .instrument-selection-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .page-container {
+        margin-top: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .page-main-title {
+        font-size: 1.8rem;
+    }
+
+    .page-main-subtitle {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+}

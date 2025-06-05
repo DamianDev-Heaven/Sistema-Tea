@@ -1,0 +1,277 @@
+﻿@model List<Sistema_Tea.Models.ADIR_Sesion>
+@{
+    ViewData["Title"] = "Listado de Sesiones ADI-R";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - eMind</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/InTest.css" asp-append-version="true" />
+
+</head>
+<body>
+   
+    <div class="container mt-4 mb-5 flex-grow-1">
+        <div class="emind-list-container">
+            <div class="emind-list-header">
+                <h1><i class="bi bi-journal-richtext"></i> @ViewData["Title"]</h1>
+                <a asp-controller="ADIR" asp-action="CrearSesion" class="btn emind-btn-primary">
+                    <i class="bi bi-plus-circle-fill"></i>Nueva Sesión ADI-R
+                </a>
+            </div>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-emind alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle-fill"></i> @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-emind alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill"></i> @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @if (Model == null || !Model.Any())
+            {
+                <div class="text-center p-4 p-md-5 my-4 empty-state-container">
+                    <i class="bi bi-folder2-open"></i>
+                    <h4 class="mt-3">No hay sesiones ADI-R registradas.</h4>
+                    <p>Puedes iniciar una nueva sesión para un paciente haciendo clic en "Nueva Sesión ADI-R".</p>
+                </div>
+            }
+            else
+            {
+                <div class="emind-table-wrapper">
+                    <div class="table-responsive-custom">
+                        <table class="table emind-table" id="tablaSesionesADIR">
+                            <thead>
+                                <tr>
+                                    <th>Paciente</th>
+                                    <th>Psicólogo Evaluador</th>
+                                    <th>Informante</th>
+                                    <th>Fecha Inicio</th>
+                                    <th class="text-center">Estado</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var sesion in Model)
+                                {
+                                    string nombreCompletoPaciente = $"{sesion.Paciente?.Nombre} {sesion.Paciente?.Apellidos}".Trim();
+                                    string nombreCompletoPsicologo = sesion.Psicologo?.NombreCompleto?.Trim() ?? "N/A";
+                                    string entrevistadoInfo = $"{sesion.EntrevistadoPorNombre?.Trim()} ({sesion.RelacionConPaciente?.Trim()})";
+                                    <tr>
+                                        <td data-label="Paciente:">
+                                            <div class="d-flex align-items-center">
+                                                <span class="avatar-initials" title="@nombreCompletoPaciente">
+                                                    @(!string.IsNullOrEmpty(sesion.Paciente?.Nombre) ? sesion.Paciente.Nombre[0].ToString().ToUpper() : "")@(!string.IsNullOrEmpty(sesion.Paciente?.Apellidos) ? sesion.Paciente.Apellidos[0].ToString().ToUpper() : "P")
+                                                </span>
+                                                <div>
+                                                    <span class="data-main text-truncate-custom" title="@nombreCompletoPaciente">@nombreCompletoPaciente</span>
+                                                    @if (!string.IsNullOrEmpty(sesion.Paciente?.Dui))
+                                                    {
+                                                        <span class="data-sub">DUI Pac.: @sesion.Paciente.Dui</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td data-label="Psicólogo:">
+                                            <div class="d-flex align-items-center">
+                                                <span class="avatar-initials" title="@nombreCompletoPsicologo">
+                                                    @(!string.IsNullOrEmpty(nombreCompletoPsicologo) && nombreCompletoPsicologo != "N/A" && nombreCompletoPsicologo.Contains(' ') ? $"{nombreCompletoPsicologo.Split(' ')[0][0]}{nombreCompletoPsicologo.Split(' ').Last()[0]}".ToUpper() : (!string.IsNullOrEmpty(nombreCompletoPsicologo) && nombreCompletoPsicologo != "N/A" ? nombreCompletoPsicologo.Substring(0, Math.Min(2, nombreCompletoPsicologo.Length)).ToUpper() : "Psi"))
+                                                </span>
+                                                <div>
+                                                    <span class="data-main text-truncate-custom" title="@nombreCompletoPsicologo">@nombreCompletoPsicologo</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td data-label="Informante:">
+                                            <span class="data-main text-truncate-custom" title="@entrevistadoInfo">@sesion.EntrevistadoPorNombre</span>
+                                            <span class="data-sub">(@sesion.RelacionConPaciente)</span>
+                                        </td>
+                                        <td data-label="Fecha Inicio:">
+                                            @sesion.FechaInicio.ToString("dd/MM/yy HH:mm")
+                                            @if (sesion.FechaFin.HasValue)
+                                            {
+                                                <span class="data-sub">Fin: @sesion.FechaFin.Value.ToString("dd/MM/yy HH:mm")</span>
+                                            }
+                                        </td>
+                                        <td data-label="Estado:" class="text-center">
+                                            @{
+                                                string badgeClass = "badge-status-pendiente";
+                                                string estadoOriginal = sesion.Estado?.Trim() ?? "Indefinido";
+                                                string estadoNormalizado = estadoOriginal.ToLower().Replace(" ", "");
+                                                string estadoDisplay = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(estadoOriginal.ToLower());
+
+                                                switch (estadoNormalizado)
+                                                {
+                                                    case "pendiente": badgeClass = "badge-status-pendiente"; break;
+                                                    case "enprogreso": badgeClass = "badge-status-enprogreso"; break;
+                                                    case "pausado": badgeClass = "badge-status-pausado"; break;
+                                                    case "completado": badgeClass = "badge-status-completado"; break;
+                                                    case "cancelado": badgeClass = "badge-status-cancelado"; break;
+                                                }
+                                            }
+                                            <span class="badge-status @badgeClass">@estadoDisplay</span>
+                                        </td>
+                                        <td data-label="Acciones:">
+                                            <div class="action-btn-group">
+                                                @switch (sesion.Estado?.ToLower().Replace(" ", ""))
+                                                {
+                                                    case "pendiente":
+                                                        <a asp-controller="ADIR" asp-action="IniciarEntrevista" asp-route-sesionId="@sesion.SesionID" class="btn action-btn action-iniciar" title="Iniciar Entrevista">
+                                                            <i class="bi bi-play-circle-fill"></i> Iniciar
+                                                        </a>
+                                                        <a asp-controller="ADIR" asp-action="EditarSesionMetadata" asp-route-sesionId="@sesion.SesionID" class="btn action-btn action-editar" title="Editar Datos de Sesión">
+                                                            <i class="bi bi-pencil-fill"></i>
+                                                        </a>
+                                                        break;
+                                                    case "enprogreso":
+                                                        <a asp-controller="ADIR" asp-action="ContinuarEntrevista" asp-route-sesionId="@sesion.SesionID" class="btn action-btn action-continuar" title="Continuar/Registrar Respuestas">
+                                                            <i class="bi bi-card-text"></i> Continuar
+                                                        </a>
+                                                        <a asp-controller="ADIR" asp-action="PausarSesion" asp-route-sesionId="@sesion.SesionID" class="btn action-btn action-pausar" title="Pausar Sesión">
+                                                            <i class="bi bi-pause-circle-fill"></i>
+                                                        </a>
+                                                        break;
+                                                    case "pausado":
+                                                        <a asp-controller="ADIR" asp-action="ReanudarSesion" asp-route-sesionId="@sesion.SesionID" class="btn action-btn action-reanudar" title="Reanudar Entrevista">
+                                                            <i class="bi bi-play-fill"></i> Reanudar
+                                                        </a>
+                                                        <a asp-controller="ADIR" asp-action="FinalizarEntrevista" asp-route-sesionId="@sesion.SesionID" class="btn action-btn action-finalizar" title="Marcar como Completada">
+                                                            <i class="bi bi-check-circle-fill"></i>
+                                                        </a>
+                                                        break;
+                                                    case "completado":
+                                                        <a asp-controller="ADIR" asp-action="VerResultados" asp-route-sesionId="@sesion.SesionID" class="btn action-btn action-resultados" title="Ver Resultados/Algoritmo">
+                                                            <i class="bi bi-clipboard2-data-fill"></i> Resultados
+                                                        </a>
+                                                        <a asp-controller="ADIR" asp-action="VerDetalleEntrevista" asp-route-sesionId="@sesion.SesionID" class="btn action-btn action-notas" title="Ver Entrevista Completa">
+                                                            <i class="bi bi-journal-text"></i> Entrevista
+                                                        </a>
+                                                        break;
+                                                    case "cancelado":
+                                                        <a asp-controller="ADIR" asp-action="DetallesCancelacion" asp-route-sesionId="@sesion.SesionID" class="btn action-btn action-motivo" title="Ver Motivo de Cancelación">
+                                                            <i class="bi bi-info-circle-fill"></i> Motivo
+                                                        </a>
+                                                        break;
+                                                }
+                                                @if (sesion.Estado?.ToLower().Replace(" ", "") != "completado" && sesion.Estado?.ToLower().Replace(" ", "") != "cancelado")
+                                                {
+                                                    <a href="#" class="btn action-btn action-cancelar" title="Cancelar Sesión"
+                                                       data-bs-toggle="modal" data-bs-target="#cancelarModalADIR"
+                                                       data-sesionid="@sesion.SesionID" data-pacientenombre="@nombreCompletoPaciente">
+                                                        <i class="bi bi-x-lg"></i>
+                                                    </a>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="modal fade" id="cancelarModalADIR" tabindex="-1" aria-labelledby="cancelarModalADIRLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form id="formCancelarSesionADIR" asp-controller="ADIR" asp-action="CancelarSesionConfirmado" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cancelarModalADIRLabel"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Confirmar Cancelación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿Estás seguro de que deseas cancelar la sesión ADI-R para el paciente <strong id="modalPacienteNombreADIR"></strong>?</p>
+                        <p class="text-muted small">Esta acción marcará la sesión como cancelada.</p>
+                        <input type="hidden" name="sesionId" id="modalSesionIdADIR" />
+                        <div class="mb-3">
+                            <label for="modalMotivoCancelacionADIR" class="form-label">Motivo de la cancelación (requerido si cancela):</label>
+                            <textarea class="form-control" id="modalMotivoCancelacionADIR" name="motivoCancelacion" rows="3" required></textarea>
+                            <div class="invalid-feedback">Por favor, ingrese un motivo para la cancelación.</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, mantener sesión</button>
+                        <button type="submit" class="btn btn-danger">Sí, cancelar sesión</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+   
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const cancelarModalElementADIR = document.getElementById('cancelarModalADIR');
+            if (cancelarModalElementADIR) {
+                const bsCancelarModalADIR = new bootstrap.Modal(cancelarModalElementADIR);
+                const inputSesionIdCancelarADIR = document.getElementById('modalSesionIdADIR');
+                const nombrePacienteSpanADIR = document.getElementById('modalPacienteNombreADIR');
+                const formCancelarADIR = document.getElementById('formCancelarSesionADIR');
+
+                document.querySelectorAll('.action-btn[data-bs-target="#cancelarModalADIR"]').forEach(btn => {
+                    btn.addEventListener('click', function (event) {
+                        const id = this.getAttribute('data-sesionid');
+                        const nombre = this.getAttribute('data-pacientenombre');
+                        if(inputSesionIdCancelarADIR) inputSesionIdCancelarADIR.value = id;
+                        if(nombrePacienteSpanADIR) nombrePacienteSpanADIR.textContent = nombre;
+                    });
+                });
+
+                if(formCancelarADIR) {
+                    formCancelarADIR.addEventListener('submit', function(event) {
+                        if (!formCancelarADIR.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        formCancelarADIR.classList.add('was-validated');
+                    });
+                }
+            }
+
+            @{
+                    var successMessage = TempData["SuccessMessage"] as string;
+                    var errorMessage = TempData["ErrorMessage"] as string;
+            }
+
+            @if (!string.IsNullOrEmpty(successMessage))
+            {
+                    <text>
+                    Swal.fire({
+                        icon: 'success', title: '¡Éxito!',
+                        text: '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(successMessage))',
+                        confirmButtonColor: 'var(--emind-primary)', timer: 3000, timerProgressBar: true
+                    });
+                    </text>
+            }
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                    <text>
+                    Swal.fire({
+                        icon: 'error', title: 'Error',
+                        text: '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(errorMessage))',
+                        confirmButtonColor: 'var(--emind-danger)', timer: 4500, timerProgressBar: true
+                    });
+                    </text>
+            }
+        });
+    </script>
+</body>
+</html>
