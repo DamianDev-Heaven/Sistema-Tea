@@ -157,9 +157,10 @@
                                                 </a>
                                                 break;
                                             case "completado":
-                                                <a asp-controller="Ados2" asp-action="ResultadoSesion" asp-route-sesionId="@sesion.SesionID" class="btn action-btn action-resultado" title="Ver Resultado">
+                                                <a asp-controller="Ados2" asp-action="Resultados" asp-route-sesionId="@sesion.SesionID" class="btn action-btn action-resultado" title="Ver Resultado">
                                                     <i class="bi bi-clipboard2-data-fill"></i> Resultado
                                                 </a>
+
                                                 @if (string.IsNullOrWhiteSpace(sesion.NotasGeneralesSesion))
                                                 {
                                                     <a href="#" class="btn action-btn action-agregar-nota" title="Agregar Nota General"

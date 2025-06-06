@@ -28,5 +28,8 @@ namespace Sistema_Tea.Models
         {
             ItemsPuntuados = new HashSet<ADOS2_ItemPuntuado>();
         }
+
+        public string? Dominio { get; set; } // NVARCHAR(MAX)
+
     }
 }

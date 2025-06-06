@@ -256,7 +256,6 @@ namespace Sistema_Tea.Controllers
                 return NotFound();
             }
 
-            // 🔧 PAUSAR OTRAS SESIONES EN PROGRESO
             var otrasSesionesEnProgreso = await _context.ADOS2_Sesion
                 .Where(s => s.PsicologoID == psicologoId && s.Estado == "EnProgreso" && s.SesionID != id)
                 .ToListAsync();
@@ -312,7 +311,6 @@ namespace Sistema_Tea.Controllers
 
 
 
-        [HttpGet]
         public async Task<IActionResult> TareasModulo(int sesionId, int tareaIndex)
         {
             var sesion = await _context.ADOS2_Sesion
@@ -321,7 +319,7 @@ namespace Sistema_Tea.Controllers
             if (sesion == null || sesion.Estado != "EnProgreso")
                 return NotFound();
 
-            var tareas = await _context.ADOS2_Tarea
+            var tareas = await _context.ADOS2_Tarea  
                 .Where(t => t.Modulo == sesion.Modulo)
                 .OrderBy(t => t.TareaDefinicionID)
                 .ToListAsync();
@@ -333,12 +331,82 @@ namespace Sistema_Tea.Controllers
             {
                 sesion.Estado = "Completado";
                 sesion.FechaFin = DateTime.Now;
+
+                var itemsValidos = await _context.ADOS2_ItemPuntuado
+                    .Include(i => i.TareaDefinicion)  
+                    .Where(i => i.SesionID == sesionId && i.CodigoObservado >= 0 && i.CodigoObservado <= 3)
+                    .ToListAsync();
+
+                decimal afectoSocialTotal = itemsValidos
+                    .Where(i => i.TareaDefinicion.Dominio == "AfectoSocial")
+                    .Sum(i => (decimal)i.CodigoObservado);
+
+                decimal comportamientoRepTotal = itemsValidos
+                    .Where(i => i.TareaDefinicion.Dominio == "ComportamientoRepetitivo")
+                    .Sum(i => (decimal)i.CodigoObservado);
+
+                decimal comunicacionTotal = itemsValidos
+                    .Where(i => i.TareaDefinicion.Dominio == "Comunicacion")
+                    .Sum(i => (decimal)i.CodigoObservado);
+
+                decimal interaccionSocialTotal = itemsValidos
+                    .Where(i => i.TareaDefinicion.Dominio == "InteraccionSocial")
+                    .Sum(i => (decimal)i.CodigoObservado);
+
+                decimal otrosDominiosTotal = itemsValidos
+                    .Where(i => i.TareaDefinicion.Dominio == "OtrosDominios")
+                    .Sum(i => (decimal)i.CodigoObservado);
+
+                decimal puntajeTotal = afectoSocialTotal + comportamientoRepTotal + comunicacionTotal + interaccionSocialTotal + otrosDominiosTotal;
+
+                string diagnostico = "No determinado";
+                switch (sesion.Modulo)
+                {
+                    case "T":
+                        diagnostico = puntajeTotal >= 12 ? "Autismo" :
+                                      puntajeTotal >= 10 ? "Espectro Autista" : "No TEA";
+                        break;
+                    case "1":
+                    case "2":
+                        diagnostico = puntajeTotal >= 12 ? "Autismo" :
+                                      puntajeTotal >= 8 ? "Espectro Autista" : "No TEA";
+                        break;
+                    case "3":
+                    case "4":
+                        diagnostico = puntajeTotal >= 10 ? "Autismo" :
+                                      puntajeTotal >= 7 ? "Espectro Autista" : "No TEA";
+                        break;
+                }
+
+                decimal cssTotalGeneral = puntajeTotal;              
+                decimal cssAfectoSocial = afectoSocialTotal;          
+                decimal cssComportamientoRep = comportamientoRepTotal; 
+
+                var resultado = new ADOS2_ResultadoGlobalSesion
+                {
+                    SesionID = sesionId,
+                    AfectoSocial_PuntuacionTotal = afectoSocialTotal,
+                    ComportamientoRepetitivo_PuntuacionTotal = comportamientoRepTotal,
+                    Comunicacion_PuntuacionTotal = comunicacionTotal,
+                    InteraccionSocial_PuntuacionTotal = interaccionSocialTotal,
+                    OtrosDominios_PuntuacionTotal = otrosDominiosTotal,
+                    PuntuacionTotalAlgoritmo = puntajeTotal,
+                    ClasificacionADOS = diagnostico,
+                    CSS_TotalGeneral = cssTotalGeneral,
+                    CSS_AfectoSocial = cssAfectoSocial,
+                    CSS_ComportamientoRepetitivo = cssComportamientoRep,
+                    FechaCalculo = DateTime.Now,
+                    CalculadoPorUsuarioID = null,
+                };
+
+                _context.ADOS2_Resultado.Add(resultado);
+
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction("Index");
             }
 
             var tareaActual = tareas[tareaIndex];
-
             ViewBag.SesionId = sesionId;
             ViewBag.TareaIndex = tareaIndex;
             ViewBag.SiguienteIndex = tareaIndex + 1;
@@ -346,6 +414,9 @@ namespace Sistema_Tea.Controllers
 
             return View("TareasModulos", tareaActual);
         }
+
+
+
 
         [HttpPost]
         public async Task<IActionResult> GuardarYContinuar(int sesionId, int tareaDefinicionId, int codigoObservado, string notasObservacionItem, int tareaIndex)
@@ -458,7 +529,6 @@ namespace Sistema_Tea.Controllers
                 return RedirectToAction("Index");
             }
 
-            // Verificar si ya tiene una nota general
             if (!string.IsNullOrWhiteSpace(sesion.NotasGeneralesSesion))
             {
                 TempData["ErrorMessage"] = "Esta sesión ya tiene una nota general asignada.";
@@ -471,6 +541,47 @@ namespace Sistema_Tea.Controllers
             TempData["SuccessMessage"] = "La nota general ha sido guardada exitosamente.";
             return RedirectToAction("Index");
         }
+
+        public async Task<IActionResult> Resultados(int sesionId)
+        {
+            var resultados = await _context.ADOS2_Resultado
+                .Include(r => r.ADOS2_Sesion)
+                    .ThenInclude(s => s.Paciente)
+                .Include(r => r.ADOS2_Sesion)
+                    .ThenInclude(s => s.Psicologo)
+                .FirstOrDefaultAsync(r => r.SesionID == sesionId);
+
+            if (resultados == null)
+            {
+                TempData["ErrorMessage"] = $"No se encontró un resultado para la SesionID: {sesionId}";
+                return NotFound();
+            }
+
+            return View(resultados);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GuardarNotasResultadoGlobal(int sesionID, string NotasResultadoGlobal)
+        {
+            var resultado = await _context.ADOS2_Resultado
+                .FirstOrDefaultAsync(r => r.SesionID == sesionID);
+
+            if (resultado == null)
+                return NotFound();
+
+            resultado.NotasResultadoGlobal = NotasResultadoGlobal;
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Resultados", new { sesionId = sesionID });
+        }
+
+
+
+
+
     }
-    
+
+
+
+
 }
