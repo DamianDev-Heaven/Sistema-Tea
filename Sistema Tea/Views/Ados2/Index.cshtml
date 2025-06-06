@@ -127,10 +127,16 @@
                                                 </a>
                                                 break;
                                             case "enprogreso":
-                                                <a asp-controller="Ados2" asp-action="PuntuarItems" asp-route-sesionId="@sesion.SesionID" class="btn action-btn action-puntuar" title="Puntuar Ítems">
-                                                    <i class="bi bi-pencil-square"></i> Puntuar
+                                                <a asp-controller="Ados2" asp-action="ReanudarSesion" asp-route-id="@sesion.SesionID" class="btn action-btn action-reanudar" title="Reanudar Sesión">
+                                                    <i class="bi bi-play-fill"></i> Reanudar
                                                 </a>
-                                                <a asp-controller="Ados2" asp-action="PausarSesion" asp-route-id="@sesion.SesionID" class="btn action-btn action-pausar" title="Pausar Sesión">
+                                                <a href="#"
+                                                   class="btn action-btn action-pausar"
+                                                   title="Pausar Sesión"
+                                                   data-bs-toggle="modal"
+                                                   data-bs-target="#pausarModalADOS2"
+                                                   data-sesionid="@sesion.SesionID"
+                                                   data-pacientenombre="@sesion.Paciente.NombreCompleto">
                                                     <i class="bi bi-pause-circle-fill"></i>
                                                 </a>
                                                 break;
@@ -143,24 +149,47 @@
                                                    data-sesionid="@sesion.SesionID" data-pacientenombre="@nombreCompletoPaciente">
                                                     <i class="bi bi-x-lg"></i>
                                                 </a>
+                                                <a href="#" class="btn action-btn action-motivo" title="Ver Motivo de Pausa"
+                                                   data-bs-toggle="modal" data-bs-target="#motivoPausaModal"
+                                                   data-pacientenombre="@nombreCompletoPaciente"
+                                                   data-motivopausa="@sesion.MotivoPausaCancelacion">
+                                                    <i class="bi bi-info-circle-fill"></i> Motivo
+                                                </a>
                                                 break;
                                             case "completado":
                                                 <a asp-controller="Ados2" asp-action="ResultadoSesion" asp-route-sesionId="@sesion.SesionID" class="btn action-btn action-resultado" title="Ver Resultado">
                                                     <i class="bi bi-clipboard2-data-fill"></i> Resultado
                                                 </a>
-                                                <a asp-controller="Ados2" asp-action="NotasSesion" asp-route-sesionId="@sesion.SesionID" class="btn action-btn action-notas" title="Ver Notas Generales">
-                                                    <i class="bi bi-journal-text"></i> Notas
-                                                </a>
+                                                @if (string.IsNullOrWhiteSpace(sesion.NotasGeneralesSesion))
+                                                {
+                                                    <a href="#" class="btn action-btn action-agregar-nota" title="Agregar Nota General"
+                                                       data-bs-toggle="modal" data-bs-target="#agregarNotaModal"
+                                                       data-sesionid="@sesion.SesionID" data-pacientenombre="@nombreCompletoPaciente">
+                                                        <i class="bi bi-journal-plus"></i> Nota
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <a href="#" class="btn action-btn action-ver-nota" title="Ver Nota General"
+                                                       data-bs-toggle="modal" data-bs-target="#verNotaModal"
+                                                       data-pacientenombre="@nombreCompletoPaciente"
+                                                       data-notageneral="@sesion.NotasGeneralesSesion">
+                                                        <i class="bi bi-journal-text"></i> Ver Nota
+                                                    </a>
+                                                }
                                                 break;
                                             case "cancelado":
-                                                <a asp-controller="Ados2" asp-action="MotivoCancelacionSesion" asp-route-sesionId="@sesion.SesionID" class="btn action-btn action-motivo" title="Ver Motivo de Cancelación">
+                                                <a href="#" class="btn action-btn action-motivo" title="Ver Motivo de Cancelación"
+                                                   data-bs-toggle="modal" data-bs-target="#motivoCancelacionModal"
+                                                   data-pacientenombre="@nombreCompletoPaciente"
+                                                   data-motivocancelacion="@sesion.MotivoPausaCancelacion">
                                                     <i class="bi bi-info-circle-fill"></i> Motivo
                                                 </a>
                                                 break;
                                         }
-                                        <a asp-controller="Ados2" asp-action="DetalleSesion" asp-route-id="@sesion.SesionID" class="btn action-btn action-detalles" title="Más Información">
+                                        @* <a asp-controller="Ados2" asp-action="DetalleSesion" asp-route-id="@sesion.SesionID" class="btn action-btn action-detalles" title="Más Información">
                                             <i class="bi bi-eye-fill"></i>
-                                        </a>
+                                        </a> *@
                                     </div>
                                 </td>
                             </tr>
@@ -175,18 +204,18 @@
 <div class="modal fade" id="cancelarModalADOS2" tabindex="-1" aria-labelledby="cancelarModalADOS2Label" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <form id="formCancelarSesionADOS2" asp-controller="Ados2" asp-action="CancelarSesionConfirmado" method="post">
+            <form id="formCancelarSesionADOS2" asp-controller="Ados2" asp-action="CancelarSesionConfirmado" method="post" novalidate>
                 <div class="modal-header">
                     <h5 class="modal-title" id="cancelarModalADOS2Label"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Confirmar Cancelación</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    <p>¿Estás seguro de que deseas cancelar la sesión ADOS-2 para el paciente <strong id="modalPacienteNombreADOS2"></strong>?</p>
+                    <p>¿Estás seguro de que deseas cancelar la sesión ADOS-2 para el paciente <strong id="modalPacienteNombreCancelar"></strong>?</p>
                     <p class="text-muted small">Esta acción marcará la sesión como 'Cancelada'.</p>
-                    <input type="hidden" name="sesionId" id="modalSesionIdADOS2" />
+                    <input type="hidden" name="sesionId" id="modalSesionIdCancelar" />
                     <div class="mb-3">
-                        <label for="modalMotivoCancelacionADOS2" class="form-label fw-semibold">Motivo de la cancelación (requerido):</label>
-                        <textarea class="form-control" id="modalMotivoCancelacionADOS2" name="motivoCancelacion" rows="3" required></textarea>
+                        <label for="modalMotivoCancelacionCancelar" class="form-label fw-semibold">Motivo de la cancelación (requerido):</label>
+                        <textarea class="form-control" id="modalMotivoCancelacionCancelar" name="motivoCancelacion" rows="3" required></textarea>
                         <div class="invalid-feedback">Por favor, ingrese un motivo para la cancelación.</div>
                     </div>
                 </div>
@@ -199,61 +228,275 @@
     </div>
 </div>
 
+<div class="modal fade" id="motivoCancelacionModal" tabindex="-1" aria-labelledby="motivoCancelacionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="motivoCancelacionModalLabel"><i class="bi bi-info-circle-fill text-info me-2"></i> Motivo de Cancelación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Paciente:</strong> <span id="motivoPacienteNombre"></span></p>
+                <p><strong>Motivo:</strong></p>
+                <p id="motivoCancelacionTexto" class="border p-3 bg-light rounded"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="motivoPausaModal" tabindex="-1" aria-labelledby="motivoPausaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="motivoPausaModalLabel"><i class="bi bi-pause-circle-fill text-warning me-2"></i> Motivo de Pausa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Paciente:</strong> <span id="motivoPausaPacienteNombre"></span></p>
+                <p><strong>Motivo:</strong></p>
+                <p id="motivoPausaTexto" class="border p-3 bg-light rounded"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="pausarModalADOS2" tabindex="-1" aria-labelledby="pausarModalADOS2Label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="formPausarSesionADOS2" asp-controller="Ados2" asp-action="PausarSesion" method="post" novalidate>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pausarModalADOS2Label"><i class="bi bi-pause-circle-fill text-warning me-2"></i>Confirmar Pausa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas pausar la sesión ADOS-2 para el paciente <strong id="modalPacienteNombrePausar"></strong>?</p>
+                    <p class="text-muted small">Podrás reanudarla más tarde.</p>
+                    <input type="hidden" name="id" id="modalSesionIdPausar" />
+                    <div class="mb-3">
+                        <label for="modalNotaPausa" class="form-label fw-semibold">Motivo de la pausa (requerido):</label>
+                        <textarea class="form-control" id="modalNotaPausa" name="nota" rows="3" required></textarea>
+                        <div class="invalid-feedback">Por favor, ingrese un motivo para la pausa.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, mantener</button>
+                    <button type="submit" class="btn btn-warning">Sí, pausar sesión</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="agregarNotaModal" tabindex="-1" aria-labelledby="agregarNotaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <form id="formAgregarNota" asp-controller="Ados2" asp-action="AgregarNotaGeneral" method="post" novalidate>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="agregarNotaModalLabel"><i class="bi bi-journal-plus text-primary me-2"></i>Agregar Nota General</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Agregar nota general para el paciente <strong id="modalPacienteNombreNota"></strong></p>
+                    <input type="hidden" name="id" id="modalSesionIdNota" />
+                    <div class="mb-3">
+                        <label for="modalNotaGeneral" class="form-label fw-semibold">Nota General (requerida):</label>
+                        <textarea class="form-control" id="modalNotaGeneral" name="notaGeneral" rows="6" required placeholder="Escribe aquí la nota general sobre la sesión..."></textarea>
+                        <div class="invalid-feedback">Por favor, ingrese una nota general.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Nota</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="verNotaModal" tabindex="-1" aria-labelledby="verNotaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="verNotaModalLabel"><i class="bi bi-journal-text text-info me-2"></i> Nota General</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Paciente:</strong> <span id="verNotaPacienteNombre"></span></p>
+                <p><strong>Nota General:</strong></p>
+                <div id="verNotaTexto" class="border p-3 bg-light rounded" style="white-space: pre-wrap; min-height: 120px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts {
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Script para el modal de cancelación
-            const cancelarModalElementADOS2 = document.getElementById('cancelarModalADOS2');
-            if (cancelarModalElementADOS2) {
-                const inputSesionIdCancelarADOS2 = document.getElementById('modalSesionIdADOS2');
-                const nombrePacienteSpanADOS2 = document.getElementById('modalPacienteNombreADOS2');
-                const formCancelarADOS2 = document.getElementById('formCancelarSesionADOS2');
+            const cancelarModal = document.getElementById('cancelarModalADOS2');
+            if (cancelarModal) {
+                const inputSesionIdCancelar = document.getElementById('modalSesionIdCancelar');
+                const nombrePacienteCancelar = document.getElementById('modalPacienteNombreCancelar');
+                const formCancelar = document.getElementById('formCancelarSesionADOS2');
 
                 document.querySelectorAll('.action-btn[data-bs-target="#cancelarModalADOS2"]').forEach(btn => {
-                    btn.addEventListener('click', function (event) {
-                        const id = this.getAttribute('data-sesionid');
-                        const nombre = this.getAttribute('data-pacientenombre');
-                        if(inputSesionIdCancelarADOS2) inputSesionIdCancelarADOS2.value = id;
-                        if(nombrePacienteSpanADOS2) nombrePacienteSpanADOS2.textContent = nombre;
+                    btn.addEventListener('click', function () {
+                        const sesionId = this.getAttribute('data-sesionid');
+                        const pacienteNombre = this.getAttribute('data-pacientenombre');
+                        if (inputSesionIdCancelar) inputSesionIdCancelar.value = sesionId;
+                        if (nombrePacienteCancelar) nombrePacienteCancelar.textContent = pacienteNombre;
                     });
                 });
 
-                if(formCancelarADOS2) {
-                    formCancelarADOS2.addEventListener('submit', function(event) {
-                        if (!formCancelarADOS2.checkValidity()) {
+                if (formCancelar) {
+                    formCancelar.addEventListener('submit', function (event) {
+                        if (!formCancelar.checkValidity()) {
                             event.preventDefault();
                             event.stopPropagation();
                         }
-                        formCancelarADOS2.classList.add('was-validated');
+                        formCancelar.classList.add('was-validated');
                     });
                 }
             }
-            @{
-                    var successMessage = TempData["SuccessMessage"] as string;
-                    var errorMessage = TempData["ErrorMessage"] as string;
-            }
-            @if (!string.IsNullOrEmpty(successMessage))
-            {
-                    <text>
-                    Swal.fire({
-                        icon: 'success', title: '¡Éxito!',
-                        text: '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(successMessage))',
-                        confirmButtonColor: 'var(--emind-primary)', timer: 3000, timerProgressBar: true,
-                        toast: true, position: 'top-end', showConfirmButton: false
+
+            const motivoCancelacionModal = document.getElementById('motivoCancelacionModal');
+            if (motivoCancelacionModal) {
+                const nombrePacienteMotivo = document.getElementById('motivoPacienteNombre');
+                const motivoTexto = document.getElementById('motivoCancelacionTexto');
+
+                document.querySelectorAll('.action-btn[data-bs-target="#motivoCancelacionModal"]').forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const pacienteNombre = this.getAttribute('data-pacientenombre');
+                        const motivoCancelacion = this.getAttribute('data-motivocancelacion');
+                        if (nombrePacienteMotivo) nombrePacienteMotivo.textContent = pacienteNombre;
+                        if (motivoTexto) motivoTexto.textContent = motivoCancelacion || "No se proporcionó un motivo.";
                     });
-                    </text>
+                });
             }
-            @if (!string.IsNullOrEmpty(errorMessage))
-            {
-                    <text>
-                    Swal.fire({
-                        icon: 'error', title: 'Error',
-                        text: '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(errorMessage))',
-                        confirmButtonColor: 'var(--emind-danger)', timer: 4500, timerProgressBar: true,
-                        toast: true, position: 'top-end', showConfirmButton: false
-                    });
-                    </text>
+
+            var successMessage = '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(TempData["SuccessMessage"] as string ?? ""))';
+            var errorMessage = '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(TempData["ErrorMessage"] as string ?? ""))';
+
+            if (successMessage) {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: successMessage,
+                    confirmButtonColor: 'var(--emind-primary)',
+                    timer: 3000,
+                    timerProgressBar: true,
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false
+                });
+            }
+
+            if (errorMessage) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: errorMessage,
+                    confirmButtonColor: 'var(--emind-danger)',
+                    timer: 3000,
+                    timerProgressBar: true,
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false
+                });
             }
         });
+
+        const pausarModal = document.getElementById('pausarModalADOS2');
+        if (pausarModal) {
+            const inputSesionIdPausar = document.getElementById('modalSesionIdPausar');
+            const nombrePacientePausar = document.getElementById('modalPacienteNombrePausar');
+            const formPausar = document.getElementById('formPausarSesionADOS2');
+
+            document.querySelectorAll('.action-btn[data-bs-target="#pausarModalADOS2"]').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const sesionId = this.getAttribute('data-sesionid');
+                    const pacienteNombre = this.getAttribute('data-pacientenombre');
+                    if (inputSesionIdPausar) inputSesionIdPausar.value = sesionId;
+                    if (nombrePacientePausar) nombrePacientePausar.textContent = pacienteNombre;
+                });
+            });
+
+            if (formPausar) {
+                formPausar.addEventListener('submit', function (event) {
+                    if (!formPausar.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    formPausar.classList.add('was-validated');
+                });
+            }
+        }
+
+
+        const motivoPausaModal = document.getElementById('motivoPausaModal');
+        if (motivoPausaModal) {
+            const nombrePacienteMotivoPausa = document.getElementById('motivoPausaPacienteNombre');
+            const motivoPausaTexto = document.getElementById('motivoPausaTexto');
+
+            document.querySelectorAll('.action-btn[data-bs-target="#motivoPausaModal"]').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const pacienteNombre = this.getAttribute('data-pacientenombre');
+                    const motivoPausa = this.getAttribute('data-motivopausa');
+                    if (nombrePacienteMotivoPausa) nombrePacienteMotivoPausa.textContent = pacienteNombre;
+                    if (motivoPausaTexto) motivoPausaTexto.textContent = motivoPausa || "No se proporcionó un motivo.";
+                });
+            });
+        }
+
+        const agregarNotaModal = document.getElementById('agregarNotaModal');
+        if (agregarNotaModal) {
+            const inputSesionIdNota = document.getElementById('modalSesionIdNota');
+            const nombrePacienteNota = document.getElementById('modalPacienteNombreNota');
+            const formAgregarNota = document.getElementById('formAgregarNota');
+
+            document.querySelectorAll('.action-btn[data-bs-target="#agregarNotaModal"]').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const sesionId = this.getAttribute('data-sesionid');
+                    const pacienteNombre = this.getAttribute('data-pacientenombre');
+                    if (inputSesionIdNota) inputSesionIdNota.value = sesionId;
+                    if (nombrePacienteNota) nombrePacienteNota.textContent = pacienteNombre;
+
+                    const textarea = document.getElementById('modalNotaGeneral');
+                    if (textarea) textarea.value = '';
+                });
+            });
+
+            if (formAgregarNota) {
+                formAgregarNota.addEventListener('submit', function (event) {
+                    if (!formAgregarNota.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    formAgregarNota.classList.add('was-validated');
+                });
+            }
+        }
+
+        const verNotaModal = document.getElementById('verNotaModal');
+        if (verNotaModal) {
+            const nombrePacienteVerNota = document.getElementById('verNotaPacienteNombre');
+            const verNotaTexto = document.getElementById('verNotaTexto');
+
+            document.querySelectorAll('.action-btn[data-bs-target="#verNotaModal"]').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const pacienteNombre = this.getAttribute('data-pacientenombre');
+                    const notaGeneral = this.getAttribute('data-notageneral');
+                    if (nombrePacienteVerNota) nombrePacienteVerNota.textContent = pacienteNombre;
+                    if (verNotaTexto) verNotaTexto.textContent = notaGeneral || "No hay nota general disponible.";
+                });
+            });
+        }
     </script>
 }
