@@ -166,8 +166,6 @@ namespace Sistema_Tea.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
-
         //Tutores 
         public IActionResult IndexTutor()
         {
@@ -231,10 +229,8 @@ namespace Sistema_Tea.Controllers
             {
                 return NotFound();
             }
-
             try
             {
-                
                 if (string.IsNullOrWhiteSpace(paciente.Dui))
                 {
                     paciente.Dui = null;
