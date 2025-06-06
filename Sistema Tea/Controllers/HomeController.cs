@@ -206,18 +206,23 @@ namespace Sistema_Tea.Controllers
         }
 
 
+        [HttpGet]
         public async Task<IActionResult> CrearPsicologo()
         {
             var rolPsicologo = await _context.Rol.FirstOrDefaultAsync(r => r.NombreRol == "Psicologo");
-
             if (rolPsicologo == null)
             {
                 TempData["ErrorMessage"] = "No se encontró el rol Psicólogo en la base de datos.";
                 return RedirectToAction("Dashboard", "Home");
             }
 
-            ViewData["Certificaciones"] = await _context.Certificacion.OrderBy(c => c.Nombre).ToListAsync();
+            var certificaciones = await _context.Certificacion.OrderBy(c => c.Nombre).ToListAsync();
+            if (!certificaciones.Any())
+            {
+                TempData["WarningMessage"] = "No hay certificaciones disponibles para asignar.";
+            }
 
+            ViewData["Certificaciones"] = certificaciones;
             var nuevoPsicologo = new Usuario
             {
                 RolID = rolPsicologo.RolID
@@ -230,6 +235,15 @@ namespace Sistema_Tea.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CrearPsicologo(Usuario model, List<int> certificacionesSeleccionadas)
         {
+            if (certificacionesSeleccionadas == null || !certificacionesSeleccionadas.Any())
+            {
+                ModelState.AddModelError("", "No se seleccionaron certificaciones.");
+            }
+            else
+            {
+                Console.WriteLine($"Certificaciones seleccionadas: {string.Join(", ", certificacionesSeleccionadas)}");
+            }
+
             if (await _context.Usuario.AnyAsync(u => u.Email == model.Email))
             {
                 ModelState.AddModelError("Email", "El correo electrónico ya está registrado.");
@@ -249,31 +263,44 @@ namespace Sistema_Tea.Controllers
                 model.RolID = rolPsicologo.RolID;
             }
             ModelState.Remove("RolID");
-            if (ModelState.IsValid)
+
+            if (!ModelState.IsValid)
             {
-                model.ContrasenaHash = HashPassword(model.ContrasenaHash); // Asegúrate de tener tu método HashPassword
-                model.FechaCreacion = DateTime.Now;
-                model.Activo = true;
-                _context.Usuario.Add(model);
-                if (certificacionesSeleccionadas != null && certificacionesSeleccionadas.Any())
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                Console.WriteLine($"Errores de ModelState: {string.Join(", ", errors)}");
+            }
+            model.ContrasenaHash = HashPassword(model.ContrasenaHash);
+            model.FechaCreacion = DateTime.Now;
+            model.Activo = true;
+
+            _context.Usuario.Add(model);
+            await _context.SaveChangesAsync();
+
+            if (certificacionesSeleccionadas != null && certificacionesSeleccionadas.Any())
+            {
+                foreach (var certId in certificacionesSeleccionadas)
                 {
-                    foreach (var certId in certificacionesSeleccionadas)
+                    var usuarioCert = new UsuarioCertificacion
                     {
-                        model.UsuarioCertificaciones.Add(new UsuarioCertificacion
-                        {
-                            CertificacionID = certId,
-                            FechaObtencion = DateTime.Now
-                        });
-                    }
+                        UsuarioID = model.UsuarioID,
+                        CertificacionID = certId,
+                        FechaObtencion = DateTime.Now
+                    };
+                    _context.UsuarioCertificacion.Add(usuarioCert);
+                    Console.WriteLine($"Agregando certificación ID: {certId} para usuario ID: {model.UsuarioID}");
                 }
                 await _context.SaveChangesAsync();
-
-                TempData["SuccessMessage"] = "Psicólogo creado correctamente.";
-                return RedirectToAction("ListarPsicologos");
             }
-            ViewData["Certificaciones"] = await _context.Certificacion.OrderBy(c => c.Nombre).ToListAsync();
-            return View("Admin/CrearPsicologo", model);
+
+            var savedCertifications = await _context.UsuarioCertificacion
+                .Where(uc => uc.UsuarioID == model.UsuarioID)
+                .ToListAsync();
+            Console.WriteLine($"Certificaciones guardadas: {savedCertifications.Count}");
+
+            TempData["SuccessMessage"] = "Psicólogo creado correctamente.";
+            return RedirectToAction("ListarPsicologos");
         }
+
 
         private string HashPassword(string password)
         {

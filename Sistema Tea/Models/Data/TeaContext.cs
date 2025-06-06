@@ -41,8 +41,16 @@ namespace Sistema_Tea.Models.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<UsuarioCertificacion>()
-                .HasKey(uc => new { uc.UsuarioID, uc.CertificacionID });
+            modelBuilder.Entity<UsuarioCertificacion>(entity =>
+            {
+                entity.HasKey(uc => new { uc.UsuarioID, uc.CertificacionID });
+                entity.HasOne(uc => uc.Usuario)
+                      .WithMany(u => u.UsuarioCertificaciones)
+                      .HasForeignKey(uc => uc.UsuarioID);
+                entity.HasOne(uc => uc.Certificacion)
+                      .WithMany(c => c.UsuarioCertificaciones)
+                      .HasForeignKey(uc => uc.CertificacionID);
+            });
         }
 
     }
