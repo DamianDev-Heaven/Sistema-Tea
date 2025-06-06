@@ -195,6 +195,169 @@ namespace Sistema_Tea.Controllers
             }
 
         }
+        [HttpGet]
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var paciente = await _context.Paciente.FindAsync(id);
+            if (paciente == null)
+            {
+                return NotFound();
+            }
+            return View(paciente); 
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Paciente paciente)
+        {
+            if (paciente.PacienteID == 0)
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                
+                if (string.IsNullOrWhiteSpace(paciente.Dui))
+                {
+                    paciente.Dui = null;
+                }
+
+                _context.Update(paciente);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Paciente actualizado correctamente.";
+                return RedirectToAction(nameof(Index)); 
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!PacienteExists(paciente.PacienteID))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw; 
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"Error al actualizar el paciente: {ex.Message}");
+                return View(paciente);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditTutor(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var tutor = await _context.Tutor.FindAsync(id);
+            if (tutor == null)
+            {
+                return NotFound();
+            }
+            return View(tutor);
+        }
+        private bool PacienteExists(int id)
+        {
+            return _context.Paciente.Any(e => e.PacienteID == id);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditTutor(Tutor tutor)
+        {
+            if (tutor.TutorID == 0)
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                
+                bool duiDuplicado = await _context.Tutor.AnyAsync(t => t.Dui == tutor.Dui && t.TutorID != tutor.TutorID && t.Activo);
+                if (duiDuplicado)
+                {
+                    TempData["ErrorMessage"] = "El DUI ya está registrado para otro tutor.";
+                    return View(tutor);
+                }
+
+                _context.Update(tutor);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Tutor actualizado correctamente.";
+                return RedirectToAction(nameof(IndexTutor));
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TutorExists(tutor.TutorID))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"Error al actualizar el tutor: {ex.Message}");
+                return View(tutor);
+            }
+        }
+
+        private bool TutorExists(int id)
+        {
+            return _context.Tutor.Any(e => e.TutorID == id);
+        }
+
+        public async Task<IActionResult> MisPacientes()
+        {
+            var userId = HttpContext.Session.GetInt32("UsuarioID");
+
+            if (userId == null)
+            {
+                return Unauthorized("ID de usuario no encontrado en la sesión.");
+            }
+
+            var pacientes = await _context.Paciente
+                .Include(p => p.Tutor) 
+                .Where(p => p.Activo && 
+                            _context.AsignacionPaciente.Any(ap => ap.PacienteID == p.PacienteID && 
+                                                                 ap.PsicologoID == userId)) 
+                .ToListAsync();
+
+            return View(pacientes);
+        }
+        public IActionResult VerTutorP(int id)
+        {
+            var tutor = _context.Tutor.FirstOrDefault(t => t.TutorID == id);
+            if (tutor == null)
+            {
+                TempData["ErrorMessage"] = "No se encontró el tutor.";
+                return RedirectToAction("Index");
+            }
+            return View("DetallesTutorP", tutor);
+        }
+
+
+        public IActionResult VerPacienteP(int id)
+        {
+            var paciente = _context.Paciente.FirstOrDefault(p => p.PacienteID == id);
+            if (paciente == null)
+            {
+                TempData["ErrorMessage"] = "No se encontró el paciente.";
+                return RedirectToAction("Index");
+            }
+            return View("DetallesPacienteP", paciente);
+        }
     }
 
 
