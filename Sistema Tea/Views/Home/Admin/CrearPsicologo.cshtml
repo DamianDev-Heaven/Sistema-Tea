@@ -1,6 +1,8 @@
 ﻿@model Sistema_Tea.Models.Usuario
 @{
     ViewData["Title"] = "Crear Psicólogo";
+    // Obtenemos la lista de certificaciones que pasamos desde el controlador
+    var certificaciones = ViewData["Certificaciones"] as List<Sistema_Tea.Models.Certificacion> ?? new List<Sistema_Tea.Models.Certificacion>();
 }
 
 <link rel="stylesheet" href="~/css/create.css" asp-append-version="true" />
@@ -14,6 +16,8 @@
         <div class="alert alert-success">@TempData["SuccessMessage"]</div>
     }
 
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
     <form asp-action="CrearPsicologo" method="post" novalidate>
         <div class="mb-3">
             <label asp-for="NombreCompleto" class="form-label fw-semibold"></label>
@@ -22,7 +26,7 @@
         </div>
         <div class="mb-3">
             <label asp-for="Dui" class="form-label fw-semibold"></label>
-            <input asp-for="Dui" class="form-control" placeholder="Ej: 123456789" />
+            <input asp-for="Dui" class="form-control" placeholder="Ej: 12345678-9" />
             <span asp-validation-for="Dui" class="text-danger small"></span>
         </div>
 
@@ -38,13 +42,33 @@
             <span asp-validation-for="ContrasenaHash" class="text-danger small"></span>
         </div>
 
-        <!-- Rol (oculto pero enviado) -->
+        <div class="mb-3">
+            <label class="form-label fw-semibold"><i class="bi bi-patch-check-fill"></i> Certificaciones</label>
+            <div class="p-3 border rounded">
+                @if (certificaciones.Any())
+                {
+                    @foreach (var cert in certificaciones)
+                    {
+                        <div class="form-check">
+                            @* El atributo 'name' debe coincidir con el parámetro List<int> del método POST *@
+                            <input class="form-check-input" type="checkbox" name="certificacionesSeleccionadas" value="@cert.CertificacionID" id="cert_@cert.CertificacionID">
+                            <label class="form-check-label" for="cert_@cert.CertificacionID">
+                                @cert.Nombre
+                            </label>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted small mb-0">No hay certificaciones registradas en el sistema.</p>
+                }
+            </div>
+        </div>
         <input type="hidden" asp-for="RolID" />
 
-        <!-- Opcional: mostrar el nombre del rol fijo, solo como info -->
         <div class="mb-3">
             <label class="form-label fw-semibold">Rol asignado</label>
-            <input type="text" class="form-control" value="Psicólogo" disabled />
+            <input type="text" class="form-control" value="Psicólogo" disabled readonly />
         </div>
 
         <button type="submit" class="btn btn-primary w-100 fw-semibold">Crear Psicólogo</button>

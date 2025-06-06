@@ -204,18 +204,19 @@ namespace Sistema_Tea.Controllers
             TempData["SuccessMessage"] = "Administrador eliminado correctamente.";
             return RedirectToAction("ListarAdministradores");
         }
-        public IActionResult CrearPsicologo()
+
+
+        public async Task<IActionResult> CrearPsicologo()
         {
-            var roles = _context.Rol.ToList();
-            var rolPsicologo = roles.FirstOrDefault(r => r.NombreRol == "Psicologo");
+            var rolPsicologo = await _context.Rol.FirstOrDefaultAsync(r => r.NombreRol == "Psicologo");
 
             if (rolPsicologo == null)
             {
                 TempData["ErrorMessage"] = "No se encontró el rol Psicólogo en la base de datos.";
-                return RedirectToAction("Dashboard");
+                return RedirectToAction("Dashboard", "Home");
             }
 
-            ViewBag.Roles = new SelectList(roles, "RolID", "NombreRol", rolPsicologo.RolID);
+            ViewData["Certificaciones"] = await _context.Certificacion.OrderBy(c => c.Nombre).ToListAsync();
 
             var nuevoPsicologo = new Usuario
             {
@@ -227,42 +228,51 @@ namespace Sistema_Tea.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CrearPsicologo(Usuario model)
+        public async Task<IActionResult> CrearPsicologo(Usuario model, List<int> certificacionesSeleccionadas)
         {
+            if (await _context.Usuario.AnyAsync(u => u.Email == model.Email))
+            {
+                ModelState.AddModelError("Email", "El correo electrónico ya está registrado.");
+            }
+            if (await _context.Usuario.AnyAsync(u => u.Dui == model.Dui))
+            {
+                ModelState.AddModelError("Dui", "El DUI ya está registrado.");
+            }
+
             var rolPsicologo = await _context.Rol.FirstOrDefaultAsync(r => r.NombreRol == "Psicologo");
             if (rolPsicologo == null)
             {
                 ModelState.AddModelError("", "No se encontró el rol Psicólogo.");
-                return View("Admin/CrearPsicologo", model);
             }
-
-            model.RolID = rolPsicologo.RolID;
+            else
+            {
+                model.RolID = rolPsicologo.RolID;
+            }
             ModelState.Remove("RolID");
-
-            if (await _context.Usuario.AnyAsync(u => u.Email == model.Email))
+            if (ModelState.IsValid)
             {
-                ModelState.AddModelError("Email", "El correo electrónico ya está registrado.");
-                var roles = await _context.Rol.ToListAsync();
-                ViewBag.Roles = new SelectList(roles, "RolID", "NombreRol", model.RolID);
-                return View("Admin/CrearPsicologo", model);
+                model.ContrasenaHash = HashPassword(model.ContrasenaHash); // Asegúrate de tener tu método HashPassword
+                model.FechaCreacion = DateTime.Now;
+                model.Activo = true;
+                _context.Usuario.Add(model);
+                if (certificacionesSeleccionadas != null && certificacionesSeleccionadas.Any())
+                {
+                    foreach (var certId in certificacionesSeleccionadas)
+                    {
+                        model.UsuarioCertificaciones.Add(new UsuarioCertificacion
+                        {
+                            CertificacionID = certId,
+                            FechaObtencion = DateTime.Now
+                        });
+                    }
+                }
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Psicólogo creado correctamente.";
+                return RedirectToAction("ListarPsicologos");
             }
-            if (await _context.Usuario.AnyAsync(u => u.Dui == model.Dui))
-            {
-                ModelState.AddModelError("Dui", "El Dui ya está registrado.");
-                var roles = await _context.Rol.ToListAsync();
-                ViewBag.Roles = new SelectList(roles, "RolID", "NombreRol", model.RolID);
-                return View("Admin/CrearPsicologo", model);
-            }
-
-            model.FechaCreacion = DateTime.Now;
-            model.Activo = true;
-            model.ContrasenaHash = HashPassword(model.ContrasenaHash);
-
-            _context.Usuario.Add(model);
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = "Psicólogo creado correctamente.";
-            return RedirectToAction("ListarPsicologos");
+            ViewData["Certificaciones"] = await _context.Certificacion.OrderBy(c => c.Nombre).ToListAsync();
+            return View("Admin/CrearPsicologo", model);
         }
 
         private string HashPassword(string password)
