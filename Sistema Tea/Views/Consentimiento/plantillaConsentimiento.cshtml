@@ -9,6 +9,27 @@
     <h2>Consentimiento Informado</h2>
 
     <form method="get" asp-action="GenerarConsentimientoPDF" target="_blank">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="filtroPacienteNombre">Filtrar Pacientes (Nombre):</label>
+                <input type="text" id="filtroPacienteNombre" class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label for="filtroPacienteApellido">Filtrar Pacientes (Apellido):</label>
+                <input type="text" id="filtroPacienteApellido" class="form-control" />
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="filtroPacienteDui">Filtrar Pacientes (DUI):</label>
+                <input type="text" id="filtroPacienteDui" class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label for="filtroPacienteFechaRegistro">Filtrar Pacientes (Fecha Registro):</label>
+                <input type="date" id="filtroPacienteFechaRegistro" class="form-control" />
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-md-6">
                 <label for="pacienteId">Seleccionar Paciente:</label>
@@ -31,6 +52,19 @@
             </div>
 
             <div class="col-md-6">
+                <label for="filtroPsicologoNombre">Filtrar Psicólogos (Nombre):</label>
+                <input type="text" id="filtroPsicologoNombre" class="form-control" />
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6 offset-md-6">
+                <label for="filtroPsicologoDui">Filtrar Psicólogos (DUI):</label>
+                <input type="text" id="filtroPsicologoDui" class="form-control" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
                 <label for="psicologoId">Seleccionar Psicólogo:</label>
                 <select class="form-control" name="psicologoId" id="psicologoId" required>
                     <option value="">-- Selecciona --</option>
@@ -49,9 +83,9 @@
 
         <div class="card p-4 mt-3">
             <h4 class="text-center">CLÍNICA eMind: Consentimiento Informado para la Evaluación del Trastorno del Espectro Autista con ADOS-2 y ADI-R</h4>
-			<br />
+            <br />
 
-            <p><strong>Fecha y hora:</strong> @DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</p>
+            <p><strong>Fecha y hora:</strong> <span id="fechaHoraActual">@DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</span></p>
 
             <p><strong>Paciente:</strong> <span id="nombrePaciente">[Selecciona un paciente]</span></p>
             <p><strong>DUI:</strong> <span id="duiPaciente">-</span></p>
@@ -86,35 +120,180 @@
         </div>
 
         <button type="submit" class="btn btn-success mt-3">Generar PDF</button>
-        
+
     </form>
-    <form method="get" asp-action="subirArchivo" class="mt-3">
-		<button type="submit" class="btn btn-secondary">Añadir consentimiento</button>
-	</form>
+    <hr />
+    <h4>Subir consentimiento firmado</h4>
+    <form asp-controller="Consentimiento" asp-action="SubirConsentimientoFirmado" method="post" enctype="multipart/form-data" id="formSubidaConsentimiento">
+        <input type="hidden" id="pacienteIdParaSubida" name="pacienteId" />
+        <input type="hidden" name="tipo" value="DatosClinicos" /> @* O 'Investigacion' o 'ExportacionEHR' *@
+        <input type="hidden" name="version" value="1.0" /> @* Puedes ajustar la versión *@
+
+        <div class="mb-3">
+            <label for="archivo" class="form-label">Subir consentimiento firmado (PDF o imagen):</label>
+            <input type="file" class="form-control" id="archivo" name="archivo" accept=".pdf,image/*" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="btnSubirConsentimiento" disabled>Subir Consentimiento Firmado</button>
+    </form>
 </div>
 
-
-
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
-        document.getElementById('pacienteId').addEventListener('change', function () {
-            const selectedOption = this.options[this.selectedIndex];
+        const pacienteSelect = document.getElementById('pacienteId');
+        const psicologoSelect = document.getElementById('psicologoId');
+        const hiddenInput = document.getElementById('pacienteIdParaSubida');
+        const btnSubirConsentimiento = document.getElementById('btnSubirConsentimiento'); // Nuevo: Referencia al botón de subida
 
-            document.getElementById('nombrePaciente').innerText = selectedOption.text;
-            document.getElementById('duiPaciente').innerText = selectedOption.getAttribute('data-dui') || 'N/A';
-            document.getElementById('fechaNacimiento').innerText = selectedOption.getAttribute('data-fecha') || 'N/A';
-            document.getElementById('sexoPaciente').innerText = selectedOption.getAttribute('data-sexo') || 'N/A';
-            document.getElementById('diagnosticoPaciente').innerText = selectedOption.getAttribute('data-diagnostico') || 'Sin diagnóstico';
-            document.getElementById('tutorPaciente').innerText = selectedOption.getAttribute('data-tutor') || 'No aplica';
-            document.getElementById('tutorApellido').innerText = selectedOption.getAttribute('data-tutor-apellido') || '-';
-            document.getElementById('tutorDui').innerText = selectedOption.getAttribute('data-tutor-dui') || '-';
+        // Campos de filtro para pacientes
+        const filtroPacienteNombreInput = document.getElementById('filtroPacienteNombre');
+        const filtroPacienteApellidoInput = document.getElementById('filtroPacienteApellido');
+        const filtroPacienteDuiInput = document.getElementById('filtroPacienteDui');
+        const filtroPacienteFechaRegistroInput = document.getElementById('filtroPacienteFechaRegistro');
+
+        // Campos de filtro para psicólogos
+        const filtroPsicologoNombreInput = document.getElementById('filtroPsicologoNombre');
+        const filtroPsicologoDuiInput = document.getElementById('filtroPsicologoDui');
+
+        // Función para actualizar la plantilla de previsualización con los datos del paciente
+        function actualizarDatosPacienteEnPlantilla() {
+            const opt = pacienteSelect.options[pacienteSelect.selectedIndex];
+
+            document.getElementById('nombrePaciente').innerText = opt.text !== '-- Selecciona --' ? opt.text : '[Selecciona un paciente]';
+            document.getElementById('duiPaciente').innerText = opt.getAttribute('data-dui') || '-';
+            document.getElementById('fechaNacimiento').innerText = opt.getAttribute('data-fecha') || '-';
+            document.getElementById('sexoPaciente').innerText = opt.getAttribute('data-sexo') || '-';
+            document.getElementById('diagnosticoPaciente').innerText = opt.getAttribute('data-diagnostico') || '-';
+            document.getElementById('tutorPaciente').innerText = opt.getAttribute('data-tutor') || 'No aplica';
+            document.getElementById('tutorApellido').innerText = opt.getAttribute('data-tutor-apellido') || '-';
+            document.getElementById('tutorDui').innerText = opt.getAttribute('data-tutor-dui') || '-';
+
+            // Actualizar el hidden input para la subida del archivo
+            hiddenInput.value = opt.value;
+
+            // Habilitar o deshabilitar el botón de subida
+            if (opt.value) { // Si hay un paciente seleccionado (value no es vacío)
+                btnSubirConsentimiento.disabled = false;
+            } else {
+                btnSubirConsentimiento.disabled = true;
+            }
+        }
+
+        // Función para actualizar la plantilla de previsualización con los datos del psicólogo
+        function actualizarDatosPsicologoEnPlantilla() {
+            const opt = psicologoSelect.options[psicologoSelect.selectedIndex];
+            document.getElementById('nombrePsicologo').innerText = opt.getAttribute('data-nombrecompleto') || '[Selecciona un psicólogo]';
+        }
+
+        // Función para cargar pacientes filtrados
+        async function cargarPacientesFiltrados() {
+            const nombre = filtroPacienteNombreInput.value;
+            const apellido = filtroPacienteApellidoInput.value;
+            const dui = filtroPacienteDuiInput.value;
+            const fechaRegistro = filtroPacienteFechaRegistroInput.value; // Formato YYYY-MM-DD
+
+            const url = `/Consentimiento/ObtenerPacientesFiltrados?nombre=${nombre}&apellido=${apellido}&dui=${dui}&fechaRegistro=${fechaRegistro}`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const pacientes = await response.json();
+
+                // Limpiar y rellenar el select de pacientes
+                pacienteSelect.innerHTML = '<option value="">-- Selecciona --</option>';
+                pacientes.forEach(p => {
+                    const option = document.createElement('option');
+                    option.value = p.pacienteID;
+                    option.innerText = p.nombreCompleto;
+                    option.setAttribute('data-dui', p.dui || '');
+                    option.setAttribute('data-fecha', p.fechaNacimiento || '');
+                    option.setAttribute('data-sexo', p.sexo || '');
+                    option.setAttribute('data-diagnostico', p.diagnosticoPrevio || '');
+                    option.setAttribute('data-tutor', p.tutorNombre || '');
+                    option.setAttribute('data-tutor-apellido', p.tutorApellidos || '');
+                    option.setAttribute('data-tutor-dui', p.tutorDui || '');
+                    pacienteSelect.appendChild(option);
+                });
+                // Restablecer la selección y la previsualización
+                pacienteSelect.value = "";
+                actualizarDatosPacienteEnPlantilla(); // Llama a esta función para actualizar el botón de subida también
+
+            } catch (error) {
+                console.error("Error al cargar pacientes:", error);
+                Swal.fire('Error', 'No se pudieron cargar los pacientes filtrados.', 'error');
+            }
+        }
+
+        // Función para cargar psicólogos filtrados
+        async function cargarPsicologosFiltrados() {
+            const nombre = filtroPsicologoNombreInput.value;
+            const dui = filtroPsicologoDuiInput.value;
+
+            const url = `/Consentimiento/ObtenerPsicologosFiltrados?nombre=${nombre}&dui=${dui}`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const psicologos = await response.json();
+
+                // Limpiar y rellenar el select de psicólogos
+                psicologoSelect.innerHTML = '<option value="">-- Selecciona --</option>';
+                psicologos.forEach(ps => {
+                    const option = document.createElement('option');
+                    option.value = ps.usuarioID;
+                    option.innerText = ps.nombreCompleto;
+                    option.setAttribute('data-nombrecompleto', ps.nombreCompleto);
+                    psicologoSelect.appendChild(option);
+                });
+                // Restablecer la selección y la previsualización
+                psicologoSelect.value = "";
+                actualizarDatosPsicologoEnPlantilla();
+
+            } catch (error) {
+                console.error("Error al cargar psicólogos:", error);
+                Swal.fire('Error', 'No se pudieron cargar los psicólogos filtrados.', 'error');
+            }
+        }
+
+        // Event listeners para los cambios en los filtros de paciente
+        filtroPacienteNombreInput.addEventListener('input', cargarPacientesFiltrados);
+        filtroPacienteApellidoInput.addEventListener('input', cargarPacientesFiltrados);
+        filtroPacienteDuiInput.addEventListener('input', cargarPacientesFiltrados);
+        filtroPacienteFechaRegistroInput.addEventListener('change', cargarPacientesFiltrados); // Usar 'change' para input type="date"
+
+        // Event listeners para los cambios en los filtros de psicólogo
+        filtroPsicologoNombreInput.addEventListener('input', cargarPsicologosFiltrados);
+        filtroPsicologoDuiInput.addEventListener('input', cargarPsicologosFiltrados);
+
+        // Event listeners para los selects para actualizar la plantilla
+        pacienteSelect.addEventListener('change', actualizarDatosPacienteEnPlantilla);
+        psicologoSelect.addEventListener('change', actualizarDatosPsicologoEnPlantilla);
+
+        // **Asegúrate de llamar a esta función al cargar la página para que el botón esté deshabilitado inicialmente**
+        document.addEventListener('DOMContentLoaded', function() {
+            actualizarDatosPacienteEnPlantilla();
+            actualizarDatosPsicologoEnPlantilla();
         });
 
-        document.getElementById('psicologoId').addEventListener('change', function () {
-            const selectedOption = this.options[this.selectedIndex];
-            const nombreCompleto = selectedOption.getAttribute('data-nombrecompleto');
-            document.getElementById('nombrePsicologo').innerText = nombreCompleto || '[Selecciona un psicólogo]';
-        });
+
+        // Mensaje tras la subida (si viene TempData desde el controlador)
+        @if (TempData["Success"] != null)
+        {
+            <text>
+                        Swal.fire('Éxito', '@TempData["Success"]', 'success');
+            </text>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <text>
+                        Swal.fire('Error', '@TempData["Error"]', 'error');
+            </text>
+        }
     </script>
 }
-

@@ -12,6 +12,7 @@ using System.IO;
 using Microsoft.EntityFrameworkCore;
 using Sistema_Tea.Models;
 using Sistema_Tea.Models.Data;
+using System.Linq; 
 
 namespace Sistema_Tea.Controllers
 {
@@ -27,18 +28,91 @@ namespace Sistema_Tea.Controllers
             _environment = environment;
         }
 
-
         public IActionResult plantillaConsentimiento()
         {
             var viewModel = new ConsentimientoUserPacie
             {
-                Pacientes = _context.Paciente.Include(p => p.Tutor) 
-                .ToList(),
-                Psicologos = _context.Usuario.Where(u => u.Rol.NombreRol == "Psicologo").ToList()
+                Pacientes = _context.Paciente
+                                .Include(p => p.Tutor)
+                                .Where(p => p.Activo) 
+                                .ToList(),
+                Psicologos = _context.Usuario
+                                .Where(u => u.Rol.NombreRol == "Psicologo" && u.Activo) 
+                                .ToList()
             };
 
             return View(viewModel);
         }
+
+        [HttpGet]
+        public IActionResult ObtenerPacientesFiltrados(string nombre, string apellido, string dui, DateTime? fechaRegistro)
+        {
+            var pacientes = _context.Paciente
+                                .Include(p => p.Tutor)
+                                .Where(p => p.Activo); 
+
+            if (!string.IsNullOrEmpty(nombre))
+            {
+                pacientes = pacientes.Where(p => p.Nombre.Contains(nombre));
+            }
+
+            if (!string.IsNullOrEmpty(apellido))
+            {
+                pacientes = pacientes.Where(p => p.Apellidos.Contains(apellido));
+            }
+
+            if (!string.IsNullOrEmpty(dui))
+            {
+                pacientes = pacientes.Where(p => p.Dui != null && p.Dui.Contains(dui));
+            }
+
+            if (fechaRegistro.HasValue)
+            {
+                pacientes = pacientes.Where(p => p.FechaRegistro.Date == fechaRegistro.Value.Date);
+            }
+
+            var pacientesFiltrados = pacientes.Select(p => new
+            {
+                pacienteID = p.PacienteID,
+                nombreCompleto = p.Nombre + " " + p.Apellidos,
+                dui = p.Dui,
+                fechaNacimiento = p.FechaNacimiento.ToString("dd/MM/yyyy"),
+                sexo = p.Sexo,
+                diagnosticoPrevio = p.DiagnosticoPrevio,
+                tutorNombre = p.Tutor != null ? p.Tutor.Nombre : "No aplica",
+                tutorApellidos = p.Tutor != null ? p.Tutor.Apellidos : "-",
+                tutorDui = p.Tutor != null ? p.Tutor.Dui : "-"
+            }).ToList();
+
+            return Json(pacientesFiltrados);
+        }
+
+        [HttpGet]
+        public IActionResult ObtenerPsicologosFiltrados(string nombre, string dui)
+        {
+            var psicologos = _context.Usuario
+                                .Where(u => u.Rol.NombreRol == "Psicologo" && u.Activo); 
+
+            if (!string.IsNullOrEmpty(nombre))
+            {
+                psicologos = psicologos.Where(u => u.NombreCompleto.Contains(nombre));
+            }
+
+            if (!string.IsNullOrEmpty(dui))
+            {
+                psicologos = psicologos.Where(u => u.Dui.Contains(dui));
+            }
+
+            var psicologosFiltrados = psicologos.Select(u => new
+            {
+                usuarioID = u.UsuarioID,
+                nombreCompleto = u.NombreCompleto
+            }).ToList();
+
+            return Json(psicologosFiltrados);
+        }
+
+
         public IActionResult GenerarConsentimientoPDF(int pacienteId, int psicologoId)
         {
             var paciente = _context.Paciente.Include(p => p.Tutor).FirstOrDefault(p => p.PacienteID == pacienteId);
@@ -97,40 +171,54 @@ namespace Sistema_Tea.Controllers
             byte[] bytes = ms.ToArray();
             return File(bytes, "application/pdf", "Consentimiento_" + paciente.Nombre + ".pdf");
         }
-        public IActionResult subirArchivo()
-        {
-            return View();
-        }
+
         [HttpPost]
-        public async Task<IActionResult> SubirArchivo(IFormFile archivo)
+        public async Task<IActionResult> SubirConsentimientoFirmado(int pacienteId, string tipo, string version, IFormFile archivo)
         {
+            var user = HttpContext.Session.GetInt32("UsuarioID");
             if (archivo == null || archivo.Length == 0)
             {
-                ViewBag.Mensaje = "No se seleccionó ningún archivo.";
-                return View();
+                TempData["Error"] = "Debe seleccionar un archivo válido.";
+                return RedirectToAction("plantillaConsentimiento");
             }
 
-            // Crear nombre único para el archivo
-            var nombreArchivo = Path.GetFileNameWithoutExtension(archivo.FileName);
+            // Generar nombre único
             var extension = Path.GetExtension(archivo.FileName);
-            var nuevoNombre = $"{nombreArchivo}_{DateTime.Now.Ticks}{extension}";
+            var nombreArchivo = $"consentimiento_{pacienteId}_{DateTime.Now.Ticks}{extension}";
+            var rutaCarpeta = Path.Combine(_environment.WebRootPath, "documentos_firmados");
 
-            // Ruta completa dentro de wwwroot
-            var rutaGuardado = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/consentimientos_firmados", nuevoNombre);
+            // Asegurar que la carpeta exista
+            if (!Directory.Exists(rutaCarpeta))
+                Directory.CreateDirectory(rutaCarpeta);
 
-            // Guardar el archivo
-            using (var stream = new FileStream(rutaGuardado, FileMode.Create))
+            var rutaArchivo = Path.Combine(rutaCarpeta, nombreArchivo);
+
+            // Guardar el archivo en disco
+            using (var stream = new FileStream(rutaArchivo, FileMode.Create))
             {
                 await archivo.CopyToAsync(stream);
             }
 
-            // Generar la URL de acceso al archivo
-            var urlArchivo = $"/consentimientos_firmados/{nuevoNombre}";
-            ViewBag.UrlArchivo = urlArchivo;
+            // Construir la URL pública
+            var urlArchivo = $"/documentos_firmados/{nombreArchivo}";
 
-            return View();
+            // Crear el objeto consentimiento
+            var consentimiento = new Consentimiento
+            {
+                PacienteID = pacienteId,
+                Tipo = tipo, 
+                Version = version,
+                Aprobado = true,
+                FechaAprobacion = DateTime.Now,
+                DocumentoURL = urlArchivo,
+                UsuarioQueAproboID = user 
+            };
+
+            _context.Consentimiento.Add(consentimiento);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Consentimiento firmado subido exitosamente.";
+            return RedirectToAction("plantillaConsentimiento", new { id = pacienteId });
         }
-
-
     }
 }
