@@ -61,8 +61,12 @@
                 ¿Está seguro que desea pausar la sesión? Podrá reanudarla más tarde.
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <a href="@Url.Action("PausarSesion", "Ados2", new { id = ViewBag.SesionId })" class="btn btn-warning">Sí, pausar</a>
+                <form asp-action="PausarSesion" method="post">
+                    <input type="hidden" name="id" value="@ViewBag.SesionId" />
+                    <input type="hidden" name="nota" value="Pausado por el usuario" />
+
+                    <button type="submit" class="btn btn-warning">Sí, pausar</button>
+                </form>
             </div>
         </div>
     </div>

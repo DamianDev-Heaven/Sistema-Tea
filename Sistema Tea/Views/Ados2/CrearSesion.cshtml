@@ -1,104 +1,185 @@
 ﻿@model Sistema_Tea.Models.ADOS2_Sesion
 @{
-    ViewData["Title"] = "Asignar nueva sesión ADOS-2";
+    ViewData["Title"] = "Nueva Sesión ADOS-2";
 }
 
-<h2>@ViewData["Title"]</h2>
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <style>
+        /* --- ESTILOS PARA LA EXPERIENCIA "MODERNA PERO SENCILLA" --- */
 
-@if (!ViewData.ModelState.IsValid)
-{
-    <div class="alert alert-danger">
-        <ul class="mb-0">
-            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-            {
-                <li>@error.ErrorMessage</li>
+        .form-container {
+            max-width: 680px; /* Ancho ideal para un formulario de una columna */
+            margin: auto;
+            background: #ffffff;
+            padding: 2rem 3rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
+        }
+
+        .form-heading {
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+            font-weight: 700;
+        }
+
+        /* La magia de la animación progresiva */
+        .form-section {
+            opacity: 0.5;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            transform: translateY(10px);
+            pointer-events: none; /* No se puede interactuar si está deshabilitado */
+        }
+
+            .form-section.active {
+                opacity: 1;
+                transform: translateY(0);
+                pointer-events: all;
             }
-        </ul>
-    </div>
+
+        /* Ajustes para el buscador Choices.js */
+        .choices__inner {
+            background-color: #fff;
+            border-color: #ced4da;
+            padding: .5rem 1rem;
+            font-size: 1rem;
+            border-radius: .375rem;
+        }
+
+        .choices[data-type*="select-one"]::after {
+            border-color: #343a40 transparent transparent;
+        }
+
+        .choices.is-open[data-type*="select-one"]::after {
+            border-color: transparent transparent #343a40;
+        }
+
+        /* Ajustes para etiquetas flotantes */
+        .form-floating label {
+            color: #6c757d;
+        }
+    </style>
 }
 
-<form asp-action="CrearSesion" method="post">
-    <div class="form-group">
-        <label asp-for="PacienteID" class="control-label">Paciente</label>
-        <select asp-for="PacienteID" class="form-control" asp-items="ViewBag.Pacientes" id="PacienteID">
-            <option value="">-- Selecciona un paciente --</option>
-        </select>
-        <span asp-validation-for="PacienteID" class="text-danger"></span>
+<div class="container my-5">
+    <div class="form-container">
+        <h2 class="form-heading text-primary">
+            <i class="bi bi-clipboard2-plus-fill me-2"></i>@ViewData["Title"]
+        </h2>
+
+        <form asp-action="CrearSesion" method="post" novalidate>
+
+            <div class="mb-4">
+                <label class="form-label fw-bold">1. Seleccione el Paciente</label>
+                <select asp-for="PacienteID" asp-items="ViewBag.Pacientes"></select>
+                <span asp-validation-for="PacienteID" class="text-danger"></span>
+            </div>
+
+            <div id="session-details-section" class="form-section">
+                <div class="mb-4">
+                    <label class="form-label fw-bold">2. Elija el Módulo</label>
+                    <div id="module-helper" class="form-text text-muted mb-2"></div>
+                    <div class="form-floating">
+                        <select asp-for="Modulo" class="form-select">
+                            <option value="">Seleccione una opción</option>
+                            <option value="T">Módulo T</option>
+                            <option value="1">Módulo 1</option>
+                            <option value="2">Módulo 2</option>
+                            <option value="3">Módulo 3</option>
+                            <option value="4">Módulo 4</option>
+                        </select>
+                        <label asp-for="Modulo">Módulo a Aplicar</label>
+                        <span asp-validation-for="Modulo" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="form-floating">
+                        <input asp-for="EdadEvaluacionMeses" class="form-control" type="text" readonly placeholder="Edad en Meses" />
+                        <label asp-for="EdadEvaluacionMeses">Edad del Paciente (en meses)</label>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4" />
+
+            <div class="d-flex justify-content-end gap-2">
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary px-4">Crear Sesión</button>
+            </div>
+        </form>
     </div>
-
-    <div class="form-group">
-        <label asp-for="Modulo" class="control-label">Módulo</label>
-        <select asp-for="Modulo" class="form-control" id="Modulo">
-            <option value="">-- Selecciona módulo --</option>
-            <option value="T">T</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-        </select>
-        <span asp-validation-for="Modulo" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="EdadEvaluacionMeses" class="control-label">Edad en meses</label>
-        <input asp-for="EdadEvaluacionMeses" class="form-control" type="number" id="EdadEvaluacionMeses" readonly />
-        <span asp-validation-for="EdadEvaluacionMeses" class="text-danger"></span>
-    </div>
-
-    <div id="mensajeEdad" class="text-info font-weight-bold mb-3"></div>
-
-    <button type="submit" class="btn btn-success">Guardar sesión</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-</form>
+</div>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
     <script>
-        document.getElementById("PacienteID").addEventListener("change", function () {
-            const pacienteId = this.value;
-            const moduloSelect = document.getElementById("Modulo");
-            const edadInput = document.getElementById("EdadEvaluacionMeses");
-            const mensajeDiv = document.getElementById("mensajeEdad");
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- CONFIGURACIÓN ---
+            const pacienteSelectElement = document.getElementById('PacienteID');
+            const sessionDetailsSection = document.getElementById('session-details-section');
+            const moduloSelect = document.getElementById('Modulo');
+            const edadInput = document.getElementById('EdadEvaluacionMeses');
+            const moduleHelper = document.getElementById('module-helper');
 
-            if (!pacienteId) {
-                edadInput.value = "";
-                mensajeDiv.innerHTML = "";
-                Array.from(moduloSelect.options).forEach(option => {
-                    if (option.value !== "") {
-                        option.disabled = false;
-                    }
-                });
-                return;
-            }
+            // Inicializamos el buscador de pacientes
+            const choices = new Choices(pacienteSelectElement, {
+                searchPlaceholderValue: 'Escribe para buscar...',
+                itemSelectText: 'Seleccionar',
+                placeholder: true,
+                placeholderValue: '-- Busca un paciente --',
+                allowHTML: false
+            });
 
-            fetch(`/Ados2/ObtenerEdadYModulos?pacienteId=${pacienteId}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.error) {
-                        alert(data.error);
-                        return;
-                    }
+            // --- LÓGICA DE INTERACCIÓN ---
+            pacienteSelectElement.addEventListener('change', async function (event) {
+                const pacienteId = event.target.value;
 
+                if (!pacienteId) {
+                    // Si se deselecciona, ocultamos la sección
+                    sessionDetailsSection.classList.remove('active');
+                    return;
+                }
+
+                // Hacemos la llamada para obtener los datos
+                try {
+                    const response = await fetch(`/Ados2/ObtenerEdadYModulos?pacienteId=${pacienteId}`);
+                    if (!response.ok) throw new Error('Error al contactar al servidor.');
+
+                    const data = await response.json();
+                    if (data.error) throw new Error(data.error);
+
+                    // Llenamos los campos con los nuevos datos
                     edadInput.value = data.edadMeses;
+                    moduleHelper.textContent = `Módulos recomendados para esta edad: ${data.modulos.join(', ')}.`;
 
-                    mensajeDiv.innerHTML = `Módulos recomendados: ${data.modulos.join(', ')}`;
-
+                    // Habilitamos/deshabilitamos las opciones del módulo
                     Array.from(moduloSelect.options).forEach(option => {
-                        if (option.value !== "") {
-                            option.disabled = !data.modulos.includes(option.value);
-                            if (option.disabled && option.selected) {
-                                option.selected = false;
-                                moduloSelect.value = "";
-                            }
+                        if (option.value) {
+                             option.disabled = !data.modulos.includes(option.value);
                         }
                     });
-                })
-                .catch(err => {
-                    console.error('Error al obtener datos del paciente:', err);
-                    alert('Error al obtener información del paciente');
-                });
+
+                    // Reseteamos la selección del módulo si la opción actual queda deshabilitada
+                    if(moduloSelect.options[moduloSelect.selectedIndex]?.disabled){
+                        moduloSelect.value = "";
+                    }
+
+                    // La magia: revelamos la siguiente sección con la clase 'active'
+                    sessionDetailsSection.classList.add('active');
+
+                } catch (error) {
+                    console.error("Error:", error);
+                    // Aquí podrías mostrar una notificación de error más elegante si quisieras
+                    alert(error.message);
+                    sessionDetailsSection.classList.remove('active');
+                }
+            });
         });
     </script>
 }

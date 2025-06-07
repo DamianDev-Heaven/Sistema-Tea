@@ -457,7 +457,7 @@ namespace Sistema_Tea.Controllers
                 return NotFound();
 
             sesion.Estado = "Pausado";
-            sesion.MotivoPausaCancelacion = nota; 
+            sesion.MotivoPausaCancelacion = nota;
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Index");
