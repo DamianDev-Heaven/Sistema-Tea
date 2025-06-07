@@ -35,6 +35,8 @@ namespace Sistema_Tea.Models.Data
         public DbSet<Auditoria> Auditoria { get; set; }
         public DbSet<AsignacionPaciente> AsignacionPaciente { get; set; }
         public DbSet<Tutor> Tutor { get; set; }
+        public DbSet<Resultado> Resultado { get; set; }
+
 
 
 

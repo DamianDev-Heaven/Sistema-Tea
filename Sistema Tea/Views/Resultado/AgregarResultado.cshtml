@@ -1,0 +1,59 @@
+﻿@model Sistema_Tea.Models.ResultadoViewModel
+
+@{
+    ViewData["Title"] = "Agregar Resultado";
+}
+
+<link rel="stylesheet" href="~/css/create.css" asp-append-version="true" />
+
+<div class="form-container shadow-sm p-4 rounded-4 mx-auto" style="max-width: 1000px; background: #fff;">
+    <h2 class="mb-4 text-primary fw-bold">Agregar Resultado para @Model.NombrePaciente</h2>
+
+    <form asp-action="AgregarResultado" method="post">
+        <input type="hidden" asp-for="PacienteId" />
+
+        <div class="row g-3">
+            <div class="col-12">
+                <label asp-for="ResultadoAdir" class="form-label fw-semibold">Resultado ADI-R</label>
+                <textarea asp-for="ResultadoAdir" class="form-control" placeholder="Escriba el resultado de la entrevista ADI-R"></textarea>
+                <span asp-validation-for="ResultadoAdir" class="text-danger small"></span>
+            </div>
+
+            <div class="col-12">
+                <label asp-for="ResultadoAdos" class="form-label fw-semibold">Resultado ADOS</label>
+                <textarea asp-for="ResultadoAdos" class="form-control" placeholder="Escriba el resultado de la observación ADOS"></textarea>
+                <span asp-validation-for="ResultadoAdos" class="text-danger small"></span>
+            </div>
+
+            <div class="col-12">
+                <label asp-for="Observaciones" class="form-label fw-semibold">Observaciones</label>
+                <textarea asp-for="Observaciones" class="form-control" placeholder="Observaciones adicionales sobre el paciente"></textarea>
+                <span asp-validation-for="Observaciones" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="ReferidoA" class="form-label fw-semibold">Referido a:</label>
+                <input asp-for="ReferidoA" class="form-control" placeholder="Especialista, institución, etc." />
+                <span asp-validation-for="ReferidoA" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="EstudiosAdicionales" class="form-label fw-semibold">Estudios adicionales:</label>
+                <input asp-for="EstudiosAdicionales" class="form-control" placeholder="Exámenes o evaluaciones complementarias" />
+                <span asp-validation-for="EstudiosAdicionales" class="text-danger small"></span>
+            </div>
+
+            <div class="col-12">
+                <label asp-for="DiagnosticoFinal" class="form-label fw-semibold">Diagnóstico final:</label>
+                <textarea asp-for="DiagnosticoFinal" class="form-control" placeholder="Diagnóstico conclusivo del paciente"></textarea>
+                <span asp-validation-for="DiagnosticoFinal" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success w-100 fw-semibold mt-4">Guardar Resultado</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

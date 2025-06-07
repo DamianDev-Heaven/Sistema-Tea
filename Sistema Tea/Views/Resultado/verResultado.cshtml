@@ -1,0 +1,44 @@
+﻿@model Sistema_Tea.Models.Resultado
+
+@{
+    ViewData["Title"] = "Resultado de Evaluación";
+}
+
+<link rel="stylesheet" href="~/css/create.css" asp-append-version="true" />
+
+<div class="form-container shadow-sm p-4 rounded-4 mx-auto" style="max-width: 800px; background: #fff;">
+    <h2 class="mb-3 text-primary fw-bold">Resultado de Evaluación para <span class="text-secondary">@Model.Paciente.Nombre @Model.Paciente.Apellidos</span></h2>
+    <p class="mb-4"><strong>Fecha de registro:</strong> @Model.FechaRegistro.ToShortDateString()</p>
+
+    <hr />
+
+    <section class="mb-4">
+        <h4 class="fw-semibold text-primary">Resultado ADI-R</h4>
+        <p class="border rounded p-3 bg-light">@Model.ResultadoAdir</p>
+    </section>
+
+    <section class="mb-4">
+        <h4 class="fw-semibold text-primary">Resultado ADOS</h4>
+        <p class="border rounded p-3 bg-light">@Model.ResultadoAdos</p>
+    </section>
+
+    <section class="mb-4">
+        <h4 class="fw-semibold text-primary">Observaciones</h4>
+        <p class="border rounded p-3 bg-light">@Model.Observaciones</p>
+    </section>
+
+    <section class="mb-4">
+        <h4 class="fw-semibold text-primary">Referido a:</h4>
+        <p class="border rounded p-3 bg-light">@Model.ReferidoA</p>
+    </section>
+
+    <section class="mb-4">
+        <h4 class="fw-semibold text-primary">Estudios adicionales:</h4>
+        <p class="border rounded p-3 bg-light">@Model.EstudiosAdicionales</p>
+    </section>
+
+    <section>
+        <h4 class="fw-bold text-primary">Diagnóstico final:</h4>
+        <p class="border rounded p-3 bg-light">@Model.DiagnosticoFinal</p>
+    </section>
+</div>
