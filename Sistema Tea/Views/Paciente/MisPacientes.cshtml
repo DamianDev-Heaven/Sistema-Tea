@@ -60,6 +60,11 @@
                             <a asp-action="VerPacienteP" asp-route-id="@paciente.PacienteID" class="btn btn-sm btn-outline-primary rounded-circle" title="Detalles">
                                 <i class="bi bi-eye-fill"></i>
                             </a>
+                            <a asp-controller="Resultado" asp-action="AgregarResultado" asp-route-id="@paciente.PacienteID" class="btn btn-sm btn-outline-success rounded-circle" title="Resultado">
+                                <i class="bi bi-plus"></i>
+                            </a>
+                            <a asp-controller="Resultado" asp-action="VerResultadoPorPaciente" asp-route-id="@paciente.PacienteID" class="btn btn-sm btn-outline-success rounded-circle" title="Resultado">  <i class="bi bi-check-circle-fill"></i></a>
+
                         </td>
                     </tr>
                 }

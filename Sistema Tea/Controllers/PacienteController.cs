@@ -91,7 +91,7 @@ namespace Sistema_Tea.Controllers
             }
             return View("DetallesTutor", tutor);
         }
-     
+
 
         public IActionResult VerPaciente(int id)
         {
@@ -101,7 +101,7 @@ namespace Sistema_Tea.Controllers
                 TempData["ErrorMessage"] = "No se encontró el paciente.";
                 return RedirectToAction("Index");
             }
-            return View("DetallesPaciente",paciente);
+            return View("DetallesPaciente", paciente);
         }
 
         // En PacienteController.cs
@@ -140,7 +140,7 @@ namespace Sistema_Tea.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var paciente = await _context.Paciente
-                .Include(p => p.Tutor) 
+                .Include(p => p.Tutor)
                 .FirstOrDefaultAsync(p => p.PacienteID == id);
 
             if (paciente != null)
@@ -176,7 +176,7 @@ namespace Sistema_Tea.Controllers
         [HttpGet]
         public IActionResult Registrar(int id)
         {
-            ViewBag.TutorId = id; 
+            ViewBag.TutorId = id;
             return View();
         }
 
@@ -218,7 +218,7 @@ namespace Sistema_Tea.Controllers
             {
                 return NotFound();
             }
-            return View(paciente); 
+            return View(paciente);
         }
 
         [HttpPost]
@@ -239,7 +239,7 @@ namespace Sistema_Tea.Controllers
                 _context.Update(paciente);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Paciente actualizado correctamente.";
-                return RedirectToAction(nameof(Index)); 
+                return RedirectToAction(nameof(Index));
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -249,7 +249,7 @@ namespace Sistema_Tea.Controllers
                 }
                 else
                 {
-                    throw; 
+                    throw;
                 }
             }
             catch (Exception ex)
@@ -290,7 +290,7 @@ namespace Sistema_Tea.Controllers
 
             try
             {
-                
+
                 bool duiDuplicado = await _context.Tutor.AnyAsync(t => t.Dui == tutor.Dui && t.TutorID != tutor.TutorID && t.Activo);
                 if (duiDuplicado)
                 {
@@ -336,10 +336,10 @@ namespace Sistema_Tea.Controllers
             }
 
             var pacientes = await _context.Paciente
-                .Include(p => p.Tutor) 
-                .Where(p => p.Activo && 
-                            _context.AsignacionPaciente.Any(ap => ap.PacienteID == p.PacienteID && 
-                                                                 ap.PsicologoID == userId)) 
+                .Include(p => p.Tutor)
+                .Where(p => p.Activo &&
+                            _context.AsignacionPaciente.Any(ap => ap.PacienteID == p.PacienteID &&
+                                                                 ap.PsicologoID == userId))
                 .ToListAsync();
 
             return View(pacientes);
@@ -366,8 +366,12 @@ namespace Sistema_Tea.Controllers
             }
             return View("DetallesPacienteP", paciente);
         }
-    }
+        public IActionResult VerResultadoP(int id)
+        {
 
+            return View();
+        }
+    }
 
 
 }
