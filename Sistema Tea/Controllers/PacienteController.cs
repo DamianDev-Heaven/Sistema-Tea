@@ -104,8 +104,20 @@ namespace Sistema_Tea.Controllers
             return View("DetallesPaciente",paciente);
         }
 
-        public IActionResult Test()
+        // En PacienteController.cs
+        public async Task<IActionResult> Test()
         {
+            var userId = HttpContext.Session.GetInt32("UsuarioID");
+            if (userId == null) return Unauthorized();
+
+            var certificacionesDelUsuario = await _context.UsuarioCertificacion
+                .Where(uc => uc.UsuarioID == userId)
+                .Include(uc => uc.Certificacion)
+                .Select(uc => uc.Certificacion.Nombre)
+                .ToListAsync();
+
+            ViewBag.UserCertifications = certificacionesDelUsuario;
+
             ViewData["Title"] = "Seleccionar Instrumento de Evaluación";
             return View();
         }
@@ -154,8 +166,6 @@ namespace Sistema_Tea.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
-
         //Tutores 
         public IActionResult IndexTutor()
         {
@@ -219,10 +229,8 @@ namespace Sistema_Tea.Controllers
             {
                 return NotFound();
             }
-
             try
             {
-                
                 if (string.IsNullOrWhiteSpace(paciente.Dui))
                 {
                     paciente.Dui = null;

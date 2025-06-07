@@ -272,6 +272,42 @@
         }
 }
 
+.instrument-card.is-coming-soon {
+    cursor: not-allowed; /* Cambia el cursor para indicar que no es clickeable */
+    opacity: 0.65;
+    position: relative; /* Necesario para el posicionamiento absoluto del badge */
+    overflow: hidden; /* Oculta las partes del badge que se salen de la tarjeta */
+    transition: all 0.3s ease;
+}
+
+    .instrument-card.is-coming-soon:hover {
+        opacity: 0.7;
+        transform: none; /* Evita que la tarjeta se levante al pasar el mouse */
+        box-shadow: var(--emind-shadow-sm); /* Mantiene la sombra base */
+    }
+
+    .instrument-card.is-coming-soon .instrument-card-action span,
+    .instrument-card.is-coming-soon .instrument-card-action i {
+        color: #6c757d; /* Un color de texto más apagado */
+    }
+
+.coming-soon-badge {
+    position: absolute;
+    top: 15px;
+    right: -45px;
+    background-color: var(--emind-warning, #ffc107); /* Usa tu variable de color o un color por defecto */
+    color: #000;
+    padding: 5px 40px;
+    transform: rotate(45deg);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    z-index: 10;
+    letter-spacing: 0.5px;
+}
+
 @@media (max-width: 576px) {
     .instrument-selection-grid {
         grid-template-columns: 1fr;

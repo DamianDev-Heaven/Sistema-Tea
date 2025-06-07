@@ -1,10 +1,10 @@
 ﻿@model Sistema_Tea.Models.Usuario
 @{
     ViewData["Title"] = "Crear Psicólogo";
+    var certificaciones = ViewData["Certificaciones"] as List<Sistema_Tea.Models.Certificacion> ?? new List<Sistema_Tea.Models.Certificacion>();
 }
 
 <link rel="stylesheet" href="~/css/create.css" asp-append-version="true" />
-
 
 <div class="form-container shadow-sm p-4 rounded-4 mx-auto" style="max-width: 480px; background: #fff;">
     <h2 class="mb-4 text-primary fw-bold">Crear Nuevo Psicólogo</h2>
@@ -13,6 +13,23 @@
     {
         <div class="alert alert-success">@TempData["SuccessMessage"]</div>
     }
+    @if (TempData["WarningMessage"] != null)
+    {
+        <div class="alert alert-warning">@TempData["WarningMessage"]</div>
+    }
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            <ul>
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
+
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
     <form asp-action="CrearPsicologo" method="post" novalidate>
         <div class="mb-3">
@@ -22,31 +39,45 @@
         </div>
         <div class="mb-3">
             <label asp-for="Dui" class="form-label fw-semibold"></label>
-            <input asp-for="Dui" class="form-control" placeholder="Ej: 123456789" />
+            <input asp-for="Dui" class="form-control" placeholder="Ej: 12345678-9" />
             <span asp-validation-for="Dui" class="text-danger small"></span>
         </div>
-
         <div class="mb-3">
             <label asp-for="Email" class="form-label fw-semibold"></label>
             <input asp-for="Email" class="form-control" placeholder="correo@ejemplo.com" />
             <span asp-validation-for="Email" class="text-danger small"></span>
         </div>
-
         <div class="mb-3">
             <label asp-for="ContrasenaHash" class="form-label fw-semibold">Contraseña</label>
             <input asp-for="ContrasenaHash" type="password" class="form-control" placeholder="Contraseña segura" />
             <span asp-validation-for="ContrasenaHash" class="text-danger small"></span>
         </div>
-
-        <!-- Rol (oculto pero enviado) -->
+        <div class="mb-3">
+            <label class="form-label fw-semibold"><i class="bi bi-patch-check-fill"></i> Certificaciones</label>
+            <div class="p-3 border rounded">
+                @if (certificaciones.Any())
+                {
+                    @foreach (var cert in certificaciones)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="certificacionesSeleccionadas" value="@cert.CertificacionID" id="cert_@cert.CertificacionID">
+                            <label class="form-check-label" for="cert_@cert.CertificacionID">
+                                @cert.Nombre
+                            </label>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted small mb-0">No hay certificaciones registradas en el sistema.</p>
+                }
+            </div>
+        </div>
         <input type="hidden" asp-for="RolID" />
-
-        <!-- Opcional: mostrar el nombre del rol fijo, solo como info -->
         <div class="mb-3">
             <label class="form-label fw-semibold">Rol asignado</label>
-            <input type="text" class="form-control" value="Psicólogo" disabled />
+            <input type="text" class="form-control" value="Psicólogo" disabled readonly />
         </div>
-
         <button type="submit" class="btn btn-primary w-100 fw-semibold">Crear Psicólogo</button>
     </form>
 </div>

@@ -1,13 +1,26 @@
 ﻿@{
     ViewData["Title"] = "Seleccionar Instrumento de Evaluación";
+    var userCerts = ViewBag.UserCertifications as List<string> ?? new List<string>();
 }
-
 <link rel="stylesheet" href="~/css/select.css" asp-append-version="true" />
-
-
-@{
-    ViewData["Title"] = "Seleccionar Instrumento de Evaluación";
-}
+<style>
+    .instrument-card.requires-cert {
+        position: relative;
+    }
+    .disabled-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background-color: rgba(108, 117, 125, 0.85);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        z-index: 10;
+        pointer-events: none;
+    }
+</style>
 
 <div class="instrument-selection-page-container">
     <div class="text-center mb-4 mb-md-5">
@@ -21,55 +34,127 @@
     </div>
 
     <div class="row gy-4 justify-content-center">
+
         <div class="col-lg-4 col-md-6">
-            <a asp-controller="Ados2" asp-action="Index" class="instrument-card h-100" aria-label="Iniciar o gestionar evaluaciones ADOS-2">
-                <div class="instrument-card-icon-wrapper icon-ados">
-                    <i class="bi bi-puzzle-fill"></i>
-                </div>
-                <h2 class="instrument-card-title">ADOS-2</h2>
-                <p class="instrument-card-description">Escala de Observación para el Diagnóstico del Autismo. Evaluación estandarizada y semi-estructurada de la comunicación, interacción social, juego y comportamientos restringidos/repetitivos.</p>
-                <div class="instrument-card-action mt-auto">
-                    <span>Acceder a ADOS-2</span>
-                    <i class="bi bi-arrow-right-circle-fill"></i>
-                </div>
-            </a>
+            @{
+                if (userCerts.Contains("ADOS-2"))
+                {
+                    // VERSIÓN ACTIVA: El usuario SÍ tiene la certificación.
+                    <a asp-controller="Ados2" asp-action="Index" class="instrument-card h-100" aria-label="Iniciar o gestionar evaluaciones ADOS-2">
+                        <div class="instrument-card-icon-wrapper icon-ados">
+                            <i class="bi bi-puzzle-fill"></i>
+                        </div>
+                        <h2 class="instrument-card-title">ADOS-2</h2>
+                        <p class="instrument-card-description">Escala de Observación para el Diagnóstico del Autismo. Evaluación estandarizada y semi-estructurada de la comunicación, interacción social, juego y comportamientos restringidos/repetitivos.</p>
+                        <div class="instrument-card-action mt-auto">
+                            <span>Acceder a ADOS-2</span>
+                            <i class="bi bi-arrow-right-circle-fill"></i>
+                        </div>
+                    </a>
+                }
+                else
+                {
+                    // VERSIÓN BLOQUEADA: El usuario NO tiene la certificación.
+                    <a href="#" class="instrument-card h-100 requires-cert" data-required-cert="ADOS-2">
+                        <div class="disabled-badge"><i class="bi bi-lock-fill"></i> Se requiere certificación</div>
+                        <div class="instrument-card-icon-wrapper icon-ados">
+                            <i class="bi bi-puzzle-fill"></i>
+                        </div>
+                        <h2 class="instrument-card-title">ADOS-2</h2>
+                        <p class="instrument-card-description">Escala de Observación para el Diagnóstico del Autismo. Evaluación estandarizada y semi-estructurada de la comunicación, interacción social, juego y comportamientos restringidos/repetitivos.</p>
+                        <div class="instrument-card-action mt-auto">
+                            <span>Acceder a ADOS-2</span>
+                            <i class="bi bi-arrow-right-circle-fill"></i>
+                        </div>
+                    </a>
+                }
+            }
         </div>
 
         <div class="col-lg-4 col-md-6">
-            <a asp-controller="Adir" asp-action="Index" class="instrument-card h-100" aria-label="Iniciar o gestionar entrevistas ADI-R">
-                <div class="instrument-card-icon-wrapper icon-adir">
-                    <i class="bi bi-person-lines-fill"></i>
-                </div>
-                <h2 class="instrument-card-title">ADI-R</h2>
-                <p class="instrument-card-description">Entrevista para el Diagnóstico del Autismo - Revisada. Entrevista clínica exhaustiva con padres o cuidadores sobre el historial de desarrollo y comportamientos actuales.</p>
-                <div class="instrument-card-action mt-auto">
-                    <span>Acceder a ADI-R</span>
-                    <i class="bi bi-arrow-right-circle-fill"></i>
-                </div>
-            </a>
+            @{
+                if (userCerts.Contains("ADI-R"))
+                {
+                    <a asp-controller="Adir" asp-action="Index" class="instrument-card h-100" aria-label="Iniciar o gestionar entrevistas ADI-R">
+                        <div class="instrument-card-icon-wrapper icon-adir">
+                            <i class="bi bi-person-lines-fill"></i>
+                        </div>
+                        <h2 class="instrument-card-title">ADI-R</h2>
+                        <p class="instrument-card-description">Entrevista para el Diagnóstico del Autismo - Revisada. Entrevista clínica exhaustiva con padres o cuidadores sobre el historial de desarrollo y comportamientos actuales.</p>
+                        <div class="instrument-card-action mt-auto">
+                            <span>Acceder a ADI-R</span>
+                            <i class="bi bi-arrow-right-circle-fill"></i>
+                        </div>
+                    </a>
+                }
+                else
+                {
+                    <a href="#" class="instrument-card h-100 requires-cert" data-required-cert="ADI-R">
+                        <div class="disabled-badge"><i class="bi bi-lock-fill"></i> Se requiere certificación</div>
+                        <div class="instrument-card-icon-wrapper icon-adir">
+                            <i class="bi bi-person-lines-fill"></i>
+                        </div>
+                        <h2 class="instrument-card-title">ADI-R</h2>
+                        <p class="instrument-card-description">Entrevista para el Diagnóstico del Autismo - Revisada. Entrevista clínica exhaustiva con padres o cuidadores sobre el historial de desarrollo y comportamientos actuales.</p>
+                        <div class="instrument-card-action mt-auto">
+                            <span>Acceder a ADI-R</span>
+                            <i class="bi bi-arrow-right-circle-fill"></i>
+                        </div>
+                    </a>
+                }
+            }
         </div>
 
         <div class="col-lg-4 col-md-6">
-            <a asp-controller="Cars2" asp-action="Index" class="instrument-card h-100" aria-label="Iniciar o gestionar evaluaciones CARS-2">
+            <div class="instrument-card h-100 is-coming-soon" aria-label="Evaluaciones CARS-2 (Próximamente)">
+                <div class="coming-soon-badge">Próximamente</div>
                 <div class="instrument-card-icon-wrapper icon-cars">
                     <i class="bi bi-clipboard-data-fill"></i>
                 </div>
                 <h2 class="instrument-card-title">CARS-2</h2>
                 <p class="instrument-card-description">Escala de Puntuación del Autismo Infantil - Segunda Edición. Instrumento para identificar niños con autismo y evaluar la severidad de los síntomas observados.</p>
                 <div class="instrument-card-action mt-auto">
-                    <span>Acceder a CARS-2</span>
-                    <i class="bi bi-arrow-right-circle-fill"></i>
+                    <span>En desarrollo...</span>
+                    <i class="bi bi-clock-history"></i>
                 </div>
-            </a>
+            </div>
         </div>
     </div>
 
-    @if (TempData["InfoMessage"] != null)
-    {
-        <div class="alert alert-info alert-dismissible fade show mt-4" role="alert">
-            <i class="bi bi-info-circle-fill me-2"></i>
-            <span>@TempData["InfoMessage"]</span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="modal fade" id="certificationModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="modalTitle">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Certificación Requerida
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Entendido</button>
+                </div>
+            </div>
         </div>
-    }
+    </div>
+
 </div>
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const restrictedLinks = document.querySelectorAll('.requires-cert');
+            const certModal = new bootstrap.Modal(document.getElementById('certificationModal'));
+            restrictedLinks.forEach(link => {
+                link.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    const requiredCertName = this.dataset.requiredCert;
+                    const instrumentTitle = this.querySelector('.instrument-card-title').textContent;
+                    const modalBody = document.getElementById('modalBody');
+                    modalBody.innerHTML = `Para acceder al instrumento <strong>${instrumentTitle}</strong>, primero debe obtener la certificación <strong>${requiredCertName}</strong>.`;
+                    certModal.show();
+                });
+            });
+        });
+    </script>
+}
