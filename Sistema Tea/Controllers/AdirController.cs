@@ -197,8 +197,6 @@ namespace Sistema_Tea.Controllers
             return RedirectToAction("Index");
         }
 
-
-        // GET: Adir/VerResultadoGlobal/5
         public async Task<IActionResult> VerResultadoGlobal(int sesionId)
         {
             var datos = await (from rg in _context.ADIR_Resultado
@@ -206,60 +204,67 @@ namespace Sistema_Tea.Controllers
                                join p in _context.Paciente on s.PacienteID equals p.PacienteID
                                join u in _context.Usuario on s.PsicologoID equals u.UsuarioID
                                where s.SesionID == sesionId
-                               select new
+                               select new ResultadoGlobalViewModel
                                {
-                                   s.SesionID,
+                                   SesionID = s.SesionID,
                                    PacienteNombre = p.Nombre + " " + p.Apellidos,
-                                   p.FechaNacimiento,
-                                   s.FechaInicio,
+                                   FechaNacimiento = p.FechaNacimiento,
+                                   FechaInicio = s.FechaInicio,
                                    PsicologoNombre = u.NombreCompleto,
-                                   rg.TipoAlgoritmoUsado,
-                                   rg.ComunicacionSocial_PuntuacionTotal,
-                                   rg.InteraccionSocialReciproca_PuntuacionTotal,
-                                   rg.ComportamientosRepetitivos_PuntuacionTotal,
-                                   rg.ClasificacionADIR,
-                                   rg.NotasResultadoGlobal
+                                   TipoAlgoritmoUsado = rg.TipoAlgoritmoUsado,
+                                   ClasificacionADIR = rg.ClasificacionADIR,
+                                   NotasResultadoGlobal = rg.NotasResultadoGlobal
                                }).FirstOrDefaultAsync();
 
             if (datos == null)
-                return NotFound();
+            {
+                ViewBag.ErrorMessage = "No se encontró la sesión o resultados.";
+                return View("Resultado", new ResultadoGlobalViewModel());
+            }
 
             int edadMeses = ((datos.FechaInicio.Year - datos.FechaNacimiento.Year) * 12) + (datos.FechaInicio.Month - datos.FechaNacimiento.Month);
-            string edadTexto = $"{edadMeses / 12} años y {edadMeses % 12} meses";
+            datos.EdadTexto = $"{edadMeses / 12} años y {edadMeses % 12} meses";
 
-            var historial = await (from r in _context.ADIR_ItemRespondido
-                                   join p in _context.ADIR_Pregunta on r.PreguntaDefinicionID equals p.PreguntaDefinicionID
-                                   where r.SesionID == sesionId
-                                   orderby p.CodigoPregunta
-                                   select new
-                                   {
-                                       p.CodigoPregunta,
-                                       p.TextoPregunta,
-                                       r.CodigoRespuestaAlgoritmo,
-                                       r.NotasObservacionItem
-                                   }).ToListAsync();
+            datos.Historial = await (from r in _context.ADIR_ItemRespondido
+                                     join p in _context.ADIR_Pregunta on r.PreguntaDefinicionID equals p.PreguntaDefinicionID
+                                     where r.SesionID == sesionId
+                                     orderby p.CodigoPregunta
+                                     select new ItemRespondidoViewModel
+                                     {
+                                         CodigoPregunta = p.CodigoPregunta,
+                                         TextoPregunta = p.TextoPregunta,
+                                         NotasObservacionItem = r.NotasObservacionItem
+                                     }).ToListAsync();
 
-            ViewBag.Datos = datos;
-            ViewBag.EdadTexto = edadTexto;
-            ViewBag.Historial = historial;
-
-            return View("Resultado");
+            return View("Resultado", datos);
         }
 
 
         [HttpPost]
-        public async Task<IActionResult> GuardarNotaDiagnostica(int SesionID, string NotaDiagnostica)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GuardarNotaDiagnostica(ResultadoGlobalViewModel model)
         {
-            var resultado = await _context.ADIR_Resultado.FirstOrDefaultAsync(r => r.SesionID == SesionID);
+            var resultado = await _context.ADIR_Resultado.FirstOrDefaultAsync(r => r.SesionID == model.SesionID);
             if (resultado == null)
-                return NotFound();
+            {
+                TempData["ErrorMessage"] = "No se encontró resultado para actualizar.";
+                return RedirectToAction("VerResultadoGlobal", new { sesionId = model.SesionID });
+            }
 
-            resultado.NotasResultadoGlobal = NotaDiagnostica;
-            await _context.SaveChangesAsync();
+            if (string.IsNullOrWhiteSpace(resultado.NotasResultadoGlobal))
+            {
+                resultado.NotasResultadoGlobal = model.NotasResultadoGlobal;
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Nota guardada.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "La nota diagnóstica ya fue registrada y no puede ser modificada.";
+            }
 
-            TempData["SuccessMessage"] = "Nota guardada.";
-            return RedirectToAction(nameof(VerResultadoGlobal), new { sesionId = SesionID });
+            return RedirectToAction("VerResultadoGlobal", new { sesionId = model.SesionID });
         }
+
 
 
 

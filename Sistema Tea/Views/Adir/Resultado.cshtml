@@ -1,70 +1,88 @@
-﻿@{
-    var d = ViewBag.Datos;
-    var historial = ViewBag.Historial as List<dynamic>;
-}
+﻿@model ResultadoGlobalViewModel
 
 <h2>Resultado Global ADI-R</h2>
 <hr />
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success">
-        @TempData["SuccessMessage"]
-    </div>
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
 }
 
-<div class="mb-4">
-    <h4>Información del Paciente</h4>
-    <p><strong>Nombre:</strong> @d.PacienteNombre</p>
-    <p><strong>Fecha de nacimiento:</strong> @d.FechaNacimiento.ToString("dd/MM/yyyy")</p>
-    <p><strong>Edad al momento de evaluación:</strong> @ViewBag.EdadTexto</p>
-    <p><strong>Psicólogo:</strong> @d.PsicologoNombre</p>
-</div>
+@if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+{
+    <div class="alert alert-warning">@ViewBag.ErrorMessage</div>
+}
+else
+{
+    <div class="mb-4">
+        <h4>Información del Paciente</h4>
+        <p><strong>Nombre:</strong> @Model.PacienteNombre</p>
+        <p><strong>Fecha de nacimiento:</strong> @Model.FechaNacimiento.ToString("dd/MM/yyyy")</p>
+        <p><strong>Edad al momento de evaluación:</strong> @Model.EdadTexto</p>
+        <p><strong>Psicólogo:</strong> @Model.PsicologoNombre</p>
+    </div>
 
-<div class="mb-4">
-    <h4>Resultado por Algoritmo: @d.TipoAlgoritmoUsado</h4>
-    <ul>
-        <li><strong>Comunicación:</strong> @d.ComunicacionSocial_PuntuacionTotal</li>
-        <li><strong>Interacción Social:</strong> @d.InteraccionSocialReciproca_PuntuacionTotal</li>
-        <li><strong>Conductas Repetitivas:</strong> @d.ComportamientosRepetitivos_PuntuacionTotal</li>
-    </ul>
-    <p><strong>Clasificación:</strong> <span class="text-success">@d.ClasificacionADIR</span></p>
-</div>
+    <div class="mb-4">
+        <h4>Resultado por Algoritmo: @Model.TipoAlgoritmoUsado</h4>
+        <ul>
+            <li><strong>Comunicación:</strong> @Model.ComunicacionSocial_PuntuacionTotal</li>
+            <li><strong>Interacción Social:</strong> @Model.InteraccionSocialReciproca_PuntuacionTotal</li>
+            <li><strong>Conductas Repetitivas:</strong> @Model.ComportamientosRepetitivos_PuntuacionTotal</li>
+        </ul>
+        <p><strong>Clasificación:</strong> <span class="text-success">@Model.ClasificacionADIR</span></p>
+    </div>
 
-<div class="mb-4">
-    <h4>Historial de Preguntas</h4>
-    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
-        <table class="table table-sm table-bordered">
-            <thead>
-                <tr>
-                    <th>Código</th>
-                    <th>Pregunta</th>
-                    <th>Respuesta</th>
-                    <th>Comentario</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in historial)
-                {
+    <div class="mb-4">
+        <h4>Historial de Preguntas</h4>
+        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+            <table class="table table-sm table-bordered">
+                <thead>
                     <tr>
-                        <td>@item.CodigoPregunta</td>
-                        <td>@item.TextoPregunta</td>
-                        <td>@item.CodigoRespuestaAlgoritmo</td>
-                        <td>@item.NotasObservacionItem</td>
+                        <th>Código</th>
+                        <th>Pregunta</th>
+                        <th>Respuesta</th>
+                        <th>Comentario</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Historial)
+                    {
+                        <tr>
+                            <td>@item.CodigoPregunta</td>
+                            <td>@item.TextoPregunta</td>
+                            <td>@item.CodigoRespuestaAlgoritmo</td>
+                            <td>@item.NotasObservacionItem</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
 
-<hr />
+    <hr />
 
-<form asp-controller="Adir" asp-action="GuardarNotaDiagnostica" method="post">
-    <input type="hidden" name="SesionID" value="@d.SesionID" />
-    <div class="mb-3">
-        <label class="form-label">Nota diagnóstica del psicólogo</label>
-        <textarea name="NotaDiagnostica" class="form-control" rows="4">@d.NotasResultadoGlobal</textarea>
+    <div class="mb-4">
+        <h4>Nota diagnóstica del psicólogo</h4>
+
+        @if (string.IsNullOrWhiteSpace(Model.NotasResultadoGlobal))
+        {
+            <form asp-action="GuardarNotaDiagnostica" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="SesionID" />
+                <textarea asp-for="NotasResultadoGlobal" class="form-control" rows="4" placeholder="Ingrese la nota diagnóstica aquí..."></textarea>
+                <br />
+                <button type="submit" class="btn btn-primary">Guardar Nota</button>
+            </form>
+        }
+        else
+        {
+            <div class="border p-3 bg-light">
+                @Html.Raw(System.Net.WebUtility.HtmlEncode(Model.NotasResultadoGlobal).Replace("\n", "<br />"))
+            </div>
+        }
     </div>
-    <button type="submit" class="btn btn-primary">Guardar Nota</button>
-</form>
+}
