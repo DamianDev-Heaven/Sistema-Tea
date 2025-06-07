@@ -1,96 +1,99 @@
-﻿@model Sistema_Tea.Models.ADIR_Sesion
+﻿@model List<Sistema_Tea.Models.ADIR_Sesion>
 @{
-    ViewData["Title"] = "Asignar nueva sesión ADI-R";
+    ViewData["Title"] = "Listado de Sesiones ADI-R";
 }
+<link rel="stylesheet" href="~/css/InTest.css" asp-append-version="true" />
 
-<h2 class="mb-4">@ViewData["Title"]</h2>
-
-@if (!ViewData.ModelState.IsValid)
-{
-    <div class="alert alert-danger">
-        <ul class="mb-0">
-            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-            {
-                <li>@error.ErrorMessage</li>
-            }
-        </ul>
-    </div>
-}
-
-<form asp-action="CrearSesion" method="post" class="needs-validation" novalidate>
-
-    <!-- Psicólogo: mostrar solo texto -->
-    <div class="mb-3">
-        <label class="form-label">Psicólogo</label>
-        <input type="text" class="form-control" value="@ViewBag.NombrePsicologo" readonly />
+<div class="emind-list-container">
+    <div class="emind-list-header">
+        <h1><i class="bi bi-clipboard2-pulse"></i> @ViewData["Title"]</h1>
+        <a asp-controller="Adir" asp-action="CrearSesion" class="btn emind-btn-primary">
+            <i class="bi bi-plus-circle-fill"></i> Nueva Sesión ADI-R
+        </a>
     </div>
 
-    <!-- Paciente -->
-    <div class="mb-3">
-        <label asp-for="PacienteID" class="form-label">Paciente</label>
-        <select asp-for="PacienteID" class="form-select" asp-items="ViewBag.Pacientes" required id="pacienteSelect">
-            <option value="" selected disabled>-- Selecciona un paciente --</option>
-        </select>
-        <div class="invalid-feedback">
-            Por favor, selecciona un paciente.
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-emind alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-        <span asp-validation-for="PacienteID" class="text-danger"></span>
-    </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-emind alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
-    <!-- Tutor (solo texto, se rellena con JS) -->
-    <div class="mb-3">
-        <label class="form-label">Tutor asignado</label>
-        <input type="text" id="tutorNombre" class="form-control" readonly placeholder="Selecciona un paciente para ver tutor" />
-    </div>
-
-    <!-- Eliminar Edad mental -->
-
-    <div class="mb-3">
-        <label asp-for="EntrevistadoPorNombre" class="form-label">Nombre del entrevistado</label>
-        <input asp-for="EntrevistadoPorNombre" class="form-control" required />
-        <div class="invalid-feedback">Este campo es obligatorio.</div>
-        <span asp-validation-for="EntrevistadoPorNombre" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="RelacionConPaciente" class="form-label">Relación con el paciente</label>
-        <input asp-for="RelacionConPaciente" class="form-control" required />
-        <div class="invalid-feedback">Este campo es obligatorio.</div>
-        <span asp-validation-for="RelacionConPaciente" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-success">Guardar sesión</button>
-    <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
-</form>
-
-@section Scripts {
-    <script>
-        (function () {
-            'use strict';
-            var forms = document.querySelectorAll('.needs-validation');
-            Array.prototype.slice.call(forms).forEach(function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (!form.checkValidity()) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                }, false);
-            });
-        })();
-
-        // Lista de pacientes con tutor, pasada desde el controlador
-        const pacientes = @Html.Raw(ViewBag.PacientesConTutorJson ?? "[]");
-
-        // Cuando cambie paciente, actualizar tutor
-        document.getElementById('pacienteSelect').addEventListener('change', function () {
-            const selectedId = this.value;
-            const paciente = pacientes.find(p => p.PacienteID == selectedId);
-            if (paciente && paciente.TutorNombre) {
-                document.getElementById('tutorNombre').value = paciente.TutorNombre;
-            } else {
-                document.getElementById('tutorNombre').value = 'Sin tutor asignado';
-            }
-        });
-    </script>
-}
+    @if (Model == null || !Model.Any())
+    {
+        <div class="text-center p-4 p-md-5 my-4 empty-state-container">
+            <i class="bi bi-folder-x"></i>
+            <h4 class="mt-3">No hay sesiones ADI-R registradas.</h4>
+            <p>Puedes asignar una nueva sesión haciendo clic en "Nueva Sesión ADI-R".</p>
+        </div>
+    }
+    else
+    {
+        <div class="emind-table-wrapper">
+            <div class="table-responsive-custom">
+                <table class="table emind-table" id="tablaSesionesAdir">
+                    <thead>
+                        <tr>
+                            <th>Paciente</th>
+                            <th>Entrevistado</th>
+                            <th>Psicólogo</th>
+                            <th>Fecha de Inicio</th>
+                            <th class="text-center">Estado</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var sesion in Model)
+                        {
+                            string paciente = sesion.Paciente?.Nombre + " " + sesion.Paciente?.Apellidos;
+                            string psicologo = sesion.Psicologo?.NombreCompleto;
+                            <tr>
+                                <td>@paciente</td>
+                                <td>@sesion.EntrevistadoPorNombre (@sesion.RelacionConPaciente)</td>
+                                <td>@psicologo</td>
+                                <td>@sesion.FechaInicio.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td class="text-center">
+                                    <span class="badge-status badge-status-@sesion.Estado?.ToLower().Replace(" ", "")">@sesion.Estado</span>
+                                </td>
+                                <td class="text-end">
+                                    @switch (sesion.Estado?.ToLower().Replace(" ", ""))
+                                    {
+                                        case "pendiente":
+                                            <a asp-action="IniciarEvaluacion" asp-route-id="@sesion.SesionID" class="btn btn-sm btn-success">
+                                                <i class="bi bi-play-fill"></i> Iniciar
+                                            </a>
+                                            break;
+                                        case "enprogreso":
+                                            <a asp-action="ReanudarSesion" asp-route-id="@sesion.SesionID" class="btn btn-sm btn-primary">
+                                                <i class="bi bi-arrow-clockwise"></i> Reanudar
+                                            </a>
+                                            break;
+                                        case "completado":
+                                            <span class="text-muted"><i class="bi bi-check-circle"></i> Finalizado</span>
+                                            break;
+                                        case "pausado":
+                                            <a asp-action="ReanudarSesion" asp-route-id="@sesion.SesionID" class="btn btn-sm btn-warning">
+                                                <i class="bi bi-play-fill"></i> Continuar
+                                            </a>
+                                            break;
+                                        case "cancelado":
+                                            <span class="text-danger"><i class="bi bi-x-circle"></i> Cancelado</span>
+                                            break;
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

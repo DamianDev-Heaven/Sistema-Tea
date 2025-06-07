@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Sistema_Tea.Models;
 using Sistema_Tea.Models.Data;
 
@@ -37,6 +38,10 @@ namespace Sistema_Tea.Controllers
             if (psicologoId == null)
                 return RedirectToAction("Login", "Cuenta");
 
+            // Obtener el psicólogo para mostrar su nombre (desde sesión)
+            var psicologo = await _context.Usuario.FindAsync(psicologoId);
+
+            // Pacientes asignados con tutor
             var pacientesAsignados = await (
                 from ap in _context.AsignacionPaciente
                 join p in _context.Paciente on ap.PacienteID equals p.PacienteID
@@ -45,7 +50,7 @@ namespace Sistema_Tea.Controllers
                 {
                     p.PacienteID,
                     NombreCompleto = p.Nombre + " " + p.Apellidos,
-                    TutorNombre = p.Tutor
+                    Tutor = p.Tutor 
                 }
             ).ToListAsync();
 
@@ -55,10 +60,15 @@ namespace Sistema_Tea.Controllers
                 Text = p.NombreCompleto
             }).ToList();
 
+            // Serializado para usarlo en JavaScript y mostrar tutor al seleccionar paciente
             ViewBag.PacientesDatosJson = Newtonsoft.Json.JsonConvert.SerializeObject(pacientesAsignados);
+
+            ViewBag.NombrePsicologo = psicologo?.NombreCompleto ?? "Psicólogo";
 
             return View();
         }
+
+
 
         [HttpPost]
         public async Task<IActionResult> CrearSesion(ADIR_Sesion sesion, string NuevoPacienteNombre, string PsicologoNombre)
