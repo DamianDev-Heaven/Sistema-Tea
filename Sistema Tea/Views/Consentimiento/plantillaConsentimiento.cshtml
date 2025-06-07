@@ -3,297 +3,128 @@
 @{
     ViewBag.Title = "Consentimiento Informado";
 }
-<link rel="stylesheet" href="~/css/create.css" asp-append-version="true" />
 
-<div class="form-container shadow-sm p-4 rounded-4 mx-auto" style="max-width: 1000px; background: #fff;">
-    <h2>Consentimiento Informado</h2>
-
-    <form method="get" asp-action="GenerarConsentimientoPDF" target="_blank">
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label for="filtroPacienteNombre">Filtrar Pacientes (Nombre):</label>
-                <input type="text" id="filtroPacienteNombre" class="form-control" />
-            </div>
-            <div class="col-md-6">
-                <label for="filtroPacienteApellido">Filtrar Pacientes (Apellido):</label>
-                <input type="text" id="filtroPacienteApellido" class="form-control" />
-            </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label for="filtroPacienteDui">Filtrar Pacientes (DUI):</label>
-                <input type="text" id="filtroPacienteDui" class="form-control" />
-            </div>
-            <div class="col-md-6">
-                <label for="filtroPacienteFechaRegistro">Filtrar Pacientes (Fecha Registro):</label>
-                <input type="date" id="filtroPacienteFechaRegistro" class="form-control" />
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6">
-                <label for="pacienteId">Seleccionar Paciente:</label>
-                <select class="form-control" name="pacienteId" id="pacienteId" required>
-                    <option value="">-- Selecciona --</option>
-                    @foreach (var paciente in Model.Pacientes)
-                    {
-                        <option value="@paciente.PacienteID"
-                                data-dui="@paciente.Dui"
-                                data-fecha="@paciente.FechaNacimiento.ToString("dd/MM/yyyy")"
-                                data-sexo="@paciente.Sexo"
-                                data-diagnostico="@paciente.DiagnosticoPrevio"
-                                data-tutor="@paciente.Tutor?.Nombre"
-                                data-tutor-apellido="@paciente.Tutor?.Apellidos"
-                                data-tutor-dui="@paciente.Tutor?.Dui">
-                            @paciente.Nombre @paciente.Apellidos
-                        </option>
-                    }
-                </select>
-            </div>
-
-            <div class="col-md-6">
-                <label for="filtroPsicologoNombre">Filtrar Psicólogos (Nombre):</label>
-                <input type="text" id="filtroPsicologoNombre" class="form-control" />
-            </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col-md-6 offset-md-6">
-                <label for="filtroPsicologoDui">Filtrar Psicólogos (DUI):</label>
-                <input type="text" id="filtroPsicologoDui" class="form-control" />
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6">
-                <label for="psicologoId">Seleccionar Psicólogo:</label>
-                <select class="form-control" name="psicologoId" id="psicologoId" required>
-                    <option value="">-- Selecciona --</option>
-                    @foreach (var psicologo in Model.Psicologos)
-                    {
-                        <option value="@psicologo.UsuarioID"
-                                data-nombrecompleto="@psicologo.NombreCompleto ">
-                            @psicologo.NombreCompleto
-                        </option>
-                    }
-                </select>
-            </div>
-        </div>
-
-        <hr />
-
-        <div class="card p-4 mt-3">
-            <h4 class="text-center">CLÍNICA eMind: Consentimiento Informado para la Evaluación del Trastorno del Espectro Autista con ADOS-2 y ADI-R</h4>
-            <br />
-
-            <p><strong>Fecha y hora:</strong> <span id="fechaHoraActual">@DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</span></p>
-
-            <p><strong>Paciente:</strong> <span id="nombrePaciente">[Selecciona un paciente]</span></p>
-            <p><strong>DUI:</strong> <span id="duiPaciente">-</span></p>
-            <p><strong>Fecha de Nacimiento:</strong> <span id="fechaNacimiento">-</span></p>
-            <p><strong>Sexo:</strong> <span id="sexoPaciente">-</span></p>
-            <p><strong>Diagnóstico Previo:</strong> <span id="diagnosticoPaciente">-</span></p>
-            <p><strong>Tutor Legal:</strong> <span id="tutorPaciente">[No aplica]</span></p>
-            <p><strong>Apellido del Tutor:</strong> <span id="tutorApellido">-</span></p>
-            <p><strong>DUI del Tutor:</strong> <span id="tutorDui">-</span></p>
-
-            <p><strong>Psicólogo Responsable:</strong> <span id="nombrePsicologo">[Selecciona un psicólogo]</span></p>
-
-            <br />
-
-            <p>
-                Declaro que he sido informado(a) clara y detalladamente sobre el proceso de intervención psicológica que recibiré.
-                Entiendo los objetivos de las evaluaciones, las técnicas a emplearse, así como los beneficios y posibles riesgos asociados.
-            </p>
-            <p>
-                Me comprometo a colaborar activamente en las sesiones, respetando los acuerdos establecidos con el/la psicólogo/a.
-                Sé que tengo derecho a interrumpir el proceso terapéutico si así lo decido.
-            </p>
-            <p>
-                Acepto que la información compartida durante la terapia será tratada con estricta confidencialidad y no será divulgada a terceros sin mi consentimiento, salvo en situaciones contempladas por la ley o cuando exista riesgo para mi integridad o la de otros.
-            </p>
-            <p>
-                Conforme a la Ley de Protección de Datos Personales vigente en El Salvador, autorizo el tratamiento responsable de mis datos personales únicamente para fines clínicos y administrativos relacionados con esta atención.
-            </p>
-
-            <p class="mt-4"><strong>Firma del paciente o tutor legal:</strong> ___________________________</p>
-            <p><strong>Firma del psicólogo:</strong> ___________________________</p>
-        </div>
-
-        <button type="submit" class="btn btn-success mt-3">Generar PDF</button>
-
-    </form>
-    <hr />
-    <h4>Subir consentimiento firmado</h4>
-    <form asp-controller="Consentimiento" asp-action="SubirConsentimientoFirmado" method="post" enctype="multipart/form-data" id="formSubidaConsentimiento">
-        <input type="hidden" id="pacienteIdParaSubida" name="pacienteId" />
-        <input type="hidden" name="tipo" value="DatosClinicos" /> @* O 'Investigacion' o 'ExportacionEHR' *@
-        <input type="hidden" name="version" value="1.0" /> @* Puedes ajustar la versión *@
-
-        <div class="mb-3">
-            <label for="archivo" class="form-label">Subir consentimiento firmado (PDF o imagen):</label>
-            <input type="file" class="form-control" id="archivo" name="archivo" accept=".pdf,image/*" required />
-        </div>
-
-        <button type="submit" class="btn btn-primary" id="btnSubirConsentimiento" disabled>Subir Consentimiento Firmado</button>
-    </form>
-</div>
-
-@section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <script>
-        const pacienteSelect = document.getElementById('pacienteId');
-        const psicologoSelect = document.getElementById('psicologoId');
-        const hiddenInput = document.getElementById('pacienteIdParaSubida');
-        const btnSubirConsentimiento = document.getElementById('btnSubirConsentimiento'); // Nuevo: Referencia al botón de subida
-
-        // Campos de filtro para pacientes
-        const filtroPacienteNombreInput = document.getElementById('filtroPacienteNombre');
-        const filtroPacienteApellidoInput = document.getElementById('filtroPacienteApellido');
-        const filtroPacienteDuiInput = document.getElementById('filtroPacienteDui');
-        const filtroPacienteFechaRegistroInput = document.getElementById('filtroPacienteFechaRegistro');
-
-        // Campos de filtro para psicólogos
-        const filtroPsicologoNombreInput = document.getElementById('filtroPsicologoNombre');
-        const filtroPsicologoDuiInput = document.getElementById('filtroPsicologoDui');
-
-        // Función para actualizar la plantilla de previsualización con los datos del paciente
-        function actualizarDatosPacienteEnPlantilla() {
-            const opt = pacienteSelect.options[pacienteSelect.selectedIndex];
-
-            document.getElementById('nombrePaciente').innerText = opt.text !== '-- Selecciona --' ? opt.text : '[Selecciona un paciente]';
-            document.getElementById('duiPaciente').innerText = opt.getAttribute('data-dui') || '-';
-            document.getElementById('fechaNacimiento').innerText = opt.getAttribute('data-fecha') || '-';
-            document.getElementById('sexoPaciente').innerText = opt.getAttribute('data-sexo') || '-';
-            document.getElementById('diagnosticoPaciente').innerText = opt.getAttribute('data-diagnostico') || '-';
-            document.getElementById('tutorPaciente').innerText = opt.getAttribute('data-tutor') || 'No aplica';
-            document.getElementById('tutorApellido').innerText = opt.getAttribute('data-tutor-apellido') || '-';
-            document.getElementById('tutorDui').innerText = opt.getAttribute('data-tutor-dui') || '-';
-
-            // Actualizar el hidden input para la subida del archivo
-            hiddenInput.value = opt.value;
-
-            // Habilitar o deshabilitar el botón de subida
-            if (opt.value) { // Si hay un paciente seleccionado (value no es vacío)
-                btnSubirConsentimiento.disabled = false;
-            } else {
-                btnSubirConsentimiento.disabled = true;
-            }
+@section Styles {
+    <link rel="stylesheet" href="~/css/create.css" asp-append-version="true" />
+    <style>
+        /* 1. Fondo y fuente base */
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
         }
 
-        // Función para actualizar la plantilla de previsualización con los datos del psicólogo
-        function actualizarDatosPsicologoEnPlantilla() {
-            const opt = psicologoSelect.options[psicologoSelect.selectedIndex];
-            document.getElementById('nombrePsicologo').innerText = opt.getAttribute('data-nombrecompleto') || '[Selecciona un psicólogo]';
+        /* 2. Contenedor principal con efecto cristal */
+        .glass-container {
+            max-width: 1000px;
+            margin: 3rem auto;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            overflow: hidden; /* Para que los bordes redondeados se apliquen al contenido */
         }
 
-        // Función para cargar pacientes filtrados
-        async function cargarPacientesFiltrados() {
-            const nombre = filtroPacienteNombreInput.value;
-            const apellido = filtroPacienteApellidoInput.value;
-            const dui = filtroPacienteDuiInput.value;
-            const fechaRegistro = filtroPacienteFechaRegistroInput.value; // Formato YYYY-MM-DD
-
-            const url = `/Consentimiento/ObtenerPacientesFiltrados?nombre=${nombre}&apellido=${apellido}&dui=${dui}&fechaRegistro=${fechaRegistro}`;
-
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const pacientes = await response.json();
-
-                // Limpiar y rellenar el select de pacientes
-                pacienteSelect.innerHTML = '<option value="">-- Selecciona --</option>';
-                pacientes.forEach(p => {
-                    const option = document.createElement('option');
-                    option.value = p.pacienteID;
-                    option.innerText = p.nombreCompleto;
-                    option.setAttribute('data-dui', p.dui || '');
-                    option.setAttribute('data-fecha', p.fechaNacimiento || '');
-                    option.setAttribute('data-sexo', p.sexo || '');
-                    option.setAttribute('data-diagnostico', p.diagnosticoPrevio || '');
-                    option.setAttribute('data-tutor', p.tutorNombre || '');
-                    option.setAttribute('data-tutor-apellido', p.tutorApellidos || '');
-                    option.setAttribute('data-tutor-dui', p.tutorDui || '');
-                    pacienteSelect.appendChild(option);
-                });
-                // Restablecer la selección y la previsualización
-                pacienteSelect.value = "";
-                actualizarDatosPacienteEnPlantilla(); // Llama a esta función para actualizar el botón de subida también
-
-            } catch (error) {
-                console.error("Error al cargar pacientes:", error);
-                Swal.fire('Error', 'No se pudieron cargar los pacientes filtrados.', 'error');
-            }
+        /* 3. Encabezado */
+        .page-header {
+            padding: 2rem 2.5rem;
+            background-color: rgba(255,255,255,0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .page-header h2 {
+            font-weight: 700;
+            color: #1c2a4d;
+            margin: 0;
+        }
+        
+        .main-content {
+            padding: 2.5rem;
         }
 
-        // Función para cargar psicólogos filtrados
-        async function cargarPsicologosFiltrados() {
-            const nombre = filtroPsicologoNombreInput.value;
-            const dui = filtroPsicologoDuiInput.value;
-
-            const url = `/Consentimiento/ObtenerPsicologosFiltrados?nombre=${nombre}&dui=${dui}`;
-
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const psicologos = await response.json();
-
-                // Limpiar y rellenar el select de psicólogos
-                psicologoSelect.innerHTML = '<option value="">-- Selecciona --</option>';
-                psicologos.forEach(ps => {
-                    const option = document.createElement('option');
-                    option.value = ps.usuarioID;
-                    option.innerText = ps.nombreCompleto;
-                    option.setAttribute('data-nombrecompleto', ps.nombreCompleto);
-                    psicologoSelect.appendChild(option);
-                });
-                // Restablecer la selección y la previsualización
-                psicologoSelect.value = "";
-                actualizarDatosPsicologoEnPlantilla();
-
-            } catch (error) {
-                console.error("Error al cargar psicólogos:", error);
-                Swal.fire('Error', 'No se pudieron cargar los psicólogos filtrados.', 'error');
-            }
+        /* 4. Estilos para las secciones */
+        .section-card {
+            background-color: rgba(255,255,255,0.4);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
-        // Event listeners para los cambios en los filtros de paciente
-        filtroPacienteNombreInput.addEventListener('input', cargarPacientesFiltrados);
-        filtroPacienteApellidoInput.addEventListener('input', cargarPacientesFiltrados);
-        filtroPacienteDuiInput.addEventListener('input', cargarPacientesFiltrados);
-        filtroPacienteFechaRegistroInput.addEventListener('change', cargarPacientesFiltrados); // Usar 'change' para input type="date"
-
-        // Event listeners para los cambios en los filtros de psicólogo
-        filtroPsicologoNombreInput.addEventListener('input', cargarPsicologosFiltrados);
-        filtroPsicologoDuiInput.addEventListener('input', cargarPsicologosFiltrados);
-
-        // Event listeners para los selects para actualizar la plantilla
-        pacienteSelect.addEventListener('change', actualizarDatosPacienteEnPlantilla);
-        psicologoSelect.addEventListener('change', actualizarDatosPsicologoEnPlantilla);
-
-        // **Asegúrate de llamar a esta función al cargar la página para que el botón esté deshabilitado inicialmente**
-        document.addEventListener('DOMContentLoaded', function() {
-            actualizarDatosPacienteEnPlantilla();
-            actualizarDatosPsicologoEnPlantilla();
-        });
-
-
-        // Mensaje tras la subida (si viene TempData desde el controlador)
-        @if (TempData["Success"] != null)
-        {
-            <text>
-                        Swal.fire('Éxito', '@TempData["Success"]', 'success');
-            </text>
+        .section-title {
+            font-weight: 600;
+            color: #0d6efd;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
-        @if (TempData["Error"] != null)
-        {
-            <text>
-                        Swal.fire('Error', '@TempData["Error"]', 'error');
-            </text>
+
+        /* 5. Estilos para los campos del formulario */
+        .form-label {
+            font-weight: 500;
+            color: #344061;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
         }
-    </script>
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 1px solid #ced4da;
+            background-color: rgba(255,255,255,0.5);
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            background-color: white;
+        }
+
+        /* 6. Estilos para el panel de previsualización */
+        .preview-pane {
+            background-color: #f8f9fa;
+            border: 1px dashed #dee2e6;
+            border-radius: 15px;
+        }
+        .preview-pane p {
+            margin-bottom: 0.75rem;
+        }
+        .preview-pane p strong {
+            color: #344061;
+        }
+        .preview-pane span {
+            color: #0d6efd;
+            font-weight: 500;
+            background-color: rgba(13,110,253,0.08);
+            padding: 2px 6px;
+            border-radius: 5px;
+        }
+
+        /* 7. Botones */
+        .btn {
+            border-radius: 50px;
+            font-weight: 600;
+            padding: 0.6rem 1.5rem;
+            border: none;
+        }
+        .btn-success {
+            background: linear-gradient(45deg, #198754, #157347);
+        }
+        .btn-primary {
+             background: linear-gradient(45deg, #0d6efd, #0b5ed7);
+        }
+        .btn-primary:disabled {
+            background: #e9ecef;
+            border-color: #e9ecef;
+        }
+    </style>
 }
+
+<div class="glass-container mx-auto">
+    <div class="page-header">
+        <h2><i class="bi bi-file-text-fill me-2"></i>@ViewBag.Title</h2>
+    </div>
+
+    <div class="main-content">
+        <div class="section-card">
+            <h5 class="section-title"><i class="bi bi-filter-circle-fill"></i>Filtros y Selección de Participantes</h5>
+            <form method="
