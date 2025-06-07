@@ -21,6 +21,7 @@ namespace Sistema_Tea.Models.Data
         public DbSet<ADOS2_ItemPuntuado> ADOS2_ItemPuntuado { get; set; }
 
         public DbSet<ADIR_Sesion> ADIR_Sesion { get; set; }
+        public DbSet<ADIR_ItemRespondido> ADIR_ItemRespondido { get; set; }
         public DbSet<ADIR_PreguntaDefinicion> ADIR_Pregunta { get; set; }
         public DbSet<ADIR_ResultadoGlobalSesion> ADIR_Resultado { get; set; }
 

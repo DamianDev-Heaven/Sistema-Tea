@@ -1,0 +1,100 @@
+﻿@model Sistema_Tea.Models.ADIR_Sesion
+@{
+    ViewData["Title"] = "Asignar nueva sesión ADI-R";
+}
+
+<h2 class="mb-4">@ViewData["Title"]</h2>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
+<form asp-action="CrearSesion" method="post" class="needs-validation" novalidate>
+
+    <!-- Psicólogo (editable) -->
+    <div class="mb-3">
+        <label for="PsicologoNombre" class="form-label">Psicólogo</label>
+        <input type="text" id="PsicologoNombre" name="PsicologoNombre" class="form-control"
+               value="@ViewBag.NombrePsicologo" required />
+        <div class="invalid-feedback">Por favor ingresa el nombre del psicólogo.</div>
+    </div>
+
+    <!-- Seleccionar paciente existente -->
+    <div class="mb-3">
+        <label asp-for="PacienteID" class="form-label">Selecciona un paciente existente</label>
+        <select asp-for="PacienteID" class="form-select" asp-items="ViewBag.Pacientes">
+            <option value="" selected>-- Ninguno --</option>
+        </select>
+        <span asp-validation-for="PacienteID" class="text-danger"></span>
+    </div>
+
+    <div class="mb-2 text-center">O</div>
+
+    <!-- Agregar paciente nuevo -->
+    <div class="mb-3">
+        <label for="NuevoPacienteNombre" class="form-label">Agregar nuevo paciente (Nombre completo)</label>
+        <input type="text" id="NuevoPacienteNombre" name="NuevoPacienteNombre" class="form-control" />
+        <small class="form-text text-muted">Si agregas un paciente nuevo, se creará antes de la sesión.</small>
+    </div>
+
+    <hr />
+
+    <div class="mb-3">
+        <label asp-for="EntrevistadoPorNombre" class="form-label">Nombre del entrevistado</label>
+        <input asp-for="EntrevistadoPorNombre" class="form-control" required />
+        <div class="invalid-feedback">Este campo es obligatorio.</div>
+        <span asp-validation-for="EntrevistadoPorNombre" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="RelacionConPaciente" class="form-label">Relación con el paciente</label>
+        <input asp-for="RelacionConPaciente" class="form-control" required />
+        <div class="invalid-feedback">Este campo es obligatorio.</div>
+        <span asp-validation-for="RelacionConPaciente" class="text-danger"></span>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="EdadMentalAproximadaAnios" class="form-label">Edad mental estimada (años)</label>
+            <input asp-for="EdadMentalAproximadaAnios" type="number" min="0" class="form-control" required />
+            <div class="invalid-feedback">Ingresa una edad válida en años (0 o más).</div>
+            <span asp-validation-for="EdadMentalAproximadaAnios" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label asp-for="EdadMentalAproximadaMeses" class="form-label">Edad mental estimada (meses)</label>
+            <input asp-for="EdadMentalAproximadaMeses" type="number" min="0" max="11" class="form-control" />
+            <div class="invalid-feedback">Ingresa meses entre 0 y 11.</div>
+            <span asp-validation-for="EdadMentalAproximadaMeses" class="text-danger"></span>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-success">Guardar sesión</button>
+    <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+</form>
+
+@section Scripts {
+    <script>
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })();
+    </script>
+}

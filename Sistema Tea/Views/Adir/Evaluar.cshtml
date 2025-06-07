@@ -1,0 +1,63 @@
+﻿@model List<Sistema_Tea.Models.ADIR_PreguntaDefinicion>
+@{
+    ViewBag.Title = "Evaluación ADI-R";
+    var respuestas = ViewBag.Respuestas as Dictionary<int, Sistema_Tea.Models.ADIR_ItemRespondido>;
+    var sesionId = (int)ViewBag.SesionID;
+    var soloLectura = ViewBag.SoloLectura != null && (bool)ViewBag.SoloLectura;
+    var opciones = new[] { 0, 1, 2, 3, 7, 8, 9 };
+}
+
+<h2>Evaluación ADI-R</h2>
+<form asp-action="GuardarEvaluacion" method="post">
+    <input type="hidden" name="SesionID" value="@sesionId" />
+
+    <div class="accordion" id="accordionPreguntas">
+        @foreach (var pregunta in Model)
+        {
+            var respondida = respuestas != null && respuestas.ContainsKey(pregunta.PreguntaDefinicionID);
+            var respuesta = respondida ? respuestas[pregunta.PreguntaDefinicionID] : null;
+            var respuestaValor = respuesta?.CodigoRespuestaBruta ?? -1;
+            var comentario = respuesta?.NotasObservacionItem ?? "";
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading@pregunta.PreguntaDefinicionID">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse@pregunta.PreguntaDefinicionID">
+                        <strong>@pregunta.CodigoPregunta:</strong> @pregunta.TextoPregunta
+                    </button>
+                </h2>
+                <div id="collapse@pregunta.PreguntaDefinicionID" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <div class="mb-2">
+                            <label><strong>Respuesta:</strong></label>
+                            @foreach (var opcion in opciones)
+                            {
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio"
+                                           name="Respuestas[@pregunta.PreguntaDefinicionID].CodigoRespuestaBruta"
+                                           value="@opcion" @(respuestaValor == opcion ? "checked" : "") @(soloLectura ? "disabled" : "") />
+                                    <label class="form-check-label">@opcion</label>
+                                </div>
+                            }
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Comentarios / Observaciones</label>
+                            <textarea class="form-control" name="Respuestas[@pregunta.PreguntaDefinicionID].NotasObservacionItem" rows="3" @(soloLectura ? "readonly" : "")>@comentario</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (!soloLectura)
+    {
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary">Guardar progreso</button>
+            <a asp-action="FinalizarSesion" asp-route-sesionId="@sesionId" class="btn btn-success">Finalizar Evaluación</a>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info mt-3">Esta sesión ha sido completada. Solo lectura.</div>
+    }
+</form>

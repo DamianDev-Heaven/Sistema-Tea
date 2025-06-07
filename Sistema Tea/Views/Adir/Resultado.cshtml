@@ -1,0 +1,40 @@
+﻿@model Sistema_Tea.Models.ADIR_ResultadoGlobalSesion
+@{
+    ViewBag.Title = "Resultado ADI-R";
+    var algoritmos = new[] {
+        new SelectListItem { Value = "DSM-IV", Text = "Diagnóstico DSM-IV" },
+        new SelectListItem { Value = "DSM-5", Text = "Diagnóstico DSM-5" },
+        new SelectListItem { Value = "Toddler", Text = "Algoritmo para menores de 4 años" },
+    };
+}
+
+<h2>Resultado ADI-R</h2>
+
+<form asp-action="CalcularResultado" method="post">
+    <input type="hidden" name="SesionID" value="@Model.SesionID" />
+
+    <div class="mb-3">
+        <label for="TipoAlgoritmoUsado" class="form-label">Selecciona el algoritmo de diagnóstico:</label>
+        <select class="form-select" id="TipoAlgoritmoUsado" name="TipoAlgoritmoUsado" required>
+            @foreach (var algoritmo in algoritmos)
+            {
+                <option value="@algoritmo.Value">@algoritmo.Text</option>
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Calcular Resultado</button>
+</form>
+
+@if (Model.ClasificacionADIR != null)
+{
+    <div class="mt-4">
+        <h4>Clasificación: <span class="text-success">@Model.ClasificacionADIR</span></h4>
+        <ul class="list-group mt-3">
+            <li class="list-group-item">Puntuación total comunicación social: @Model.ComunicacionSocial_PuntuacionTotal</li>
+            <li class="list-group-item">Puntuación total comportamientos repetitivos: @Model.ComportamientosRepetitivos_PuntuacionTotal</li>
+            <li class="list-group-item">Notas:</li>
+            <li class="list-group-item"><pre>@Model.NotasResultadoGlobal</pre></li>
+        </ul>
+    </div>
+}
