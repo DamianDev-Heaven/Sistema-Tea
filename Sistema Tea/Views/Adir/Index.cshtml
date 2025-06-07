@@ -67,22 +67,26 @@
                                     @switch (sesion.Estado?.ToLower().Replace(" ", ""))
                                     {
                                         case "pendiente":
-                                            <a asp-action="IniciarEvaluacion" asp-route-id="@sesion.SesionID" class="btn btn-sm btn-success">
+                                            <a asp-action="Evaluar" asp-route-sesionId="@sesion.SesionID" class="btn btn-sm btn-success">
                                                 <i class="bi bi-play-fill"></i> Iniciar
                                             </a>
+
                                             break;
                                         case "enprogreso":
-                                            <a asp-action="ReanudarSesion" asp-route-id="@sesion.SesionID" class="btn btn-sm btn-primary">
+                                            <a asp-action="ReanudarSesion" asp-route-sesionId="@sesion.SesionID" class="btn btn-sm btn-primary">
                                                 <i class="bi bi-arrow-clockwise"></i> Reanudar
                                             </a>
+
                                             break;
                                         case "completado":
                                             <span class="text-muted"><i class="bi bi-check-circle"></i> Finalizado</span>
                                             break;
                                         case "pausado":
-                                            <a asp-action="ReanudarSesion" asp-route-id="@sesion.SesionID" class="btn btn-sm btn-warning">
-                                                <i class="bi bi-play-fill"></i> Continuar
+                                            <a asp-action="ReanudarSesion" asp-route-sesionId="@sesion.SesionID" class="btn btn-sm btn-primary">
+                                                <i class="bi bi-arrow-clockwise"></i> Reanudar
                                             </a>
+
+
                                             break;
                                         case "cancelado":
                                             <span class="text-danger"><i class="bi bi-x-circle"></i> Cancelado</span>

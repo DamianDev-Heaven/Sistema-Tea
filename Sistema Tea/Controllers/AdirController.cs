@@ -38,10 +38,8 @@ namespace Sistema_Tea.Controllers
             if (psicologoId == null)
                 return RedirectToAction("Login", "Cuenta");
 
-            // Obtener el psicólogo para mostrar su nombre (desde sesión)
             var psicologo = await _context.Usuario.FindAsync(psicologoId);
 
-            // Pacientes asignados con tutor
             var pacientesAsignados = await (
                 from ap in _context.AsignacionPaciente
                 join p in _context.Paciente on ap.PacienteID equals p.PacienteID
@@ -60,7 +58,6 @@ namespace Sistema_Tea.Controllers
                 Text = p.NombreCompleto
             }).ToList();
 
-            // Serializado para usarlo en JavaScript y mostrar tutor al seleccionar paciente
             ViewBag.PacientesDatosJson = Newtonsoft.Json.JsonConvert.SerializeObject(pacientesAsignados);
 
             ViewBag.NombrePsicologo = psicologo?.NombreCompleto ?? "Psicólogo";
@@ -68,10 +65,8 @@ namespace Sistema_Tea.Controllers
             return View();
         }
 
-
-
         [HttpPost]
-        public async Task<IActionResult> CrearSesion(ADIR_Sesion sesion, string NuevoPacienteNombre, string PsicologoNombre)
+        public async Task<IActionResult> CrearSesion(ADIR_Sesion sesion, string NuevoPacienteNombre)
         {
             var psicologoId = HttpContext.Session.GetInt32("UsuarioID");
             if (psicologoId == null)
@@ -86,7 +81,6 @@ namespace Sistema_Tea.Controllers
                 {
                     Nombre = nombres.Length > 0 ? nombres[0] : NuevoPacienteNombre,
                     Apellidos = nombres.Length > 1 ? nombres[1] : "",
-
                 };
 
                 _context.Paciente.Add(nuevoPaciente);
@@ -102,30 +96,14 @@ namespace Sistema_Tea.Controllers
             sesion.FechaInicio = DateTime.Now;
             sesion.Estado = "Pendiente";
 
-            if (ModelState.IsValid)
-            {
+
                 _context.ADIR_Sesion.Add(sesion);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
-            }
+  
 
-            var pacientesAsignados = await (
-                from ap in _context.AsignacionPaciente
-                join p in _context.Paciente on ap.PacienteID equals p.PacienteID
-                where ap.PsicologoID == psicologoId && ap.Estado == "Asignado"
-                select p
-            ).ToListAsync();
-
-            ViewBag.Pacientes = pacientesAsignados.Select(p => new SelectListItem
-            {
-                Value = p.PacienteID.ToString(),
-                Text = p.Nombre + " " + p.Apellidos
-            }).ToList();
-
-            ViewBag.NombrePsicologo = PsicologoNombre;
-
-            return View(sesion);
         }
+
 
 
         [HttpPost]
@@ -139,22 +117,9 @@ namespace Sistema_Tea.Controllers
             sesion.FechaInicio = DateTime.Now;
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Evaluar", new { sesionId });
+            return RedirectToAction("Index", new { sesionId });
         }
 
-        [HttpGet]
-        public async Task<IActionResult> ReanudarSesion(int sesionId)
-        {
-            var sesion = await _context.ADIR_Sesion.FindAsync(sesionId);
-            if (sesion == null || (sesion.Estado != "EnProgreso" && sesion.Estado != "Pausado"))
-                return NotFound();
-
-            if (sesion.Estado == "Pausado")
-                sesion.Estado = "EnProgreso";
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Evaluar", new { sesionId });
-        }
 
         [HttpPost]
         public async Task<IActionResult> FinalizarSesion(int sesionId)
@@ -174,6 +139,10 @@ namespace Sistema_Tea.Controllers
         [HttpGet]
         public async Task<IActionResult> Evaluar(int sesionId)
         {
+            var sesion = await _context.ADIR_Sesion.FindAsync(sesionId);
+            if (sesion == null)
+                return NotFound();
+
             var preguntas = await _context.ADIR_Pregunta
                 .OrderBy(p => p.CodigoPregunta)
                 .ToListAsync();
@@ -182,25 +151,22 @@ namespace Sistema_Tea.Controllers
                 .Where(r => r.SesionID == sesionId)
                 .ToDictionaryAsync(r => r.PreguntaDefinicionID);
 
-            var sesion = await _context.ADIR_Sesion.FindAsync(sesionId);
-            bool esSoloLectura = sesion != null && sesion.Estado == "Completado";
+            bool esSoloLectura = sesion.Estado == "Completado";
 
             ViewBag.SesionID = sesionId;
             ViewBag.Respuestas = respuestasPrevias;
             ViewBag.SoloLectura = esSoloLectura;
 
-            return View("EvaluarADI", preguntas);
+            return View("Evaluar", preguntas);
         }
 
+
+
         [HttpPost]
-        public async Task<IActionResult> GuardarEvaluacion(int SesionID, Dictionary<int, ADIR_ItemRespondido> Respuestas)
+        public async Task<IActionResult> GuardarEvaluacionPausada(int SesionID, Dictionary<int, ADIR_ItemRespondido> Respuestas, string MotivoPausa)
         {
             var sesion = await _context.ADIR_Sesion.FindAsync(SesionID);
-            if (sesion == null || sesion.Estado == "Completado")
-            {
-                TempData["Error"] = "La sesión ya está finalizada y no puede ser modificada.";
-                return RedirectToAction("Evaluar", new { sesionId = SesionID });
-            }
+            if (sesion == null) return NotFound();
 
             foreach (var entrada in Respuestas)
             {
@@ -223,14 +189,15 @@ namespace Sistema_Tea.Controllers
                 }
             }
 
-            sesion.Estado = "EnProgreso";
+            sesion.Estado = "Pausado";
+            sesion.MotivoPausaCancelacion = MotivoPausa;
             await _context.SaveChangesAsync();
 
-            TempData["Mensaje"] = "Evaluación ADI-R guardada con éxito.";
-            return RedirectToAction("Evaluar", new { sesionId = SesionID });
+            TempData["Mensaje"] = "Sesión pausada correctamente.";
+            return RedirectToAction("Index");
         }
 
-        [HttpPost]
+
         [HttpPost]
         public async Task<IActionResult> CalcularResultado(int SesionID, string TipoAlgoritmoUsado)
         {
@@ -318,6 +285,59 @@ namespace Sistema_Tea.Controllers
 
             return View("ResultadoADI", resultado);
         }
+
+
+        [HttpPost]
+        public async Task<IActionResult> CancelarSesion(int SesionID, string MotivoCancelacion)
+        {
+            var sesion = await _context.ADIR_Sesion.FindAsync(SesionID);
+            if (sesion == null)
+                return NotFound();
+
+            if (string.IsNullOrWhiteSpace(MotivoCancelacion))
+            {
+                TempData["Error"] = "Debe especificar el motivo de la cancelación.";
+                return RedirectToAction("Evaluar", new { sesionId = SesionID });
+            }
+
+            sesion.Estado = "Cancelado";
+            sesion.MotivoPausaCancelacion = MotivoCancelacion;
+            sesion.FechaFin = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+
+            TempData["Mensaje"] = "Sesión cancelada correctamente.";
+            return RedirectToAction("Index");
+        }
+
+
+        public IActionResult ReanudarSesion(int sesionId)
+        {
+            var sesion = _context.ADIR_Sesion
+                                 .Include(s => s.Paciente)
+                                 .FirstOrDefault(s => s.SesionID == sesionId);
+
+            if (sesion == null)
+            {
+                TempData["ErrorMessage"] = "Sesión no encontrada.";
+                return RedirectToAction("Index");
+            }
+
+            var preguntas = _context.ADIR_Pregunta
+                                    .OrderBy(p => p.CodigoPregunta)
+                                    .ToList();
+
+            var respuestas = _context.ADIR_ItemRespondido
+                                    .Where(r => r.SesionID == sesionId)
+                                    .ToDictionary(r => r.PreguntaDefinicionID);
+
+            ViewBag.SesionID = sesionId;
+            ViewBag.Respuestas = respuestas;
+            ViewBag.SoloLectura = false;
+
+            return View("Evaluar", preguntas);
+        }
+
 
 
 
