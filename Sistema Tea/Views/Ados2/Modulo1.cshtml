@@ -4,68 +4,258 @@
     ViewData["Title"] = "Inicio de Test ADOS-2 Modulo 1";
 }
 
-<div class="container mt-5">
-    <div class="card shadow-lg p-4 rounded">
-        <h2 class="text-center mb-4 text-primary">Test ADOS-2</h2>
+<style>
+    /* 1. Fondo y Contenedor Principal */
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+    }
 
-        <div class="mb-3">
-            <h4><strong>Paciente:</strong> @Model.Paciente.Nombre @Model.Paciente.Apellidos</h4>
-            <h5><strong>Examinado por:</strong> @Model.Psicologo.NombreCompleto</h5>
-            <h5><strong>Módulo:</strong> @Model.Modulo</h5>
-        </div>
+    .main-container {
+        perspective: 1000px;
+    }
 
-        <div class="card border-0 bg-light shadow-sm p-4 mb-4">
-            <div class="d-flex align-items-start">
-                <i class="bi bi-info-circle-fill text-primary fs-2 me-3"></i>
-                <div>
-                    <h5 class="text-primary">Descripción del Módulo</h5>
-                    <p class="mb-0">
-                        Este módulo se aplica a niños que ya superan los 30 meses de edad, pero aún no usan frases de forma fluida. Utiliza juguetes llamativos y situaciones
-                        estructuradas para fomentar la interacción. Se adapta también para adolescentes o adultos con lenguaje muy limitado.<hr>
+    /* 2. Tarjeta Principal con Efecto Cristal (Glassmorphism) */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(15px) saturate(180%);
+        -webkit-backdrop-filter: blur(15px) saturate(180%);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        transform-style: preserve-3d;
+    }
 
-                        Actividades:
-                        Incluye entre 10 y 14 actividades estructuradas, como juego con juguetes, burbujas, juego funcional, imitación, construcción, reacción al nombre y 
-                        seguimiento de instrucciones.<hr>
+        .glass-card:hover {
+            transform: rotateY(5deg) rotateX(5deg) scale(1.02);
+            box-shadow: 0 15px 45px 0 rgba(31, 38, 135, 0.25);
+        }
 
-                        Objetivo:
-                        Evaluar el uso del lenguaje no verbal, la reciprocidad social, el juego funcional o simbólico, y la presencia de conductas repetitivas o restringidas.
-                    </p>
+    /* 3. Encabezado de la Tarjeta */
+    .card-header-modern {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+        .card-header-modern .patient-info h2 {
+            font-weight: 700;
+            color: #1c2a4d;
+        }
+
+        .card-header-modern .patient-info p {
+            color: #5a6789;
+            margin-bottom: 0;
+        }
+
+    /* 4. "Píldora" del Módulo con gradiente */
+    .module-badge {
+        background: linear-gradient(45deg, #0d6efd, #0d9efd);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+    }
+
+    /* 5. Cuerpo de la Tarjeta y Sección de Descripción */
+    .card-body-modern {
+        padding: 2.5rem;
+    }
+
+    .description-box {
+        display: flex;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
+
+    .icon-wrapper {
+        flex-shrink: 0;
+        width: 60px;
+        height: 60px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, rgba(13, 110, 253, 0.1), rgba(13, 158, 253, 0.1));
+        border-radius: 15px;
+        color: #0d6efd;
+    }
+
+        .icon-wrapper .bi {
+            font-size: 2rem;
+        }
+
+    .description-content h4 {
+        font-weight: 600;
+        color: #1c2a4d;
+        margin-bottom: 1rem;
+    }
+
+    .description-content .text-muted {
+        color: #5a6789 !important;
+        line-height: 1.6;
+    }
+
+    /* 6. Lista de Actividades y Objetivos */
+    .info-list {
+        list-style: none;
+        padding: 0;
+        margin-top: 1.5rem;
+        border-left: 3px solid #0d6efd;
+        padding-left: 1.5rem;
+    }
+
+        .info-list li {
+            margin-bottom: 1rem;
+        }
+
+            .info-list li strong {
+                display: block;
+                color: #344061;
+                margin-bottom: 0.25rem;
+            }
+
+    /* 7. Botones de Acción */
+    .card-footer-modern {
+        padding: 2rem;
+        background-color: transparent;
+        border-top: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .btn-back {
+        color: #5a6789;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s ease;
+    }
+
+        .btn-back:hover {
+            color: #0d6efd;
+        }
+
+    .btn-start-test {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        border: none;
+        border-radius: 50px;
+        padding: 0.8rem 2.5rem;
+        font-weight: 700;
+        color: white;
+        box-shadow: 0 4px 20px rgba(40, 167, 69, 0.35);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .btn-start-test:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 25px rgba(40, 167, 69, 0.45);
+        }
+
+    /* 8. Estilo del Modal */
+    .modal-content {
+        border-radius: 20px;
+        border: none;
+        background: #ffffff;
+    }
+
+    .modal-header {
+        background: linear-gradient(45deg, #0d6efd, #0d9efd);
+        color: white;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        border-bottom: none;
+    }
+
+        .modal-header .modal-title {
+            font-weight: 600;
+        }
+
+    .modal-body {
+        color: #344061;
+    }
+
+    .modal-footer {
+        border-top: none;
+    }
+</style>
+
+<div class="container my-5 main-container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <div class="glass-card">
+
+                <div class="card-header-modern">
+                    <div class="patient-info">
+                        <h2 class="mb-0">@Model.Paciente.Nombre @Model.Paciente.Apellidos</h2>
+                        <p class="fs-6">Examinado por: @Model.Psicologo.NombreCompleto</p>
+                    </div>
+                    <div class="module-badge">
+                        Módulo @Model.Modulo
+                    </div>
+                </div>
+
+                <div class="card-body-modern">
+                    <div class="description-box">
+                        <div class="icon-wrapper">
+                            <i class="bi bi-bricks"></i>
+                        </div>
+                        <div class="description-content">
+                            <h4>Detalles del Módulo 1</h4>
+                            <p class="text-muted">
+                                Este módulo se aplica a niños que ya superan los 30 meses de edad, pero aún no usan frases de forma fluida. Utiliza juguetes llamativos y situaciones estructuradas para fomentar la interacción.
+                            </p>
+
+                            <ul class="info-list">
+                                <li>
+                                    <strong>Actividades Principales</strong>
+                                    <span class="text-muted">Incluye entre 10 y 14 actividades como juego con burbujas, imitación, construcción con bloques, reacción al nombre y seguimiento de instrucciones.</span>
+                                </li>
+                                <li>
+                                    <strong>Objetivo de Evaluación</strong>
+                                    <span class="text-muted">Evaluar el uso del lenguaje no verbal, la reciprocidad social, el juego funcional o simbólico, y la presencia de conductas repetitivas o restringidas.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer-modern">
+                    <a asp-action="Index" class="btn-back">
+                        <i class="bi bi-arrow-left-circle me-2"></i>Regresar
+                    </a>
+                    <button type="button" class="btn btn-start-test" data-bs-toggle="modal" data-bs-target="#confirmarModal">
+                        <i class="bi bi-play-circle-fill me-2"></i>Comenzar Evaluación
+                    </button>
                 </div>
             </div>
-        </div>
-
-        <div class="d-flex justify-content-between mt-4">
-            <a asp-action="Index" class="btn btn-secondary">
-                <i class="bi bi-arrow-left-circle"></i> Volver Atrás
-            </a>
-
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmarModal">
-                <i class="bi bi-play-circle"></i> Iniciar Test
-            </button>
         </div>
     </div>
 </div>
 
 <div class="modal fade" id="confirmarModal" tabindex="-1" aria-labelledby="confirmarModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content rounded-3 shadow-lg">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="confirmarModalLabel"><i class="bi bi-exclamation-circle-fill me-2"></i>Confirmar Inicio del Test</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmarModalLabel"><i class="bi bi-shield-check me-2"></i>Confirmar Inicio de Sesión</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-            <div class="modal-body">
-                ¿Estás seguro de que deseas iniciar el test? Una vez iniciado, no se podrá retroceder ni modificar el módulo.
+            <div class="modal-body p-4">
+                <p class="fs-5">¿Estás seguro de que deseas iniciar el test?</p>
+                <p class="text-muted">Una vez iniciado, no se podrá retroceder ni modificar el módulo. La sesión comenzará a registrarse.</p>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <div class="modal-footer p-3">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <form asp-action="ConfirmarSesion" method="get">
                     <input type="hidden" name="SesionID" value="@Model.SesionID" />
                     <button type="submit" class="btn btn-success">
-                        <i class="bi bi-check-circle"></i> Sí, Iniciar
+                        <i class="bi bi-check-circle-fill me-2"></i>Sí, Iniciar Ahora
                     </button>
                 </form>
             </div>
         </div>
     </div>
 </div>
-
