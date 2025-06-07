@@ -32,14 +32,16 @@
         padding-bottom: 0.75rem;
         margin-bottom: 1.5rem;
     }
+
     .task-info-body p {
         color: #5a6789;
         line-height: 1.6;
     }
-    .task-info-body p strong {
-        color: #344061;
-        font-weight: 600;
-    }
+
+        .task-info-body p strong {
+            color: #344061;
+            font-weight: 600;
+        }
 
     /* 4. Estilos para el formulario */
     .form-group {
@@ -60,11 +62,12 @@
         padding: 0.75rem 1rem;
         transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
-    .form-control:focus {
-        border-color: #86b7fe;
-        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-        background-color: white;
-    }
+
+        .form-control:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            background-color: white;
+        }
 
     /* 5. Grupo de botones con Flexbox para mejor alineación */
     .button-group {
@@ -74,43 +77,61 @@
         align-items: center;
         margin-top: 2rem;
     }
-    
-    /* Estilo individual de botones */
-    .button-group .btn {
-        border-radius: 50px; /* Píldoras */
-        font-weight: 600;
-        padding: 0.6rem 1.5rem;
-        border: none;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .button-group .btn:hover {
-        transform: translateY(-2px);
-    }
-    .button-group .btn-primary {
-        background: linear-gradient(45deg, #0d6efd, #0d9efd);
-        color: white;
-        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
-    }
-    .button-group .btn-secondary {
-        background-color: #6c757d;
-        color: white;
-        box-shadow: 0 4px 15px rgba(0,0,0, 0.1);
-    }
-    .button-group .btn-warning {
-        background: linear-gradient(45deg, #ffc107, #ff9800);
-        color: white;
-        box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
-    }
+
+        /* Estilo individual de botones */
+        .button-group .btn {
+            border-radius: 50px; /* Píldoras */
+            font-weight: 600;
+            padding: 0.6rem 1.5rem;
+            border: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+            .button-group .btn:hover {
+                transform: translateY(-2px);
+            }
+
+        .button-group .btn-primary {
+            background: linear-gradient(45deg, #0d6efd, #0d9efd);
+            color: white;
+            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+        }
+
+        .button-group .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0, 0.1);
+        }
+
+        .button-group .btn-warning {
+            background: linear-gradient(45deg, #ffc107, #ff9800);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
+        }
 
     /* 6. Modal estilizado */
-    .modal-content { border-radius: 20px; border: none; }
-    .modal-header { background: linear-gradient(45deg, #ffc107, #ff9800); color: white; border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom: none; }
-    .modal-footer .btn-warning { background: #ffc107; border-color: #ffc107; }
+    .modal-content {
+        border-radius: 20px;
+        border: none;
+    }
+
+    .modal-header {
+        background: linear-gradient(45deg, #ffc107, #ff9800);
+        color: white;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        border-bottom: none;
+    }
+
+    .modal-footer .btn-warning {
+        background: #ffc107;
+        border-color: #ffc107;
+    }
 
 </style>
 
 <div class="glass-container">
-    
+
     <div class="task-info-header">
         <h2>@Model.NombreTarea</h2>
     </div>
@@ -146,7 +167,7 @@
             <textarea id="notasObservacionItem" name="notasObservacionItem" class="form-control" rows="4"
                       placeholder="Describa comportamientos específicos observados..."></textarea>
         </div>
-        
+
         <div class="button-group">
             <button type="submit" class="btn btn-primary">Guardar</button>
 

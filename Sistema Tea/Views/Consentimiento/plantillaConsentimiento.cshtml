@@ -329,11 +329,11 @@
 
         @if (TempData["Success"] != null)
         {
-                <text>Swal.fire('Éxito', '@Html.Raw(TempData["Success"])', 'success');</text>
+                    <text>Swal.fire('Éxito', '@Html.Raw(TempData["Success"])', 'success');</text>
         }
         @if (TempData["Error"] != null)
         {
-                <text>Swal.fire('Error', '@Html.Raw(TempData["Error"])', 'error');</text>
+                    <text>Swal.fire('Error', '@Html.Raw(TempData["Error"])', 'error');</text>
         }
     </script>
 }
