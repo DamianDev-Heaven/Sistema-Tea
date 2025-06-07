@@ -198,93 +198,69 @@ namespace Sistema_Tea.Controllers
         }
 
 
-        [HttpPost]
-        public async Task<IActionResult> CalcularResultado(int SesionID, string TipoAlgoritmoUsado)
+        // GET: Adir/VerResultadoGlobal/5
+        public async Task<IActionResult> VerResultadoGlobal(int sesionId)
         {
-            var sesion = await _context.ADIR_Sesion.FindAsync(SesionID);
-            if (sesion == null)
+            var datos = await (from rg in _context.ADIR_Resultado
+                               join s in _context.ADIR_Sesion on rg.SesionID equals s.SesionID
+                               join p in _context.Paciente on s.PacienteID equals p.PacienteID
+                               join u in _context.Usuario on s.PsicologoID equals u.UsuarioID
+                               where s.SesionID == sesionId
+                               select new
+                               {
+                                   s.SesionID,
+                                   PacienteNombre = p.Nombre + " " + p.Apellidos,
+                                   p.FechaNacimiento,
+                                   s.FechaInicio,
+                                   PsicologoNombre = u.NombreCompleto,
+                                   rg.TipoAlgoritmoUsado,
+                                   rg.ComunicacionSocial_PuntuacionTotal,
+                                   rg.InteraccionSocialReciproca_PuntuacionTotal,
+                                   rg.ComportamientosRepetitivos_PuntuacionTotal,
+                                   rg.ClasificacionADIR,
+                                   rg.NotasResultadoGlobal
+                               }).FirstOrDefaultAsync();
+
+            if (datos == null)
                 return NotFound();
 
-            var respuestas = await (from r in _context.ADIR_ItemRespondido
-                                    join p in _context.ADIR_Pregunta
-                                      on r.PreguntaDefinicionID equals p.PreguntaDefinicionID
-                                    where r.SesionID == SesionID && p.EsParteDelAlgoritmoDiagnostico
-                                    select new { Respuesta = r, Pregunta = p })
-                                   .ToListAsync();
+            int edadMeses = ((datos.FechaInicio.Year - datos.FechaNacimiento.Year) * 12) + (datos.FechaInicio.Month - datos.FechaNacimiento.Month);
+            string edadTexto = $"{edadMeses / 12} años y {edadMeses % 12} meses";
 
-            var filtradas = respuestas.Where(r =>
-                (TipoAlgoritmoUsado == "DSM-IV" && r.Pregunta.AlgoritmoTemporalidad == "Alguna Vez") ||
-                (TipoAlgoritmoUsado == "DSM-5" && r.Pregunta.AlgoritmoTemporalidad == "Actual") ||
-                (TipoAlgoritmoUsado == "Toddler" && r.Pregunta.AlgoritmoTemporalidad == "4-5 años")
-            );
+            var historial = await (from r in _context.ADIR_ItemRespondido
+                                   join p in _context.ADIR_Pregunta on r.PreguntaDefinicionID equals p.PreguntaDefinicionID
+                                   where r.SesionID == sesionId
+                                   orderby p.CodigoPregunta
+                                   select new
+                                   {
+                                       p.CodigoPregunta,
+                                       p.TextoPregunta,
+                                       r.CodigoRespuestaAlgoritmo,
+                                       r.NotasObservacionItem
+                                   }).ToListAsync();
 
-            var comunicacion = filtradas.Where(r =>
-                r.Pregunta.DominioPrincipal.Contains("Lenguaje") ||
-                (r.Pregunta.SubDominio != null && r.Pregunta.SubDominio.Contains("Comunicación"))
-            ).Sum(r => r.Respuesta.CodigoRespuestaAlgoritmo);
+            ViewBag.Datos = datos;
+            ViewBag.EdadTexto = edadTexto;
+            ViewBag.Historial = historial;
 
-            var social = filtradas.Where(r => r.Pregunta.DominioPrincipal.Contains("Interacción"))
-                                 .Sum(r => r.Respuesta.CodigoRespuestaAlgoritmo);
+            return View("Resultado");
+        }
 
-            var repetitivos = filtradas.Where(r => r.Pregunta.DominioPrincipal.Contains("Repetitivas"))
-                                      .Sum(r => r.Respuesta.CodigoRespuestaAlgoritmo);
 
-            string clasificacion = "Sin Clasificación";
-            if (TipoAlgoritmoUsado == "DSM-IV")
-            {
-                if (comunicacion >= 8 && social >= 10 && repetitivos >= 3)
-                    clasificacion = "Cumple criterios para Autismo (DSM-IV)";
-                else
-                    clasificacion = "No cumple criterios DSM-IV";
-            }
-            else if (TipoAlgoritmoUsado == "DSM-5")
-            {
-                if (social + comunicacion >= 12 && repetitivos >= 2)
-                    clasificacion = "Cumple criterios para TEA (DSM-5)";
-                else
-                    clasificacion = "No cumple criterios DSM-5";
-            }
-            else if (TipoAlgoritmoUsado == "Toddler")
-            {
-                if (social >= 9 && repetitivos >= 2)
-                    clasificacion = "Probable TEA (menores de 4 años)";
-                else
-                    clasificacion = "No concluyente (Toddler)";
-            }
-
-            var resultado = await _context.ADIR_Resultado
-                .FirstOrDefaultAsync(r => r.SesionID == SesionID);
-
+        [HttpPost]
+        public async Task<IActionResult> GuardarNotaDiagnostica(int SesionID, string NotaDiagnostica)
+        {
+            var resultado = await _context.ADIR_Resultado.FirstOrDefaultAsync(r => r.SesionID == SesionID);
             if (resultado == null)
-            {
-                resultado = new ADIR_ResultadoGlobalSesion
-                {
-                    SesionID = SesionID,
-                    TipoAlgoritmoUsado = TipoAlgoritmoUsado,
-                    ComunicacionSocial_PuntuacionTotal = comunicacion,
-                    InteraccionSocialReciproca_PuntuacionTotal = social,
-                    ComportamientosRepetitivos_PuntuacionTotal = repetitivos,
-                    ClasificacionADIR = clasificacion,
-                    FechaCalculo = DateTime.Now,
-                    NotasResultadoGlobal = $"Evaluado por algoritmo {TipoAlgoritmoUsado}."
-                };
-                _context.ADIR_Resultado.Add(resultado);
-            }
-            else
-            {
-                resultado.TipoAlgoritmoUsado = TipoAlgoritmoUsado;
-                resultado.ComunicacionSocial_PuntuacionTotal = comunicacion;
-                resultado.InteraccionSocialReciproca_PuntuacionTotal = social;
-                resultado.ComportamientosRepetitivos_PuntuacionTotal = repetitivos;
-                resultado.ClasificacionADIR = clasificacion;
-                resultado.FechaCalculo = DateTime.Now;
-                resultado.NotasResultadoGlobal = $"Evaluado por algoritmo {TipoAlgoritmoUsado}.";
-            }
+                return NotFound();
 
+            resultado.NotasResultadoGlobal = NotaDiagnostica;
             await _context.SaveChangesAsync();
 
-            return View("ResultadoADI", resultado);
+            TempData["SuccessMessage"] = "Nota guardada.";
+            return RedirectToAction(nameof(VerResultadoGlobal), new { sesionId = SesionID });
         }
+
 
 
         [HttpPost]
