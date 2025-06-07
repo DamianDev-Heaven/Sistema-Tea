@@ -17,6 +17,8 @@
     <link rel="stylesheet" href="~/Sistema_Tea.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    @RenderSection("Styles", required: false)
+
 </head>
 <body>
     <header>
@@ -77,9 +79,7 @@
                     <a asp-controller="Paciente" asp-action="MisPacientes" class="list-group-item list-group-item-action">
                         <i class="bi bi-person-lines-fill"></i> Mis Pacientes
                     </a>
-                    <a asp-controller="Sesion" asp-action="Index" class="list-group-item list-group-item-action">
-                        <i class="bi bi-calendar-check-fill"></i> Sesiones
-                    </a>
+                    
                    
                     <a asp-controller="Paciente" asp-action="Test" class="list-group-item list-group-item-action">
                         <i class="bi bi-spellcheck"></i> Test

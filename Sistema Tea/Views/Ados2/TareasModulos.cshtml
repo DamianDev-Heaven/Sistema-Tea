@@ -1,68 +1,191 @@
 ﻿@model Sistema_Tea.Models.ADOS2_TareaDefinicion
 
-<h2>@Model.NombreTarea</h2>
-<p><strong>Descripción:</strong> @Model.Descripcion</p>
-<p><strong>Instrucciones:</strong> @Model.InstruccionesAdministracion</p>
+@{
+    ViewData["Title"] = $"Tarea: {Model.NombreTarea}";
+}
 
-<form asp-action="GuardarYContinuar" method="post">
-    <input type="hidden" name="sesionId" value="@ViewBag.SesionId" />
-    <input type="hidden" name="tareaDefinicionId" value="@Model.TareaDefinicionID" />
-    <input type="hidden" name="tareaIndex" value="@ViewBag.TareaIndex" />
+<style>
+    /* 1. Fondo y fuente base */
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+    }
 
-    <div class="form-group">
-        <label for="codigoObservado">Puntuación:</label>
-        <select id="codigoObservado" name="codigoObservado" class="form-control" required>
-            <option value="">--Seleccione--</option>
-            <option value="0">0 - Sin evidencia anormal</option>
-            <option value="1">1 - Comportamiento ligeramente anormal</option>
-            <option value="2">2 - Comportamiento moderadamente anormal</option>
-            <option value="3">3 - Comportamiento severamente anormal</option>
-            <option value="7">7 - No aplicable</option>
-            <option value="8">8 - No puntuable</option>
-            <option value="9">9 - No observado</option>
-        </select>
+    /* 2. Contenedor principal con efecto cristal */
+    .glass-container {
+        max-width: 800px; /* Ancho máximo para mejor legibilidad */
+        margin: 4rem auto; /* Centrado vertical y horizontal */
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px) saturate(150%);
+        -webkit-backdrop-filter: blur(10px) saturate(150%);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        padding: 2.5rem 3rem;
+    }
+
+    /* 3. Estilos para la información de la tarea */
+    .task-info-header h2 {
+        font-weight: 700;
+        color: #1c2a4d;
+        border-bottom: 2px solid rgba(13, 110, 253, 0.5);
+        padding-bottom: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+    .task-info-body p {
+        color: #5a6789;
+        line-height: 1.6;
+    }
+    .task-info-body p strong {
+        color: #344061;
+        font-weight: 600;
+    }
+
+    /* 4. Estilos para el formulario */
+    .form-group {
+        margin-bottom: 1.75rem; /* Más espacio entre campos */
+    }
+
+    label {
+        font-weight: 600;
+        color: #344061;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        border: 1px solid #ced4da;
+        background-color: rgba(255,255,255,0.5);
+        padding: 0.75rem 1rem;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .form-control:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        background-color: white;
+    }
+
+    /* 5. Grupo de botones con Flexbox para mejor alineación */
+    .button-group {
+        display: flex;
+        flex-wrap: wrap; /* Para que se ajuste en pantallas pequeñas */
+        gap: 0.75rem; /* Espacio entre botones */
+        align-items: center;
+        margin-top: 2rem;
+    }
+    
+    /* Estilo individual de botones */
+    .button-group .btn {
+        border-radius: 50px; /* Píldoras */
+        font-weight: 600;
+        padding: 0.6rem 1.5rem;
+        border: none;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .button-group .btn:hover {
+        transform: translateY(-2px);
+    }
+    .button-group .btn-primary {
+        background: linear-gradient(45deg, #0d6efd, #0d9efd);
+        color: white;
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+    }
+    .button-group .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+        box-shadow: 0 4px 15px rgba(0,0,0, 0.1);
+    }
+    .button-group .btn-warning {
+        background: linear-gradient(45deg, #ffc107, #ff9800);
+        color: white;
+        box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
+    }
+
+    /* 6. Modal estilizado */
+    .modal-content { border-radius: 20px; border: none; }
+    .modal-header { background: linear-gradient(45deg, #ffc107, #ff9800); color: white; border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom: none; }
+    .modal-footer .btn-warning { background: #ffc107; border-color: #ffc107; }
+
+</style>
+
+<div class="glass-container">
+    
+    <div class="task-info-header">
+        <h2>@Model.NombreTarea</h2>
     </div>
 
-    <div class="form-group">
-        <label for="notasObservacionItem">Notas de observación (opcional):</label>
-        <textarea id="notasObservacionItem" name="notasObservacionItem" class="form-control" rows="4"
-                  placeholder="Describa comportamientos específicos observados..."></textarea>
+    <div class="task-info-body">
+        <p><strong>Descripción:</strong> @Model.Descripcion</p>
+        <p><strong>Instrucciones:</strong> @Model.InstruccionesAdministracion</p>
     </div>
 
-    <div class="form-group">
-        <button type="submit" class="btn btn-primary">Guardar</button>
+    <hr class="my-4">
 
-        @if (ViewBag.TareaIndex > 0)
-        {
-            <a href="@Url.Action("TareasModulo", new { sesionId = ViewBag.SesionId, tareaIndex = ViewBag.TareaIndex - 1 })"
-               class="btn btn-secondary">Tarea Anterior</a>
-        }
+    <form asp-action="GuardarYContinuar" method="post">
+        <input type="hidden" name="sesionId" value="@ViewBag.SesionId" />
+        <input type="hidden" name="tareaDefinicionId" value="@Model.TareaDefinicionID" />
+        <input type="hidden" name="tareaIndex" value="@ViewBag.TareaIndex" />
 
-        @if (ViewBag.TareaIndex + 1 < ViewBag.TotalTareas)
-        {
-            <a href="@Url.Action("TareasModulo", new { sesionId = ViewBag.SesionId, tareaIndex = ViewBag.TareaIndex + 1 })"
-               class="btn btn-secondary">Siguiente</a>
-        }
+        <div class="form-group">
+            <label for="codigoObservado">Puntuación:</label>
+            <select id="codigoObservado" name="codigoObservado" class="form-control form-select" required>
+                <option value="">-- Seleccione --</option>
+                <option value="0">0 - Sin evidencia anormal</option>
+                <option value="1">1 - Comportamiento ligeramente anormal</option>
+                <option value="2">2 - Comportamiento moderadamente anormal</option>
+                <option value="3">3 - Comportamiento severamente anormal</option>
+                <option value="7">7 - No aplicable</option>
+                <option value="8">8 - No puntuable</option>
+                <option value="9">9 - No observado</option>
+            </select>
+        </div>
 
-        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalPausar">
-            Pausar
-        </button>
-    </div>
-</form>
+        <div class="form-group">
+            <label for="notasObservacionItem">Notas de observación (opcional):</label>
+            <textarea id="notasObservacionItem" name="notasObservacionItem" class="form-control" rows="4"
+                      placeholder="Describa comportamientos específicos observados..."></textarea>
+        </div>
+        
+        <div class="button-group">
+            <button type="submit" class="btn btn-primary">Guardar</button>
+
+            @if (ViewBag.TareaIndex > 0)
+            {
+                <a href="@Url.Action("TareasModulo", new { sesionId = ViewBag.SesionId, tareaIndex = ViewBag.TareaIndex - 1 })"
+                   class="btn btn-secondary">Tarea Anterior</a>
+            }
+
+            @if (ViewBag.TareaIndex + 1 < ViewBag.TotalTareas)
+            {
+                <a href="@Url.Action("TareasModulo", new { sesionId = ViewBag.SesionId, tareaIndex = ViewBag.TareaIndex + 1 })"
+                   class="btn btn-secondary">Siguiente</a>
+            }
+
+            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalPausar">
+                Pausar
+            </button>
+        </div>
+    </form>
+</div>
 
 <div class="modal fade" id="modalPausar" tabindex="-1" aria-labelledby="modalPausarLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalPausarLabel">Confirmar pausa</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <h5 class="modal-title" id="modalPausarLabel"><i class="bi bi-exclamation-triangle-fill me-2"></i>Confirmar Pausa</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-4">
                 ¿Está seguro que desea pausar la sesión? Podrá reanudarla más tarde.
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <a href="@Url.Action("PausarSesion", "Ados2", new { id = ViewBag.SesionId })" class="btn btn-warning">Sí, pausar</a>
+                <form asp-action="PausarSesion" method="post">
+                    <input type="hidden" name="id" value="@ViewBag.SesionId" />
+                    <input type="hidden" name="nota" value="Pausado por el usuario" />
+                    <button type="submit" class="btn btn-warning">Sí, pausar</button>
+                </form>
             </div>
         </div>
     </div>
